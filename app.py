@@ -1,15 +1,10 @@
 # app/app.py
 import streamlit as st
 import pandas as pd
-import geopandas as gpd
 
 from app.config import PANEL_BG, PANEL_H
 from app.ui_styles import inject_dashboard_style
 from app.maps import build_japan_map_fig
-
-
-# Load prefectures
-gdf = gpd.read_file("data/japan_prefectures.geojson")
 
 
 # ---------- 1. Page config & dark theme ----------

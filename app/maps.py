@@ -25,7 +25,7 @@ def build_japan_map_fig(year=2015):
     df = con.execute(f"""
         SELECT area_estat, population
         FROM v_census
-        WHERE year = {year} AND sex = 'total' AND level = 2
+        WHERE year = {year} AND sex = 'total' AND age_group = 'Total' AND area_level = 2
     """).df()
     con.close()
 

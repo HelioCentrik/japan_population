@@ -5,7 +5,7 @@ PAGE_BG = str("#091023")
 PANEL_BG = str("rgba(0, 0, 0, 0)")
 PANEL_BORDER = str("#334466")
 
-SENSOR_FILL = str("#f00f3c")
+ACCENT = str("#f00f3c")
 
 PANEL_H = 720
 LEGEND_H = PANEL_H * 1.03
