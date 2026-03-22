@@ -1,31 +1,57 @@
-# app/app.py
-import streamlit as st
-import pandas as pd
+# app.py — Dash entrypoint
+import dash
+from dash import html, dcc
+import duckdb as ddb
 
-from app.config import PANEL_BG, PANEL_H
-from app.ui_styles import inject_dashboard_style
+from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, PANEL_H
 from app.maps import build_japan_map_fig
 
 
-# ---------- 1. Page config & dark theme ----------
-st.set_page_config(
-    page_title="Japanese Population Dashboard",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+
+# ── App instance ──────────────────────────────────────────────────────────────
+app = dash.Dash(__name__, title="Japanese Population Dashboard")
+server = app.server  # expose for deployment (Gunicorn etc.)
+
+# ── Census years for slider ───────────────────────────────────────────────────
+con = ddb.connect("data/japan_population.duckdb")
+years_df = con.execute(
+    "SELECT DISTINCT year, era_name, era_year FROM d_years ORDER BY year"
+).df()
+con.close()
+
+CENSUS_YEARS = years_df["year"].tolist()
+YEAR_LABELS = {
+    int(row.year): f"{row.year} ({row.era_name}{row.era_year})"
+    for row in years_df.itertuples()
+}
+
+# ── Layout ────────────────────────────────────────────────────────────────────
+app.layout = html.Div(
+    style={"backgroundColor": PAGE_BG, "minHeight": "100vh", "padding": "1.5rem"},
+    children=[
+
+        # Header
+        html.H2(
+            "Japanese Population 日本の人口統計",
+            style={"textAlign": "center", "color": "#aad", "marginBottom": "1rem"}
+        ),
+
+        # Map (placeholder for pyramid col later)
+        html.Div(
+            style={"display": "flex", "gap": "1rem"},
+            children=[
+                dcc.Graph(
+                    id="choropleth-map",
+                    figure=build_japan_map_fig(year=2015),
+                    config={"displayModeBar": False},
+                    style={"flex": "3"}
+                ),
+            ]
+        ),
+
+    ]
 )
 
-inject_dashboard_style()
-
-st.markdown("<h2 style='text-align:center; color:#aad;'>Japanese Population</h2>", unsafe_allow_html=True)
-st.write("")
-
-with st.container():
-    _, center, _ = st.columns([1, 6, 1])
-    with center:
-        japan_map = build_japan_map_fig(year=2015)
-        japan_map.update_layout(height=PANEL_H, paper_bgcolor=PANEL_BG)
-        st.plotly_chart(
-            japan_map,
-            use_container_width=True,
-            config=dict(displayModeBar=False)
-        )
+# ── Run ───────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    app.run(debug=True)
