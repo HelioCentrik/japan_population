@@ -5,8 +5,22 @@ PAGE_BG = str("#091023")
 PANEL_BG = str("rgba(0, 0, 0, 0)")
 PANEL_BORDER = str("#334466")
 
-ACCENT = str("#f00f3c")
-
 PANEL_H = 720
 LEGEND_H = PANEL_H * 1.03
 TIME_H = 180
+
+# Cohort & annotation accent colors
+ACCENT               = str("#f00f3c")
+ACCENT_DANKAI        = str("#f5a623")   # Dankai generation highlight (primary)
+ACCENT_DANKAI_JR     = str("#7ed321")   # Dankai Junior highlight (secondary)
+ACCENT_WWII_SCAR     = str("#d0021b")   # Sex ratio flag (WWII male deficit)
+ACCENT_HINOEUMA      = str("#9b9b9b")   # Hinoeuma notch (subtle)
+ACCENT_THRESHOLD     = str("#50e3c2")   # Aging index = 100 reference line
+
+COHORT_COLORS = {
+    "dankai":       ACCENT_DANKAI,
+    "dankai_jr":    ACCENT_DANKAI_JR,
+    "wwii_scar":    ACCENT_WWII_SCAR,
+    "hinoeuma":     ACCENT_HINOEUMA,
+    "threshold":    ACCENT_THRESHOLD,
+}
