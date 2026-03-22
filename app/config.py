@@ -10,7 +10,6 @@ LEGEND_H = PANEL_H * 1.03
 TIME_H = 180
 
 # Cohort & annotation accent colors
-ACCENT               = str("#f00f3c")
 ACCENT_DANKAI        = str("#f5a623")   # Dankai generation highlight (primary)
 ACCENT_DANKAI_JR     = str("#7ed321")   # Dankai Junior highlight (secondary)
 ACCENT_WWII_SCAR     = str("#d0021b")   # Sex ratio flag (WWII male deficit)
