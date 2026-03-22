@@ -6,34 +6,35 @@ import duckdb as ddb
 con = ddb.connect("../data/japan_population.duckdb")
 
 # ---- UPDATE RECORDS -----------------------------
-# view_census = con.execute("""
-#     CREATE OR REPLACE VIEW v_census AS
-#     SELECT cen.year,
-#         pref.prefecture_name_ja,
-#         pref.prefecture_name,
-#         pref.level AS area_level,
-#         pref.parent_estat,
-#         age.age_group,
-#         age.age_start,
-#         age.age_end,
-#         age.is_open_ended,
-#         age.source_scheme AS age_scheme,
-#         sex.sex,
-#         sex.sex_ja,
-#         cen.population
-#     FROM f_census cen
-#         INNER JOIN d_prefectures pref
-#             ON cen.area_estat = pref.area_estat
-#         INNER JOIN d_age_groups age
-#             ON cen.age_group_id = age.age_group_id
-#         INNER JOIN d_sex sex
-#             ON cen.sex_id = sex.sex_id
-# """).df()
-# print(f"\nCensus view columns:\n{view_census.columns}\n"
-#       f"{len(view_census.values)} records.")
-# for i, v in enumerate(view_census.values):
-#     if i < 20:
-#         print(v)
+view_census = con.execute("""
+    CREATE OR REPLACE VIEW v_census AS
+    SELECT cen.year,
+        pref.area_estat,
+        pref.prefecture_name_ja,
+        pref.prefecture_name,
+        pref.level AS area_level,
+        pref.parent_estat,
+        age.age_group,
+        age.age_start,
+        age.age_end,
+        age.is_open_ended,
+        age.source_scheme AS age_scheme,
+        sex.sex,
+        sex.sex_ja,
+        cen.population
+    FROM f_census cen
+        INNER JOIN d_prefectures pref
+            ON cen.area_estat = pref.area_estat
+        INNER JOIN d_age_groups age
+            ON cen.age_group_id = age.age_group_id
+        INNER JOIN d_sex sex
+            ON cen.sex_id = sex.sex_id
+""").df()
+print(f"\nCensus view columns:\n{view_census.columns}\n"
+      f"{len(view_census.values)} records.")
+for i, v in enumerate(view_census.values):
+    if i < 20:
+        print(v)
 
 # con.execute("""
 #       ALTER TABLE d_prefectures

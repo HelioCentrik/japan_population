@@ -1,7 +1,7 @@
 # app/ui_styles.py ────────────────────────────────────────────────────────────────────
 import streamlit as st
 
-from config import PAGE_BG, PANEL_BG, PANEL_H, PANEL_BORDER, LEGEND_H
+from app.config import PAGE_BG, PANEL_BG, PANEL_H, PANEL_BORDER, LEGEND_H
 
 
 
