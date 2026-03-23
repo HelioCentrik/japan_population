@@ -31,48 +31,69 @@ def build_japan_map_fig(year=2015):
     prefectures_js = json.loads(prefectures.to_json())
     prefectures["log_population"] = np.log1p(prefectures["population"])
 
-    fig = go.Figure(go.Choropleth(
+    fig = go.Figure(go.Choroplethmapbox(
         geojson=prefectures_js,
         locations=prefectures["area_estat"],
         z=prefectures["log_population"],
         featureidkey="properties.area_estat",
         colorscale="YlGnBu",
-        marker_line_width=0.5,
-        marker_line_color="black",
+        marker_line_width=0.8,
+        marker_line_color=MAP_GEO.get("line_color"),
         colorbar=dict(
             title=dict(
                 text="logₑ(Pop + 1)",
                 side="right",
-                font=dict(size=10, color="#aad")
+                font=dict(size=12, color="#aad")
             ),
-            x=0.01,
+            x=0.02,
             xanchor="left",
-            thickness=12,
-            len=0.65,
-            tickfont=dict(size=10, color="#aad"),
+            thickness=16,
+            len=0.8,
+            tickfont=dict(size=14, color="#aad"),
         )
     ))
 
-    fig.update_geos(
-        fitbounds="locations",
-        visible=True,
-        # showcountries=False,
-        showcoastlines=False,
-        # showland=False,
-        landcolor=MAP_GEO.get("land_color"),
-        # showocean=True,
-        # oceancolor=PAGE_BG,
-        # showlakes=False,
-        # showrivers=False,
-        showframe=False,
-        bgcolor=MAP_GEO.get("bg_color"),
-    )
     fig.update_layout(
-        margin=dict(l=80, r=0, t=0, b=0),
+        mapbox=dict(
+            style="carto-darkmatter",   # no token needed, dark ocean built in
+            center=dict(lat=35.5, lon=135.5),
+            zoom=4.2,                   # tune this — 4–5 is the right range for Japan
+        ),
+        margin=dict(l=4, r=5, t=4, b=4),
         autosize=True,
         paper_bgcolor=PANEL_BG,
         plot_bgcolor=PANEL_BG,
     )
+
+    # fig.update_geos(
+    #     visible=True,
+    #     # fitbounds="locations",
+    #     # lataxis_range=[24, 46],         # Okinawa → Hokkaido
+    #     # lonaxis_range=[122, 148],       # west Kyushu → east Hokkaido
+    #     projection_type="equirectangular",
+    #     center=dict(lat=35, lon=136),   # center of Japan mainland — tune lat to shift N/S, lon for E/W
+    #     projection_scale=7.5,           # tune this: higher = more zoomed in, lower = more zoomed out
+    #     bgcolor=MAP_GEO.get("bg_color"),
+    #     # showcountries=False,
+    #     showcoastlines=False,
+    #     # showland=False,
+    #     landcolor=MAP_GEO.get("land_color"),
+    #     # showocean=True,
+    #     # oceancolor=PAGE_BG,
+    #     showlakes=True,
+    #     lakecolor=MAP_GEO.get("bg_color"),
+    #     # showrivers=False,
+    #     showframe=False,
+    # )
+    # fig.update_layout(
+    #     margin=dict(l=6, r=7, t=6, b=6),
+    #     autosize=True,
+    #     paper_bgcolor=PANEL_BG,
+    #     plot_bgcolor=PANEL_BG,
+    #     geo=dict(
+    #         domain=dict(x=[0, 1], y=[0, 1])  # geo subplot fills the entire figure area
+    #     ),
+    # )
 
 
     return fig

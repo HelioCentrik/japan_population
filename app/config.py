@@ -24,6 +24,7 @@ COHORT_COLORS = {
 }
 
 MAP_GEO = {
-    "bg_color": "#101040",
-    "land_color": "#2a2c28"
+    "bg_color":   "#06091a",   # near-black ocean — the "floor"
+    "land_color": "#1c1f30",   # surrounding land (Korea/Russia) — mid-tier
+    "line_color": "#6089A0",   # prefecture borders — edge highlight, creates lift
 }

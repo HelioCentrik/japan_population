@@ -36,39 +36,10 @@ app.layout = html.Div(
         "margin": "0 auto",
     },
     children=[
-
         # Header
         html.H2(
             "Japanese Population 日本の人口統計",
             style={"textAlign": "center", "color": "#aad", "marginBottom": "1.5rem"}
-        ),
-
-        # Map + Pyramid columns
-        html.Div(
-            style={"display": "flex", "gap": "1rem"},
-            children=[
-                dcc.Graph(
-                    id="choropleth-map",
-                    figure=build_japan_map_fig(year=2015),
-                    config={"displayModeBar": False, "responsive": True},
-                    style={"flex": "4", "height": "68vh", "backgroundColor": PAGE_BG},
-                ),
-                # Pyramid placeholder — Phase 2
-                html.Div(
-                    style={
-                        "flex": "1",
-                        "border": f"1px solid {PANEL_BORDER}",
-                        "borderRadius": "6px",
-                        "display": "flex",
-                        "alignItems": "center",
-                        "justifyContent": "center",
-                        "color": "#445",
-                        "fontSize": "14px",
-                        "height": "68vh",
-                    },
-                    children="Population pyramid — Phase 2"
-                ),
-            ]
         ),
 
         # Year Slider
@@ -90,7 +61,7 @@ app.layout = html.Div(
                     min=min(CENSUS_YEARS),
                     max=max(CENSUS_YEARS),
                     step=None,
-                    value=2015,
+                    value=2000,
                     marks={
                         yr: {
                             "label": str(yr),
@@ -112,6 +83,53 @@ app.layout = html.Div(
             ]
         ),
 
+        # Map + Pyramid columns
+        html.Div(
+            style={"display": "flex", "gap": "1rem"},
+            children=[
+
+                # Map container — the styled bezel
+                html.Div(
+                    style={
+                        "flex": "3",
+                        "height": "68vh",
+                        "borderRadius": "8px",
+                        "border": "1px solid #1a2440",
+                        "boxShadow": (
+                            "inset 0 3px 14px rgba(0,0,0,0.65), "
+                            "inset 0 1px 4px rgba(0,0,0,0.4)"
+                        ),
+                        "overflow": "hidden",
+                        "backgroundColor": "#06091a",
+                    },
+                    children=[
+                        dcc.Graph(
+                            id="choropleth-map",
+                            figure=build_japan_map_fig(year=2000),
+                            config={"displayModeBar": False, "responsive": True},
+                            style={"height": "100%"},
+                        ),
+                    ]
+                ),
+
+                # Pyramid placeholder — Phase 2
+                html.Div(
+                    style={
+                        "flex": "1",
+                        "border": f"1px solid {PANEL_BORDER}",
+                        "borderRadius": "6px",
+                        "display": "flex",
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                        "color": "#445",
+                        "fontSize": "14px",
+                        "height": "68vh",
+                    },
+                    children="Population pyramid — Phase 2"
+                ),
+
+            ]
+        ),
     ]
 )
 
