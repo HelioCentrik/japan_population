@@ -28,7 +28,13 @@ YEAR_LABELS = {
 
 # ── Layout ────────────────────────────────────────────────────────────────────
 app.layout = html.Div(
-    style={"backgroundColor": PAGE_BG, "minHeight": "100vh", "padding": "1.5rem"},
+    style={
+        "backgroundColor": PAGE_BG,
+        "minHeight": "100vh",
+        "padding": "1.5rem",
+        "maxWidth": "1600px",
+        "margin": "0 auto",
+    },
     children=[
 
         # Header
@@ -45,12 +51,12 @@ app.layout = html.Div(
                     id="choropleth-map",
                     figure=build_japan_map_fig(year=2015),
                     config={"displayModeBar": False},
-                    style={"flex": "3"}
+                    style={"flex": "4", "height": "68vh"},
                 ),
                 # Pyramid placeholder — Phase 2
                 html.Div(
                     style={
-                        "flex": "2",
+                        "flex": "1",
                         "border": f"1px solid {PANEL_BORDER}",
                         "borderRadius": "6px",
                         "display": "flex",
@@ -58,6 +64,7 @@ app.layout = html.Div(
                         "justifyContent": "center",
                         "color": "#445",
                         "fontSize": "14px",
+                        "height": "68vh",
                     },
                     children="Population pyramid — Phase 2"
                 ),

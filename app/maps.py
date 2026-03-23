@@ -12,7 +12,6 @@ from app.config import PANEL_BG
 
 @lru_cache(maxsize=32)
 def build_japan_map_fig(year=2015):
-    # Load simplified prefectures
     prefectures = gpd.read_parquet("data/japan_prefectures_simplified.parquet").to_crs(epsg=4326)
 
     if "prefecture_code" not in prefectures.columns:
@@ -40,15 +39,26 @@ def build_japan_map_fig(year=2015):
         colorscale="YlGnBu",
         marker_line_width=0.5,
         marker_line_color="black",
-        colorbar_title="logₑ(Population + 1)"
+        colorbar=dict(
+            title=dict(
+                text="logₑ(Pop + 1)",
+                side="right",
+                font=dict(size=10, color="#aad")
+            ),
+            x=0.01,
+            xanchor="left",
+            thickness=12,
+            len=0.65,
+            tickfont=dict(size=10, color="#aad"),
+        )
     ))
 
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(
-        margin=dict(l=0, r=0, t=0, b=0),
-        height=800,
+        margin=dict(l=80, r=0, t=0, b=0),
+        autosize=True,
         paper_bgcolor=PANEL_BG,
-        plot_bgcolor=PANEL_BG
+        plot_bgcolor=PANEL_BG,
     )
 
     return fig
