@@ -1,6 +1,6 @@
 # app.py — Dash entrypoint
 import dash
-from dash import html, dcc
+from dash import html, dcc, Input, Output
 import duckdb as ddb
 
 from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, PANEL_H
@@ -25,6 +25,7 @@ YEAR_LABELS = {
     for row in years_df.itertuples()
 }
 
+
 # ── Layout ────────────────────────────────────────────────────────────────────
 app.layout = html.Div(
     style={"backgroundColor": PAGE_BG, "minHeight": "100vh", "padding": "1.5rem"},
@@ -33,10 +34,10 @@ app.layout = html.Div(
         # Header
         html.H2(
             "Japanese Population 日本の人口統計",
-            style={"textAlign": "center", "color": "#aad", "marginBottom": "1rem"}
+            style={"textAlign": "center", "color": "#aad", "marginBottom": "1.5rem"}
         ),
 
-        # Map (placeholder for pyramid col later)
+        # Map + Pyramid columns
         html.Div(
             style={"display": "flex", "gap": "1rem"},
             children=[
@@ -46,11 +47,78 @@ app.layout = html.Div(
                     config={"displayModeBar": False},
                     style={"flex": "3"}
                 ),
+                # Pyramid placeholder — Phase 2
+                html.Div(
+                    style={
+                        "flex": "2",
+                        "border": f"1px solid {PANEL_BORDER}",
+                        "borderRadius": "6px",
+                        "display": "flex",
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                        "color": "#445",
+                        "fontSize": "14px",
+                    },
+                    children="Population pyramid — Phase 2"
+                ),
+            ]
+        ),
+
+        # Year Slider
+        html.Div(
+            style={"padding": "0 2rem 1.5rem 2rem"},
+            children=[
+                html.Div(
+                    id="era-label",
+                    style={
+                        "textAlign": "center",
+                        "color": "#aad",
+                        "fontSize": "13px",
+                        "marginBottom": "0.5rem",
+                        "letterSpacing": "0.05em",
+                    }
+                ),
+                dcc.Slider(
+                    id="year-slider",
+                    min=min(CENSUS_YEARS),
+                    max=max(CENSUS_YEARS),
+                    step=None,
+                    value=2015,
+                    marks={
+                        yr: {
+                            "label": str(yr),
+                            "style": {
+                                "color": "#d0021b" if yr == 1945 else "#aad",
+                                "fontSize": "11px",
+                                "fontWeight": "bold" if yr == 1945 else "normal",
+                            }
+                        }
+                        for yr in CENSUS_YEARS
+                    },
+                    tooltip={
+                        "placement": "top",
+                        "always_visible": False,
+                        # "template": {str(yr): label for yr, label in YEAR_LABELS.items()},
+                    },
+                    included=False,
+                )
             ]
         ),
 
     ]
 )
+
+
+# ── Callbacks ─────────────────────────────────────────────────────────────────
+@app.callback(
+    Output("choropleth-map", "figure"),
+    Output("era-label", "children"),
+    Input("year-slider", "value")
+)
+def update_map(year):
+    label = YEAR_LABELS.get(int(year), str(year))
+    return build_japan_map_fig(year=int(year)), label
+
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
