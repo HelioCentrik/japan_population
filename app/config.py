@@ -1,7 +1,6 @@
 # app/config.py ────────────────────────────────────────────────────────────────────
 
 PAGE_BG = str("#091023")
-# panel_bg = str("#1b1e27")
 PANEL_BG = str("rgba(0, 0, 0, 0)")
 PANEL_BORDER = str("#334466")
 
@@ -22,4 +21,9 @@ COHORT_COLORS = {
     "wwii_scar":    ACCENT_WWII_SCAR,
     "hinoeuma":     ACCENT_HINOEUMA,
     "threshold":    ACCENT_THRESHOLD,
+}
+
+MAP_GEO = {
+    "bg_color": "#101040",
+    "land_color": "#2a2c28"
 }

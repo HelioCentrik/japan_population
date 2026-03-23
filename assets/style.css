@@ -1,0 +1,16 @@
+/* Full page background */
+html, body {
+    background-color: #091023;
+    margin: 0;
+    padding: 0;
+}
+
+/* Dash's root app div */
+#react-entry-point, ._dash-loading, .dash-loading {
+    background-color: #091023;
+}
+
+/* The main view container Dash renders into */
+.dash-renderer {
+    background-color: #091023;
+}

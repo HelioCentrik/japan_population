@@ -7,10 +7,10 @@ import geopandas as gpd
 import duckdb as ddb
 from plotly import graph_objects as go
 
-from app.config import PANEL_BG
+from app.config import PANEL_BG, PAGE_BG, MAP_GEO
 
 
-@lru_cache(maxsize=32)
+# @lru_cache(maxsize=32)
 def build_japan_map_fig(year=2015):
     prefectures = gpd.read_parquet("data/japan_prefectures_simplified.parquet").to_crs(epsg=4326)
 
@@ -53,12 +53,26 @@ def build_japan_map_fig(year=2015):
         )
     ))
 
-    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_geos(
+        fitbounds="locations",
+        visible=True,
+        # showcountries=False,
+        showcoastlines=False,
+        # showland=False,
+        landcolor=MAP_GEO.get("land_color"),
+        # showocean=True,
+        # oceancolor=PAGE_BG,
+        # showlakes=False,
+        # showrivers=False,
+        showframe=False,
+        bgcolor=MAP_GEO.get("bg_color"),
+    )
     fig.update_layout(
         margin=dict(l=80, r=0, t=0, b=0),
         autosize=True,
         paper_bgcolor=PANEL_BG,
         plot_bgcolor=PANEL_BG,
     )
+
 
     return fig

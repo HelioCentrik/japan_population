@@ -50,8 +50,8 @@ app.layout = html.Div(
                 dcc.Graph(
                     id="choropleth-map",
                     figure=build_japan_map_fig(year=2015),
-                    config={"displayModeBar": False},
-                    style={"flex": "4", "height": "68vh"},
+                    config={"displayModeBar": False, "responsive": True},
+                    style={"flex": "4", "height": "68vh", "backgroundColor": PAGE_BG},
                 ),
                 # Pyramid placeholder — Phase 2
                 html.Div(
