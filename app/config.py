@@ -3,10 +3,17 @@
 PAGE_BG = str("#091023")
 PANEL_BG = str("rgba(0, 0, 0, 0)")
 PANEL_BORDER = str("#334466")
+FONT_MAIN = str("#aad")
 
 PANEL_H = 720
 LEGEND_H = PANEL_H * 1.03
 TIME_H = 180
+
+MAP_GEO = {
+    "bg_color":   "#06091a",   # near-black ocean — the "floor"
+    "land_color": "#1c1f30",   # surrounding land (Korea/Russia) — mid-tier
+    "line_color": "#6089A0",   # prefecture borders — edge highlight, creates lift
+}
 
 # Cohort & annotation accent colors
 ACCENT_DANKAI        = str("#f5a623")   # Dankai generation highlight (primary)
@@ -22,9 +29,6 @@ COHORT_COLORS = {
     "hinoeuma":     ACCENT_HINOEUMA,
     "threshold":    ACCENT_THRESHOLD,
 }
-
-MAP_GEO = {
-    "bg_color":   "#06091a",   # near-black ocean — the "floor"
-    "land_color": "#1c1f30",   # surrounding land (Korea/Russia) — mid-tier
-    "line_color": "#6089A0",   # prefecture borders — edge highlight, creates lift
-}
+# Population pyramid sex colors
+PYRAMID_MALE_COLOR   = str("#4a90d9")
+PYRAMID_FEMALE_COLOR = str("#e07b8a")

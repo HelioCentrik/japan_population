@@ -7,7 +7,7 @@ import geopandas as gpd
 import duckdb as ddb
 from plotly import graph_objects as go
 
-from app.config import PANEL_BG, PAGE_BG, MAP_GEO
+from app.config import PANEL_BG, PAGE_BG, FONT_MAIN, MAP_GEO
 
 
 # @lru_cache(maxsize=32)
@@ -83,13 +83,13 @@ def build_japan_map_fig(year=2015):
             title=dict(
                 text="logₑ(Pop + 1)",
                 side="right",
-                font=dict(size=12, color="#aad")
+                font=dict(size=12, color=FONT_MAIN)
             ),
             x=0.02,
             xanchor="left",
             thickness=16,
             len=0.8,
-            tickfont=dict(size=14, color="#aad"),
+            tickfont=dict(size=14, color=FONT_MAIN),
         )
     ))
 

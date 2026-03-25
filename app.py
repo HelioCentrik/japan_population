@@ -3,8 +3,9 @@ import dash
 from dash import html, dcc, Input, Output
 import duckdb as ddb
 
-from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, PANEL_H
+from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, FONT_MAIN, PANEL_H
 from app.maps import build_japan_map_fig
+from app.pyramid import build_pyramid_fig
 
 
 
@@ -39,7 +40,7 @@ app.layout = html.Div(
         # Header
         html.H2(
             "Japanese Population 日本の人口統計",
-            style={"textAlign": "center", "color": "#aad", "marginBottom": "1.5rem"}
+            style={"textAlign": "center", "color": FONT_MAIN, "marginBottom": "1.5rem"}
         ),
 
         # Year Slider
@@ -50,7 +51,7 @@ app.layout = html.Div(
                     id="era-label",
                     style={
                         "textAlign": "center",
-                        "color": "#aad",
+                        "color": FONT_MAIN,
                         "fontSize": "13px",
                         "marginBottom": "0.5rem",
                         "letterSpacing": "0.05em",
@@ -66,7 +67,7 @@ app.layout = html.Div(
                         yr: {
                             "label": str(yr),
                             "style": {
-                                "color": "#d0021b" if yr == 1945 else "#aad",
+                                "color": "#d0021b" if yr == 1945 else FONT_MAIN,
                                 "fontSize": "11px",
                                 "fontWeight": "bold" if yr == 1945 else "normal",
                             }
@@ -94,7 +95,7 @@ app.layout = html.Div(
                         "flex": "3",
                         "height": "68vh",
                         "borderRadius": "8px",
-                        "border": "1px solid #1a2440",
+                        "border": f"1px solid {PANEL_BORDER}",
                         "boxShadow": (
                             "inset 0 3px 14px rgba(0,0,0,0.65), "
                             "inset 0 1px 4px rgba(0,0,0,0.4)"
@@ -112,22 +113,26 @@ app.layout = html.Div(
                     ]
                 ),
 
-                # Pyramid placeholder — Phase 2
+                # Population Pyramid
                 html.Div(
                     style={
                         "flex": "1",
-                        "border": f"1px solid {PANEL_BORDER}",
-                        "borderRadius": "6px",
-                        "display": "flex",
-                        "alignItems": "center",
-                        "justifyContent": "center",
-                        "color": "#445",
-                        "fontSize": "14px",
                         "height": "68vh",
+                        "borderRadius": "6px",
+                        "border": f"1px solid {PANEL_BORDER}",
+                        "boxShadow": "0 0 8px #00112266",
+                        "overflow": "hidden",
+                        "backgroundColor": "#06091a",
                     },
-                    children="Population pyramid — Phase 2"
+                    children=[
+                        dcc.Graph(
+                            id="pyramid-chart",
+                            figure=build_pyramid_fig(year=2000),
+                            config={"displayModeBar": False, "responsive": True},
+                            style={"height": "100%"},
+                        ),
+                    ]
                 ),
-
             ]
         ),
     ]
@@ -137,12 +142,14 @@ app.layout = html.Div(
 # ── Callbacks ─────────────────────────────────────────────────────────────────
 @app.callback(
     Output("choropleth-map", "figure"),
+    Output("pyramid-chart", "figure"),
     Output("era-label", "children"),
     Input("year-slider", "value")
 )
-def update_map(year):
-    label = YEAR_LABELS.get(int(year), str(year))
-    return build_japan_map_fig(year=int(year)), label
+def update_charts(year):
+    y = int(year)
+    label = YEAR_LABELS.get(y, str(y))
+    return build_japan_map_fig(year=y), build_pyramid_fig(year=y), label
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────

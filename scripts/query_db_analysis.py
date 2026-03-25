@@ -6,7 +6,11 @@ import duckdb as ddb
 con = ddb.connect("../data/japan_population.duckdb")
 
 misc = con.execute("""
-    SELECT year, COUNT(*) FROM f_census GROUP BY year ORDER BY year ASC
+SELECT year, population, pop_delta, year_gap
+FROM v_map_metrics
+WHERE area_estat = '47000'
+  AND year BETWEEN 1935 AND 1960
+ORDER BY year;
 """).df()
 print(f"\nmisc:\n{misc.columns}\n"
       f"{len(misc.values)} records.\n"
@@ -101,5 +105,20 @@ print(f"\nmisc:\n{misc.columns}\n"
 # print(f"\ncensus view:\n{v_census.columns}\n"
 #       f"{len(v_census.values)} records.\n"
 #       f"{v_census}")
+
+# okinawa_coverage = con.execute("""
+#     SELECT year, population
+#     FROM v_map_metrics
+#     WHERE area_estat = '47000'
+#     ORDER BY year
+# """).df()
+# print(f"\nOkinawa coverage:\n{okinawa_coverage}")
+#
+# completeness = con.execute("""
+#     SELECT year, COUNT(DISTINCT area_estat) AS prefecture_count
+#     FROM v_map_metrics
+#     GROUP BY year ORDER BY year
+# """).df()
+# print(f"\nPrefecture count by year:\n{completeness}")
 
 con.close()
