@@ -33,14 +33,14 @@ app.layout = html.Div(
         "backgroundColor": PAGE_BG,
         "minHeight": "100vh",
         "padding": "1.5rem",
-        "maxWidth": "1600px",
+        "maxWidth": "1400px",
         "margin": "0 auto",
     },
     children=[
         # Header
         html.H2(
             "Japanese Population 日本の人口統計",
-            style={"textAlign": "center", "color": FONT_MAIN, "marginBottom": "1.5rem"}
+            style={"textAlign": "center", "fontSize": "32px", "color": FONT_MAIN, "marginBottom": "3.5rem"}
         ),
 
         # Year Slider
@@ -52,8 +52,8 @@ app.layout = html.Div(
                     style={
                         "textAlign": "center",
                         "color": FONT_MAIN,
-                        "fontSize": "13px",
-                        "marginBottom": "0.5rem",
+                        "fontSize": "22px",
+                        "marginBottom": "2.5rem",
                         "letterSpacing": "0.05em",
                     }
                 ),
@@ -68,7 +68,7 @@ app.layout = html.Div(
                             "label": str(yr),
                             "style": {
                                 "color": "#d0021b" if yr == 1945 else FONT_MAIN,
-                                "fontSize": "11px",
+                                "fontSize": "13px",
                                 "fontWeight": "bold" if yr == 1945 else "normal",
                             }
                         }
@@ -92,8 +92,8 @@ app.layout = html.Div(
                 # Map container — the styled bezel
                 html.Div(
                     style={
-                        "flex": "3",
-                        "height": "68vh",
+                        "flex": "7",
+                        "height": "56vh",
                         "borderRadius": "8px",
                         "border": f"1px solid {PANEL_BORDER}",
                         "boxShadow": (
@@ -116,8 +116,8 @@ app.layout = html.Div(
                 # Population Pyramid
                 html.Div(
                     style={
-                        "flex": "1",
-                        "height": "68vh",
+                        "flex": "3",
+                        "height": "56vh",
                         "borderRadius": "6px",
                         "border": f"1px solid {PANEL_BORDER}",
                         "boxShadow": "0 0 8px #00112266",

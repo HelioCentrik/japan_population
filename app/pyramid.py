@@ -8,7 +8,8 @@ import plotly.graph_objects as go
 from app.config import (
     PANEL_BG, PANEL_BORDER,
     FONT_MAIN,
-    ACCENT_DANKAI, ACCENT_DANKAI_JR,
+    ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_HINOEUMA,
+    WWII_SEX_RATIO_THRESHOLD,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
 )
 
@@ -18,6 +19,7 @@ from app.config import (
 _COHORTS = {
     "dankai":    (1947, 1949, ACCENT_DANKAI),      # 団塊の世代
     "dankai_jr": (1971, 1974, ACCENT_DANKAI_JR),   # 団塊ジュニア
+    "hinoeuma": (1966, 1966, ACCENT_HINOEUMA),
 }
 
 
