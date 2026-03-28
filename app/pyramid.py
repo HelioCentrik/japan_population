@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 from app.config import (
     PANEL_BG, PANEL_BORDER,
     FONT_MAIN,
-    ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_HINOEUMA, ACCENT_WARTIME_GEN,
+    ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
 )
 
@@ -167,8 +167,43 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
         ),
     )
 
+
+    # ── 少子化 — Shoushika cohort marker ─────────────────────────────────────
+    # Birth years 1986–1990: first cohort born into sustained population decline.
+    # Diamond at x=0 (center) — symmetric and neutral, distinct from 戦中世代
+    # which sits on the male side.
+    shoushika_bands = _cohort_band_range(year, 1986, 1990) if year >= 1990 else []
+    shoushika_rows = male_df[male_df["age_start"].isin(shoushika_bands)]
+
+    shoushika_trace = go.Scatter(
+        x=[0] * len(shoushika_rows),
+        y=[_shorten_label(l) for l in shoushika_rows["age_group"]],
+        mode="markers",
+        name="少子化世代",
+        showlegend=len(shoushika_rows) > 0,
+        marker=dict(
+            symbol="diamond",
+            size=8,
+            color=ACCENT_SHOUSHIKA,
+            line=dict(width=1, color=ACCENT_SHOUSHIKA),
+        ),
+        hovertemplate=(
+            "<b>%{y}</b><br>"
+            "少子化世代 (1986–1990年生まれ)<br>"
+            "<extra></extra>"
+        ),
+    )
+
+
     # ── Layout ────────────────────────────────────────────────────────────────
-    fig = go.Figure(data=[male_trace, female_trace, legend_male, legend_female, war_gen_trace])
+    fig = go.Figure(data=[
+        male_trace,
+        female_trace,
+        legend_male,
+        legend_female,
+        war_gen_trace,
+        shoushika_trace
+    ])
 
     # ── Cohort outline shapes ──────────────────────────────────────────────────
     # 3 lines per band: top, bottom, outer left (male), outer right (female).

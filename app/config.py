@@ -16,18 +16,18 @@ MAP_GEO = {
 }
 
 # Cohort & annotation accent colors
-ACCENT_DANKAI        = str("#f5a623")   # Dankai generation highlight (primary)
-ACCENT_DANKAI_JR     = str("#7ed321")   # Dankai Junior highlight (secondary)
-ACCENT_WARTIME_GEN     = str("#d0021b")   # Sex ratio flag (WWII male deficit)
-ACCENT_HINOEUMA      = str("#9ee0ff")   # Hinoeuma notch (subtle)
-ACCENT_THRESHOLD     = str("#50e3c2")   # Aging index = 100 reference line
+ACCENT_DANKAI       = str("#f5a623")   # Dankai generation highlight (primary)
+ACCENT_DANKAI_JR    = str("#7ed321")   # Dankai Junior highlight (secondary)
+ACCENT_WARTIME_GEN  = str("#d0021b")   # Sex ratio flag (WWII male deficit)
+ACCENT_SHOUSHIKA    = str("#9ee0ff")   # 少子化 cohort — first generation born into sustained decline
+ACCENT_THRESHOLD    = str("#50e3c2")   # Aging index = 100 reference line
 WWII_SEX_RATIO_THRESHOLD = 90
 
 COHORT_COLORS = {
     "dankai":       ACCENT_DANKAI,
     "dankai_jr":    ACCENT_DANKAI_JR,
     "wwii_scar":    ACCENT_WARTIME_GEN,
-    "hinoeuma":     ACCENT_HINOEUMA,
+    "shoushika":    ACCENT_SHOUSHIKA,
     "threshold":    ACCENT_THRESHOLD,
 }
 # Population pyramid sex colors
