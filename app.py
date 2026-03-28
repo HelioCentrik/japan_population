@@ -1,6 +1,6 @@
 # app.py — Dash entrypoint
 import dash
-from dash import html, dcc, Input, Output
+from dash import html, dcc, Input, Output, State, no_update
 import duckdb as ddb
 
 from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, FONT_MAIN, PANEL_H
@@ -37,6 +37,8 @@ app.layout = html.Div(
         "margin": "0 auto",
     },
     children=[
+        dcc.Store(id="selected-prefecture", data=None),
+
         # Header
         html.H2(
             "Japanese Population 日本の人口統計",
@@ -141,15 +143,33 @@ app.layout = html.Div(
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
 @app.callback(
+    Output("selected-prefecture", "data"),
+    Output("choropleth-map", "clickData"),   # ← reset after every fire
+    Input("choropleth-map", "clickData"),
+    State("selected-prefecture", "data"),
+    prevent_initial_call=True,
+)
+def update_selected_prefecture(click_data, current_area):
+    if click_data is None:
+        return no_update, None
+    points = click_data.get("points", [])
+    if not points or "location" not in points[0]:
+        return None, None
+    clicked_area = points[0]["location"]
+    new_area = None if clicked_area == current_area else clicked_area
+    return new_area, None   # always reset clickData to None
+
+@app.callback(
     Output("choropleth-map", "figure"),
     Output("pyramid-chart", "figure"),
     Output("era-label", "children"),
-    Input("year-slider", "value")
+    Input("year-slider", "value"),
+    Input("selected-prefecture", "data"),
 )
-def update_charts(year):
+def update_charts(year, area_estat):
     y = int(year)
     label = YEAR_LABELS.get(y, str(y))
-    return build_japan_map_fig(year=y), build_pyramid_fig(year=y), label
+    return build_japan_map_fig(year=y), build_pyramid_fig(year=y, area_estat=area_estat), label
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────
