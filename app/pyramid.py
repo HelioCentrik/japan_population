@@ -8,8 +8,7 @@ import plotly.graph_objects as go
 from app.config import (
     PANEL_BG, PANEL_BORDER,
     FONT_MAIN,
-    ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_HINOEUMA,
-    WWII_SEX_RATIO_THRESHOLD,
+    ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_HINOEUMA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
 )
 
@@ -44,6 +43,14 @@ def _cohort_band(year: int, birth_start: int, birth_end: int) -> int | None:
     # Snap to scheme_a band floor (multiples of 5, starting at 0)
     band_start = (max(age_low, 0) // 5) * 5
     return band_start
+
+def _cohort_band_range(year: int, birth_start: int, birth_end: int) -> list[int]:
+    """Return all scheme_a band starts containing any birth year in [birth_start, birth_end]."""
+    age_low  = max(year - birth_end, 0)
+    age_high = min(year - birth_start, 85)
+    if age_high < 0 or age_low > 85:
+        return []
+    return [b for b in range(0, 86, 5) if b <= age_high and b + 4 >= age_low]
 
 
 @lru_cache(maxsize=64)
@@ -93,6 +100,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
 
     male_colors = [cohort_bands.get(a, PYRAMID_MALE_COLOR) for a in age_starts]
     female_colors = [cohort_bands.get(a, PYRAMID_FEMALE_COLOR) for a in age_starts]
+    # cohort_line_colors = [cohort_bands.get(a, "rgba(0,0,0,0)") for a in age_starts]
+    # cohort_line_widths = [4 if a in cohort_bands else 0 for a in age_starts]
 
     # ── Traces ────────────────────────────────────────────────────────────────
     male_trace = go.Bar(
@@ -100,8 +109,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
         y=age_labels,
         x=[-v for v in male_df["population"]],
         orientation="h",
-        showlegend=False,                        # legend handled by scatter below
-        marker=dict(color=male_colors, line=dict(width=0)),
+        showlegend=False,
+        marker=dict(color=PYRAMID_MALE_COLOR, line=dict(width=0)),
         hovertemplate="<b>Age (Years): %{y}</b><br>Male: %{customdata:,.0f}<extra></extra>",
         customdata=male_df["population"],
     )
@@ -112,7 +121,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
         x=female_df["population"],
         orientation="h",
         showlegend=False,
-        marker=dict(color=female_colors, line=dict(width=0)),
+        marker=dict(color=PYRAMID_FEMALE_COLOR, line=dict(width=0)),
         hovertemplate="<b>Age (Years): %{y}</b><br>Female: %{customdata:,.0f}<extra></extra>",
         customdata=female_df["population"],
     )
@@ -133,8 +142,53 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
         showlegend=True,
     )
 
+    # ── 戦中世代 — Wartime cohort marker ──────────────────────────────────────
+    # Men born 1910–1925 were prime conscription age during the war.
+    # Track by birth year, not sex ratio math — same logic as dankai cohorts.
+    wartime_bands = _cohort_band_range(year, 1910, 1925) if 1950 <= year <= 2015 else []
+    scar_rows = male_df[male_df["age_start"].isin(wartime_bands)]
+
+    scar_trace = go.Scatter(
+        x=[-v for v in scar_rows["population"]],
+        y=[_shorten_label(l) for l in scar_rows["age_group"]],
+        mode="markers",
+        name="戦中世代",
+        showlegend=len(scar_rows) > 0,
+        marker=dict(
+            symbol="diamond",
+            size=8,
+            color=ACCENT_WARTIME_GEN,
+            line=dict(width=1, color=ACCENT_WARTIME_GEN),
+        ),
+        hovertemplate=(
+            "<b>%{y}</b><br>"
+            "戦中世代 (1910–1925年生まれ)<br>"
+            "<extra></extra>"
+        ),
+    )
+
     # ── Layout ────────────────────────────────────────────────────────────────
-    fig = go.Figure(data=[male_trace, female_trace, legend_male, legend_female])
+    fig = go.Figure(data=[male_trace, female_trace, legend_male, legend_female, scar_trace])
+
+    # ── Cohort outline shapes ──────────────────────────────────────────────────
+    # 3 lines per band: top, bottom, outer left (male), outer right (female).
+    # Deliberately no center line.
+    bar_half = (1 - 0.15) / 2
+    for band_start, color in cohort_bands.items():
+        if band_start not in age_starts:
+            continue
+        idx = age_starts.index(band_start)
+        m_pop = male_df[male_df["age_start"] == band_start]["population"].values[0]
+        f_pop = female_df[female_df["age_start"] == band_start]["population"].values[0]
+        y0, y1 = idx - bar_half, idx + bar_half
+        for shape in [
+            dict(x0=-m_pop, x1=f_pop,  y0=y1,  y1=y1),   # top
+            dict(x0=-m_pop, x1=f_pop,  y0=y0,  y1=y0),   # bottom
+            dict(x0=-m_pop, x1=-m_pop, y0=y0,  y1=y1),   # left (male outer)
+            dict(x0=f_pop,  x1=f_pop,  y0=y0,  y1=y1),   # right (female outer)
+        ]:
+            fig.add_shape(type="line", xref="x", yref="y",
+                          line=dict(color=color, width=3.5), **shape)
 
     fig.update_layout(
         barmode="overlay",          # bars share the same y-position, not stacked

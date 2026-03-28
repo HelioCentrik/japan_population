@@ -5,16 +5,27 @@ import duckdb as ddb
 
 con = ddb.connect("../data/japan_population.duckdb")
 
-misc = con.execute("""
-SELECT year, population, pop_delta, year_gap
-FROM v_map_metrics
-WHERE area_estat = '47000'
-  AND year BETWEEN 1935 AND 1960
-ORDER BY year;
+print("=== 1945 age bands in v_census (scheme_b) ===")
+df = con.execute("""
+    SELECT DISTINCT age_group, age_start, age_end, is_open_ended
+    FROM v_census
+    WHERE year = 1945
+      AND age_scheme = 'scheme_b'
+      AND sex = 'total'
+    ORDER BY age_start
 """).df()
-print(f"\nmisc:\n{misc.columns}\n"
-      f"{len(misc.values)} records.\n"
-      f"{misc}")
+print(df.to_string(index=False))
+
+print("\n=== scheme_a bands from any other year for comparison ===")
+df2 = con.execute("""
+    SELECT DISTINCT age_group, age_start, age_end, is_open_ended
+    FROM v_census
+    WHERE age_scheme = 'scheme_a'
+      AND sex = 'total'
+    ORDER BY age_start
+    LIMIT 30
+""").df()
+print(df2.to_string(index=False))
 
 # row_counts = con.execute("""
 #     -- === TABLE ROW COUNTS ===
