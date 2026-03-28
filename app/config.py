@@ -15,6 +15,10 @@ MAP_GEO = {
     "line_color": "#6089A0",   # prefecture borders — edge highlight, creates lift
 }
 
+MAP_HIGHLIGHT_LINE_COLOR = str("#ffffff")               # selected prefecture border
+MAP_HIGHLIGHT_LINE_WIDTH = 2.5                          # thick enough to read, not cartoonish
+MAP_HIGHLIGHT_FILL       = str("rgba(255,255,255,0.08)") # barely-there overlay, keeps metric color visible
+
 # Cohort & annotation accent colors
 ACCENT_DANKAI       = str("#f5a623")   # Dankai generation highlight (primary)
 ACCENT_DANKAI_JR    = str("#7ed321")   # Dankai Junior highlight (secondary)

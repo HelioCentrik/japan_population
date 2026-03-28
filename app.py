@@ -1,6 +1,6 @@
 # app.py — Dash entrypoint
 import dash
-from dash import html, dcc, Input, Output, State, no_update
+from dash import html, dcc, Input, Output, State, no_update, ctx
 import duckdb as ddb
 
 from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, FONT_MAIN, PANEL_H
@@ -104,6 +104,7 @@ app.layout = html.Div(
                         ),
                         "overflow": "hidden",
                         "backgroundColor": "#06091a",
+                        "position": "relative",  # ← enables absolute child positioning
                     },
                     children=[
                         dcc.Graph(
@@ -111,6 +112,24 @@ app.layout = html.Div(
                             figure=build_japan_map_fig(year=2000),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
+                        ),
+                        html.Button(
+                            "✕ Clear",
+                            id="reset-prefecture-btn",
+                            style={
+                                "display": "none",  # shown/hidden via callback
+                                "position": "absolute",
+                                "bottom": "12px",
+                                "right": "12px",
+                                "backgroundColor": "rgba(0,0,0,0.55)",
+                                "color": FONT_MAIN,
+                                "border": f"1px solid {PANEL_BORDER}",
+                                "borderRadius": "4px",
+                                "padding": "4px 10px",
+                                "fontSize": "12px",
+                                "cursor": "pointer",
+                                "zIndex": "1000",
+                            }
                         ),
                     ]
                 ),
@@ -144,12 +163,15 @@ app.layout = html.Div(
 # ── Callbacks ─────────────────────────────────────────────────────────────────
 @app.callback(
     Output("selected-prefecture", "data"),
-    Output("choropleth-map", "clickData"),   # ← reset after every fire
+    Output("choropleth-map", "clickData"),
     Input("choropleth-map", "clickData"),
+    Input("reset-prefecture-btn", "n_clicks"),
     State("selected-prefecture", "data"),
     prevent_initial_call=True,
 )
-def update_selected_prefecture(click_data, current_area):
+def update_selected_prefecture(click_data, reset_clicks, current_area):
+    if ctx.triggered_id == "reset-prefecture-btn":
+        return None, None
     if click_data is None:
         return no_update, None
     points = click_data.get("points", [])
@@ -157,7 +179,28 @@ def update_selected_prefecture(click_data, current_area):
         return None, None
     clicked_area = points[0]["location"]
     new_area = None if clicked_area == current_area else clicked_area
-    return new_area, None   # always reset clickData to None
+    return new_area, None
+
+@app.callback(
+    Output("reset-prefecture-btn", "style"),
+    Input("selected-prefecture", "data"),
+)
+def toggle_reset_button(area_estat):
+    base = {
+        "position": "absolute",
+        "bottom": "12px",
+        "right": "12px",
+        "backgroundColor": "rgba(0,0,0,0.55)",
+        "color": FONT_MAIN,
+        "border": f"1px solid {PANEL_BORDER}",
+        "borderRadius": "4px",
+        "padding": "4px 10px",
+        "fontSize": "12px",
+        "cursor": "pointer",
+        "zIndex": "1000",
+        "display": "block" if area_estat else "none",
+    }
+    return base
 
 @app.callback(
     Output("choropleth-map", "figure"),
@@ -169,7 +212,7 @@ def update_selected_prefecture(click_data, current_area):
 def update_charts(year, area_estat):
     y = int(year)
     label = YEAR_LABELS.get(y, str(y))
-    return build_japan_map_fig(year=y), build_pyramid_fig(year=y, area_estat=area_estat), label
+    return build_japan_map_fig(year=y, area_estat=area_estat), build_pyramid_fig(year=y, area_estat=area_estat), label
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────
