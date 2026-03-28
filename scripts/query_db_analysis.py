@@ -7,25 +7,16 @@ con = ddb.connect("../data/japan_population.duckdb")
 
 print("=== 1945 age bands in v_census (scheme_b) ===")
 df = con.execute("""
-    SELECT DISTINCT age_group, age_start, age_end, is_open_ended
+    SELECT year, age_group, age_start, sex, population
     FROM v_census
-    WHERE year = 1945
-      AND age_scheme = 'scheme_b'
-      AND sex = 'total'
-    ORDER BY age_start
+    WHERE area_estat  = '13000'
+      AND age_scheme  = 'scheme_a'
+      AND age_group  != 'Total'
+      AND sex        != 'total'
+      AND year        IN (1960, 1970)
+    ORDER BY year, age_start, sex
 """).df()
 print(df.to_string(index=False))
-
-print("\n=== scheme_a bands from any other year for comparison ===")
-df2 = con.execute("""
-    SELECT DISTINCT age_group, age_start, age_end, is_open_ended
-    FROM v_census
-    WHERE age_scheme = 'scheme_a'
-      AND sex = 'total'
-    ORDER BY age_start
-    LIMIT 30
-""").df()
-print(df2.to_string(index=False))
 
 # row_counts = con.execute("""
 #     -- === TABLE ROW COUNTS ===

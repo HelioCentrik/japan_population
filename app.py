@@ -5,7 +5,7 @@ import duckdb as ddb
 
 from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, FONT_MAIN, PANEL_H
 from app.maps import build_japan_map_fig
-from app.pyramid import build_pyramid_fig
+from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
 
 
 
@@ -212,7 +212,12 @@ def toggle_reset_button(area_estat):
 def update_charts(year, area_estat):
     y = int(year)
     label = YEAR_LABELS.get(y, str(y))
-    return build_japan_map_fig(year=y, area_estat=area_estat), build_pyramid_fig(year=y, area_estat=area_estat), label
+    axis_max = get_pyramid_axis_max(area_estat)
+    return (
+        build_japan_map_fig(year=y, area_estat=area_estat),
+        build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
+        label,
+    )
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────

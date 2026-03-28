@@ -1,4 +1,5 @@
 # app/pyramid.py
+import math
 from functools import lru_cache
 
 import duckdb as ddb
@@ -14,11 +15,69 @@ from app.config import (
 
 
 
+@lru_cache(maxsize=8)
+def get_pyramid_axis_max(area_estat: str | None) -> int:
+    """
+    Pre-query the maximum single-sex band population across ALL years for this
+    selection. Cached per area_estat so the axis stays stable while scrubbing years.
+    """
+    con = ddb.connect("data/japan_population.duckdb")
+    if area_estat is not None:
+        result = con.execute("""
+            SELECT MAX(population) AS max_pop
+            FROM v_census
+            WHERE age_scheme  = 'scheme_a'
+              AND age_group   != 'Total'
+              AND sex         != 'total'
+              AND area_estat   = ?
+        """, [area_estat]).fetchone()
+    else:
+        result = con.execute("""
+            SELECT MAX(band_pop) AS max_pop
+            FROM (
+                SELECT year, age_start, sex, SUM(population) AS band_pop
+                FROM v_census
+                WHERE age_scheme  = 'scheme_a'
+                  AND age_group   != 'Total'
+                  AND sex         != 'total'
+                  AND area_level   = 2
+                GROUP BY year, age_start, sex
+            )
+        """).fetchone()
+    con.close()
+    return int(result[0]) if result and result[0] else 5_000_000
+
+
+def _nice_axis(max_val: int) -> tuple[float, float]:
+    """
+    Returns (dtick, half_range). half_range is always a clean dtick multiple
+    with one full tick of headroom above max_val — prevents Plotly from snapping
+    the range down and clipping bars.
+    """
+    if max_val <= 0:
+        return 1_000_000, 4_000_000
+
+    raw_step   = max_val / 3
+    magnitude  = 10 ** math.floor(math.log10(raw_step))
+    normalized = raw_step / magnitude
+
+    if normalized < 1.5:
+        snapped = 1
+    elif normalized < 3.5:
+        snapped = 2
+    else:
+        snapped = 5
+
+    dtick      = snapped * magnitude
+    n_ticks    = math.ceil(max_val / dtick)   # minimum ticks to cover the data
+    half_range = dtick * (n_ticks + 1)        # +1 full tick of headroom
+    return dtick, half_range
+
+
 # ── Cohort birth year ranges ──────────────────────────────────────────────────
 _COHORTS = {
     "dankai":    (1947, 1949, ACCENT_DANKAI),      # 団塊の世代
     "dankai_jr": (1971, 1974, ACCENT_DANKAI_JR),   # 団塊ジュニア
-    # "hinoeuma": (1966, 1966, ACCENT_HINOEUMA),
 }
 
 
@@ -54,7 +113,7 @@ def _cohort_band_range(year: int, birth_start: int, birth_end: int) -> list[int]
 
 
 @lru_cache(maxsize=64)
-def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
+def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 5_000_000) -> go.Figure:
     con = ddb.connect("data/japan_population.duckdb")
 
     if area_estat is not None:
@@ -81,6 +140,15 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
             ORDER BY age_start
         """).df()
 
+    if area_estat is not None:
+        name_row = con.execute(
+            "SELECT prefecture_name_ja, prefecture_name FROM d_prefectures WHERE area_estat = ?",
+            [area_estat]
+        ).fetchone()
+        pref_label = f"<b>{name_row[0]}<br>{name_row[1]}</b>" if name_row else area_estat
+    else:
+        pref_label = "<b>全国<br>National</b>"
+
     con.close()
 
     male_df   = df[df["sex"] == "male"  ].sort_values("age_start")
@@ -93,15 +161,14 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
     # Build a per-band colour list for male and female traces.
     # Default colours apply; cohort bands get their accent colour.
     cohort_bands = {}
-    for name, (b_start, b_end, color) in _COHORTS.items():
-        band = _cohort_band(year, b_start, b_end)
-        if band is not None:
-            cohort_bands[band] = color
+    if area_estat is None:
+        for name, (b_start, b_end, color) in _COHORTS.items():
+            band = _cohort_band(year, b_start, b_end)
+            if band is not None:
+                cohort_bands[band] = color
 
     male_colors = [cohort_bands.get(a, PYRAMID_MALE_COLOR) for a in age_starts]
     female_colors = [cohort_bands.get(a, PYRAMID_FEMALE_COLOR) for a in age_starts]
-    # cohort_line_colors = [cohort_bands.get(a, "rgba(0,0,0,0)") for a in age_starts]
-    # cohort_line_widths = [4 if a in cohort_bands else 0 for a in age_starts]
 
     # ── Traces ────────────────────────────────────────────────────────────────
     male_trace = go.Bar(
@@ -145,7 +212,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
     # ── 戦中世代 — Wartime cohort marker ──────────────────────────────────────
     # Men born 1910–1925 were prime conscription age during the war.
     # Track by birth year, not sex ratio math — same logic as dankai cohorts.
-    wartime_bands = _cohort_band_range(year, 1910, 1925) if 1950 <= year <= 2015 else []
+    wartime_bands = _cohort_band_range(year, 1910, 1925) if (area_estat is None and 1950 <= year <= 2015) else []
     war_gen_rows = male_df[male_df["age_start"].isin(wartime_bands)]
 
     war_gen_trace = go.Scatter(
@@ -172,7 +239,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
     # Birth years 1986–1990: first cohort born into sustained population decline.
     # Diamond at x=0 (center) — symmetric and neutral, distinct from 戦中世代
     # which sits on the male side.
-    shoushika_bands = _cohort_band_range(year, 1986, 1990) if year >= 1990 else []
+    shoushika_bands = _cohort_band_range(year, 1986, 1990) if (area_estat is None and year >= 1990) else []
     shoushika_rows = male_df[male_df["age_start"].isin(shoushika_bands)]
 
     shoushika_trace = go.Scatter(
@@ -225,12 +292,14 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
             fig.add_shape(type="line", xref="x", yref="y",
                           line=dict(color=color, width=3.5), **shape)
 
+    dtick, half_range = _nice_axis(axis_max)
+
     fig.update_layout(
         barmode="overlay",          # bars share the same y-position, not stacked
         bargap=0.15,
         paper_bgcolor=PANEL_BG,
         plot_bgcolor=PANEL_BG,
-        margin=dict(l=16, r=16, t=28, b=20),
+        margin=dict(l=16, r=16, t=44, b=20),
         legend=dict(
             orientation="h",
             x=0.5, xanchor="center",
@@ -239,16 +308,16 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
             bgcolor="rgba(0,0,0,0)",
         ),
         xaxis=dict(
-            tickformat="~s",  # 5000000 → "5M", -5000000 → "-5M"
+            tickformat="~s",
             tickfont=dict(color=FONT_MAIN, size=12),
             gridcolor="#1a2440",
             zeroline=True,
             zerolinewidth=1,
             zerolinecolor=PANEL_BORDER,
             showline=False,
-            range=[-7000000, 7000000],
+            range=[-half_range, half_range],
             # autorange=True,
-            dtick=3_000_000,
+            dtick=dtick,
         ),
         yaxis=dict(
             title=dict(
@@ -259,6 +328,16 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
             showgrid=False,
             autorange=True,
         ),
+    )
+
+    fig.update_layout(
+        title=dict(
+            text=pref_label,
+            x=0.12,
+            y=0.95,
+            xanchor="center",
+            font=dict(color=FONT_MAIN, size=13),
+        )
     )
 
     return fig
