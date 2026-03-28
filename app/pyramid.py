@@ -18,7 +18,7 @@ from app.config import (
 _COHORTS = {
     "dankai":    (1947, 1949, ACCENT_DANKAI),      # 団塊の世代
     "dankai_jr": (1971, 1974, ACCENT_DANKAI_JR),   # 団塊ジュニア
-    "hinoeuma": (1966, 1966, ACCENT_HINOEUMA),
+    # "hinoeuma": (1966, 1966, ACCENT_HINOEUMA),
 }
 
 
@@ -146,14 +146,14 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
     # Men born 1910–1925 were prime conscription age during the war.
     # Track by birth year, not sex ratio math — same logic as dankai cohorts.
     wartime_bands = _cohort_band_range(year, 1910, 1925) if 1950 <= year <= 2015 else []
-    scar_rows = male_df[male_df["age_start"].isin(wartime_bands)]
+    war_gen_rows = male_df[male_df["age_start"].isin(wartime_bands)]
 
-    scar_trace = go.Scatter(
-        x=[-v for v in scar_rows["population"]],
-        y=[_shorten_label(l) for l in scar_rows["age_group"]],
+    war_gen_trace = go.Scatter(
+        x=[-v for v in war_gen_rows["population"]],
+        y=[_shorten_label(l) for l in war_gen_rows["age_group"]],
         mode="markers",
         name="戦中世代",
-        showlegend=len(scar_rows) > 0,
+        showlegend=len(war_gen_rows) > 0,
         marker=dict(
             symbol="diamond",
             size=8,
@@ -168,7 +168,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None) -> go.Figure:
     )
 
     # ── Layout ────────────────────────────────────────────────────────────────
-    fig = go.Figure(data=[male_trace, female_trace, legend_male, legend_female, scar_trace])
+    fig = go.Figure(data=[male_trace, female_trace, legend_male, legend_female, war_gen_trace])
 
     # ── Cohort outline shapes ──────────────────────────────────────────────────
     # 3 lines per band: top, bottom, outer left (male), outer right (female).

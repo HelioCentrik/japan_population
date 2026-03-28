@@ -19,7 +19,7 @@ MAP_GEO = {
 ACCENT_DANKAI        = str("#f5a623")   # Dankai generation highlight (primary)
 ACCENT_DANKAI_JR     = str("#7ed321")   # Dankai Junior highlight (secondary)
 ACCENT_WARTIME_GEN     = str("#d0021b")   # Sex ratio flag (WWII male deficit)
-ACCENT_HINOEUMA      = str("#9b9b9b")   # Hinoeuma notch (subtle)
+ACCENT_HINOEUMA      = str("#9ee0ff")   # Hinoeuma notch (subtle)
 ACCENT_THRESHOLD     = str("#50e3c2")   # Aging index = 100 reference line
 WWII_SEX_RATIO_THRESHOLD = 90
 
