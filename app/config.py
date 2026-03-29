@@ -2,8 +2,12 @@
 
 PAGE_BG = str("#091023")
 PANEL_BG = str("rgba(0, 0, 0, 0)")
-PANEL_BORDER = str("#334466")
-FONT_MAIN = str("#aad")
+PANEL_BORDER = str("#334477")
+FONT_HEADER = str("serif")
+FONT_HEADER_JPRED = str("#bc002d")
+FONT_HEADER_JPWHT = str("#ffffff")
+FONT_MAIN = str("sans-serif")
+FONT_MAIN_COLOR = str("#aad")
 
 PANEL_H = 720
 LEGEND_H = PANEL_H * 1.03
@@ -22,7 +26,7 @@ MAP_HIGHLIGHT_FILL       = str("rgba(255,255,255,0.08)") # barely-there overlay,
 # Cohort & annotation accent colors
 ACCENT_DANKAI       = str("#f5a623")   # Dankai generation highlight (primary)
 ACCENT_DANKAI_JR    = str("#7ed321")   # Dankai Junior highlight (secondary)
-ACCENT_WARTIME_GEN  = str("#d0021b")   # Sex ratio flag (WWII male deficit)
+ACCENT_WARTIME_GEN  = FONT_HEADER_JPRED   # Sex ratio flag (WWII male deficit)
 ACCENT_SHOUSHIKA    = str("#9ee0ff")   # 少子化 cohort — first generation born into sustained decline
 ACCENT_THRESHOLD    = str("#50e3c2")   # Aging index = 100 reference line
 WWII_SEX_RATIO_THRESHOLD = 90
@@ -38,4 +42,4 @@ COHORT_COLORS = {
 PYRAMID_MALE_COLOR   = str("#4a90d9")
 PYRAMID_FEMALE_COLOR = str("#e07b8a")
 
-TIMESERIES_PREF_COLOR = str("#f0c040")   # Prefecture overlay line on time series
+TIMESERIES_PREF_COLOR = FONT_HEADER_JPWHT   # Prefecture overlay line on time series

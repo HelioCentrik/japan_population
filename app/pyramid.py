@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 # Replace the existing config import
 from app.config import (
     PANEL_BG, PANEL_BORDER,
-    FONT_MAIN,
+    FONT_MAIN, FONT_MAIN_COLOR,
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
 )
@@ -304,12 +304,12 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             orientation="h",
             x=0.5, xanchor="center",
             y=1.02, yanchor="bottom",
-            font=dict(color=FONT_MAIN, size=14),
+            font=dict(color=FONT_MAIN_COLOR, size=14),
             bgcolor="rgba(0,0,0,0)",
         ),
         xaxis=dict(
             tickformat="~s",
-            tickfont=dict(color=FONT_MAIN, size=12),
+            tickfont=dict(color=FONT_MAIN_COLOR, size=12),
             gridcolor="#1a2440",
             zeroline=True,
             zerolinewidth=1,
@@ -322,9 +322,9 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         yaxis=dict(
             title=dict(
                 text="Age (Years)",
-                font=dict(color=FONT_MAIN, size=12),
+                font=dict(color=FONT_MAIN_COLOR, size=12),
             ),
-            tickfont=dict(color=FONT_MAIN, size=12),
+            tickfont=dict(color=FONT_MAIN_COLOR, size=12),
             showgrid=False,
             autorange=True,
         ),
@@ -336,7 +336,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             x=0.12,
             y=0.95,
             xanchor="center",
-            font=dict(color=FONT_MAIN, size=13),
+            font=dict(color=FONT_MAIN_COLOR, size=13),
         )
     )
 

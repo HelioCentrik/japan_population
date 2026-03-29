@@ -8,7 +8,7 @@ import duckdb as ddb
 from plotly import graph_objects as go
 
 from app.config import (
-    PANEL_BG, FONT_MAIN, MAP_GEO,
+    PANEL_BG, FONT_MAIN, FONT_MAIN_COLOR, MAP_GEO,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
 )
 
@@ -88,13 +88,13 @@ def build_japan_map_fig(year: int = 2015, area_estat: str | None = None) -> go.F
             title=dict(
                 text="logₑ(Pop + 1)",
                 side="right",
-                font=dict(size=12, color=FONT_MAIN)
+                font=dict(size=12, color=FONT_MAIN_COLOR)
             ),
             x=0.02,
             xanchor="left",
             thickness=16,
             len=0.8,
-            tickfont=dict(size=14, color=FONT_MAIN),
+            tickfont=dict(size=14, color=FONT_MAIN_COLOR),
         )
     )
 

@@ -5,7 +5,7 @@ import duckdb as ddb
 import plotly.graph_objects as go
 
 from app.config import (
-    PANEL_BG, FONT_MAIN,
+    PANEL_BG, PANEL_BORDER, FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER_JPRED, FONT_HEADER_JPWHT,
     ACCENT_THRESHOLD,
     TIMESERIES_PREF_COLOR,
 )
@@ -88,7 +88,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=national_df["aging_index"],
         mode="lines",
         name="全国 National",
-        line=dict(color=FONT_MAIN, width=2),
+        line=dict(color=FONT_HEADER_JPRED, width=2),
         hovertemplate="<b>%{x}</b><br>高齢化指数: <b>%{y:.1f}</b><extra>全国</extra>",
     ))
 
@@ -98,7 +98,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=df_non_1945["aging_index"],
         mode="markers",
         showlegend=False,
-        marker=dict(color=FONT_MAIN, size=5),
+        marker=dict(color=FONT_HEADER_JPRED, size=5),
         hoverinfo="skip",
     ))
 
@@ -162,7 +162,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     # ── Selected year indicator ───────────────────────────────────────────────
     fig.add_vline(
         x=selected_year,
-        line_color=FONT_MAIN,
+        line_color=FONT_MAIN_COLOR,
         line_width=1,
         line_dash="dot",
         opacity=0.35,
@@ -177,11 +177,11 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             orientation="h",
             x=0.01, xanchor="left",
             y=0.99, yanchor="top",
-            font=dict(color=FONT_MAIN, size=12),
+            font=dict(color=FONT_MAIN_COLOR, size=12),
             bgcolor="rgba(0,0,0,0)",
         ),
         xaxis=dict(
-            tickfont=dict(color=FONT_MAIN, size=11),
+            tickfont=dict(color=FONT_MAIN_COLOR, size=11),
             gridcolor="#1a2440",
             showline=False,
             dtick=10,
@@ -189,11 +189,12 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         yaxis=dict(
             title=dict(
                 text="高齢化指数",
-                font=dict(color=FONT_MAIN, size=11),
+                font=dict(color=FONT_MAIN_COLOR, size=11),
             ),
-            tickfont=dict(color=FONT_MAIN, size=11),
+            tickfont=dict(color=FONT_MAIN_COLOR, size=11),
             gridcolor="#1a2440",
             showline=False,
+            zeroline=False,
         ),
     )
 

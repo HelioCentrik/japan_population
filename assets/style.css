@@ -20,7 +20,7 @@ html, body {
 /* ── KPI / generic panel card ──────────────────────────────────────────────── */
 .card {
     background    : rgba(0, 0, 0, 0);
-    border        : 1px solid #334466;
+    border        : 1px solid #334477;
     border-radius : 6px;
     box-shadow    : 0 0 8px rgba(0, 17, 34, 0.4);
     padding       : 12px 16px;
@@ -55,4 +55,32 @@ html, body {
     font-size  : 12px;
     margin-top : 4px;
     opacity    : 0.65;
+}
+
+
+/* ── Year Slider ───────────────────────────────────────────────────────────── */
+.dash-slider-track {
+    background-color: #1a2a44 !important;
+    height: 3px !important;
+}
+
+.dash-slider-range {
+    background-color: transparent !important;
+}
+
+.dash-slider-thumb {
+    background-color: #aad !important;
+    border-color: #aad !important;
+    box-shadow: none !important;
+}
+
+.dash-slider-thumb:hover,
+.dash-slider-thumb:focus,
+.dash-slider-thumb[data-state="dragging"] {
+    background-color: #cce !important;
+    box-shadow: 0 0 5px rgba(170, 170, 221, 0.5) !important;
+}
+
+.dash-slider-mark {
+    color: #e0e8ff !important;
 }
