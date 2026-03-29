@@ -1,3 +1,5 @@
+/* assets/style.css */
+
 /* Full page background */
 html, body {
     background-color: #091023;
@@ -13,4 +15,44 @@ html, body {
 /* The main view container Dash renders into */
 .dash-renderer {
     background-color: #091023;
+}
+
+/* ── KPI / generic panel card ──────────────────────────────────────────────── */
+.card {
+    background    : rgba(0, 0, 0, 0);
+    border        : 1px solid #334466;
+    border-radius : 6px;
+    box-shadow    : 0 0 8px rgba(0, 17, 34, 0.4);
+    padding       : 12px 16px;
+    overflow      : hidden;
+    display       : flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items   : center;
+    text-align    : center;
+    flex          : 1;
+}
+
+.kpi-label {
+    color      : #aad;
+    font-size  : 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom : 6px;
+    opacity    : 0.75;
+}
+
+.kpi-value {
+    color      : #e0e8ff;
+    font-size  : 22px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+}
+
+.kpi-sub {
+    color      : #aad;
+    font-size  : 12px;
+    margin-top : 4px;
+    opacity    : 0.65;
 }

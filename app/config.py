@@ -37,3 +37,5 @@ COHORT_COLORS = {
 # Population pyramid sex colors
 PYRAMID_MALE_COLOR   = str("#4a90d9")
 PYRAMID_FEMALE_COLOR = str("#e07b8a")
+
+TIMESERIES_PREF_COLOR = str("#f0c040")   # Prefecture overlay line on time series

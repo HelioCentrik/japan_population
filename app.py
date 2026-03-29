@@ -6,6 +6,8 @@ import duckdb as ddb
 from app.config import PAGE_BG, PANEL_BG, PANEL_BORDER, FONT_MAIN, PANEL_H
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
+from app.kpi import build_kpi_data, render_kpi_cards
+from app.timeseries import build_aging_index_fig
 
 
 
@@ -42,23 +44,40 @@ app.layout = html.Div(
         # Header
         html.H2(
             "Japanese Population 日本の人口統計",
-            style={"textAlign": "center", "fontSize": "32px", "color": FONT_MAIN, "marginBottom": "3.5rem"}
+            style={
+                "textAlign": "center",
+                "fontSize": "40px",
+                "color": FONT_MAIN,
+                "marginBottom": "3rem"
+            }
+        ),
+
+        html.Div(
+            id="era-label",
+            style={
+                "textAlign": "center",
+                "color": FONT_MAIN,
+                "fontSize": "28px",
+                "marginBottom": "1.25rem",
+                "letterSpacing": "0.05em",
+            }
+        ),
+
+        # KPI Cards
+        html.Div(
+            id="kpi-row",
+            style={
+                "display": "flex",
+                "gap": "0.75rem",
+                "marginBottom": "1.5rem",
+            },
+            children=render_kpi_cards(build_kpi_data(2000)),
         ),
 
         # Year Slider
         html.Div(
             style={"padding": "0 2rem 1.5rem 2rem"},
             children=[
-                html.Div(
-                    id="era-label",
-                    style={
-                        "textAlign": "center",
-                        "color": FONT_MAIN,
-                        "fontSize": "22px",
-                        "marginBottom": "2.5rem",
-                        "letterSpacing": "0.05em",
-                    }
-                ),
                 dcc.Slider(
                     id="year-slider",
                     min=min(CENSUS_YEARS),
@@ -156,6 +175,27 @@ app.layout = html.Div(
                 ),
             ]
         ),
+
+        # Time Series
+        html.Div(
+            style={
+                "marginTop": "1rem",
+                "height": "260px",
+                "borderRadius": "6px",
+                "border": f"1px solid {PANEL_BORDER}",
+                "boxShadow": "0 0 8px #00112266",
+                "overflow": "hidden",
+                "backgroundColor": "#06091a",
+            },
+            children=[
+                dcc.Graph(
+                    id="timeseries-chart",
+                    figure=build_aging_index_fig(selected_year=2000),
+                    config={"displayModeBar": False, "responsive": True},
+                    style={"height": "100%"},
+                ),
+            ]
+        ),
     ]
 )
 
@@ -206,6 +246,8 @@ def toggle_reset_button(area_estat):
     Output("choropleth-map", "figure"),
     Output("pyramid-chart", "figure"),
     Output("era-label", "children"),
+    Output("kpi-row", "children"),
+    Output("timeseries-chart", "figure"),
     Input("year-slider", "value"),
     Input("selected-prefecture", "data"),
 )
@@ -213,10 +255,13 @@ def update_charts(year, area_estat):
     y = int(year)
     label = YEAR_LABELS.get(y, str(y))
     axis_max = get_pyramid_axis_max(area_estat)
+    kpi_data = build_kpi_data(y)
     return (
         build_japan_map_fig(year=y, area_estat=area_estat),
         build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
         label,
+        render_kpi_cards(kpi_data),
+        build_aging_index_fig(selected_year=y, area_estat=area_estat),
     )
 
 
