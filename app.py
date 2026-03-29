@@ -31,6 +31,8 @@ YEAR_LABELS = {
     int(row.year): f"{row.year} ({row.era_name}{row.era_year})"
     for row in years_df.itertuples()
 }
+YEAR_MIN = min(CENSUS_YEARS)
+YEAR_MAX = max(CENSUS_YEARS)
 PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS if yr != 1945]
 
 
@@ -263,9 +265,9 @@ app.layout = html.Div(
 )
 def toggle_playback(n_clicks, is_disabled, current_year):
     if is_disabled:
-        # Starting playback
-        if current_year == 2015:
-            return False, "⏸", 2015, 1920   # wrap: store 2015, jump slider to 1920
+        # toggle_playback — starting from max year, jump to min
+        if current_year == YEAR_MAX:
+            return False, "⏸", YEAR_MAX, YEAR_MIN
         return False, "⏸", current_year, no_update  # normal: store current, don't move slider
     # Pausing — don't touch resume year or slider
     return True, "▶", no_update, no_update
@@ -287,8 +289,8 @@ def advance_year(n_intervals, current_year, resume_year):
         next_year = PLAYBACK_YEARS[idx + 1] if idx + 1 < len(PLAYBACK_YEARS) else None
 
     if next_year is None:
-        # End of playback — return to wherever Play was pressed
-        return resume_year if resume_year is not None else 2015, True, "▶"
+        # advance_year — fallback if resume_year store is empty
+        return resume_year if resume_year is not None else YEAR_MAX, True, "▶"
 
     return next_year, False, no_update
 

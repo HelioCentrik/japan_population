@@ -86,14 +86,14 @@ def build_japan_map_fig(year: int = 2015, area_estat: str | None = None) -> go.F
         ),
         colorbar=dict(
             title=dict(
-                text="logₑ(Pop + 1)",
-                side="right",
+                text="人口 (log)",
+                side="bottom",
                 font=dict(size=12, color=FONT_MAIN_COLOR)
             ),
             x=0.02,
             xanchor="left",
             thickness=16,
-            len=0.8,
+            len=0.6,
             tickfont=dict(size=14, color=FONT_MAIN_COLOR),
         )
     )
