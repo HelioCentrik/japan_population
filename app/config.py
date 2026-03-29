@@ -13,7 +13,7 @@ PANEL_H = 720
 LEGEND_H = PANEL_H * 1.03
 TIME_H = 180
 
-PLAY_INTERVAL_MS = 1500
+PLAY_INTERVAL_MS = 800
 
 MAP_GEO = {
     "bg_color":   "#06091a",   # near-black ocean — the "floor"

@@ -60,6 +60,7 @@ html, body {
 .play-btn {
     flex-shrink   : 0;
     align-self    : stretch;
+    width         : 52px;
     aspect-ratio  : 1 / 1;
     background-color: var(--panel-border);
     color         : var(--font-main);

@@ -45,6 +45,7 @@ app.layout = html.Div(
     },
     children=[
         dcc.Store(id="selected-prefecture", data=None),
+        dcc.Store(id="resume-year", data=None),
 
         dcc.Interval(
             id="play-interval",
@@ -91,7 +92,7 @@ app.layout = html.Div(
             style={
                 "marginBottom": "1rem",
                 "display": "flex",
-                "alignItems": "center",
+                "alignItems": "stretch",
                 "gap": "0.4rem",
             },
             children=[
@@ -102,7 +103,7 @@ app.layout = html.Div(
                     id="play-btn",
                     className="play-btn",
                     # style={
-                    #     "flexShrink": "0",
+                    #     "flexShrink": "1",
                     #     "padding": "6px 16px",
                     #     "backgroundColor": "rgba(0,0,0,0)",
                     #     "color": ACCENT_THRESHOLD,
@@ -253,14 +254,21 @@ app.layout = html.Div(
 @app.callback(
     Output("play-interval", "disabled"),
     Output("play-btn", "children"),
+    Output("resume-year", "data"),
+    Output("year-slider", "value", allow_duplicate=True),
     Input("play-btn", "n_clicks"),
     State("play-interval", "disabled"),
+    State("year-slider", "value"),
     prevent_initial_call=True,
 )
-def toggle_playback(n_clicks, is_disabled):
+def toggle_playback(n_clicks, is_disabled, current_year):
     if is_disabled:
-        return False, "⏸"
-    return True, "▶"
+        # Starting playback
+        if current_year == 2015:
+            return False, "⏸", 2015, 1920   # wrap: store 2015, jump slider to 1920
+        return False, "⏸", current_year, no_update  # normal: store current, don't move slider
+    # Pausing — don't touch resume year or slider
+    return True, "▶", no_update, no_update
 
 @app.callback(
     Output("year-slider", "value"),
@@ -268,19 +276,19 @@ def toggle_playback(n_clicks, is_disabled):
     Output("play-btn", "children", allow_duplicate=True),
     Input("play-interval", "n_intervals"),
     State("year-slider", "value"),
+    State("resume-year", "data"),
     prevent_initial_call=True,
 )
-def advance_year(n_intervals, current_year):
+def advance_year(n_intervals, current_year, resume_year):
     if current_year not in PLAYBACK_YEARS:
-        # If sitting on 1945, jump to the next playback year
         next_year = next((yr for yr in PLAYBACK_YEARS if yr > current_year), None)
     else:
         idx = PLAYBACK_YEARS.index(current_year)
         next_year = PLAYBACK_YEARS[idx + 1] if idx + 1 < len(PLAYBACK_YEARS) else None
 
     if next_year is None:
-        # Reached the end — stop and reset
-        return 2015, True, "▶"
+        # End of playback — return to wherever Play was pressed
+        return resume_year if resume_year is not None else 2015, True, "▶"
 
     return next_year, False, no_update
 
