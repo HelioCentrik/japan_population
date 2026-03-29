@@ -13,6 +13,8 @@ PANEL_H = 720
 LEGEND_H = PANEL_H * 1.03
 TIME_H = 180
 
+PLAY_INTERVAL_MS = 1500
+
 MAP_GEO = {
     "bg_color":   "#06091a",   # near-black ocean — the "floor"
     "land_color": "#1c1f30",   # surrounding land (Korea/Russia) — mid-tier

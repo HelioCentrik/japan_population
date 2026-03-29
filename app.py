@@ -5,7 +5,7 @@ import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, FONT_HEADER_JPRED, FONT_HEADER_JPWHT,
-                        PANEL_H)
+                        PANEL_H, PLAY_INTERVAL_MS, ACCENT_THRESHOLD)
 from app.index_string import INDEX_STRING
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
@@ -31,6 +31,7 @@ YEAR_LABELS = {
     int(row.year): f"{row.year} ({row.era_name}{row.era_year})"
     for row in years_df.itertuples()
 }
+PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS if yr != 1945]
 
 
 # ── Layout ────────────────────────────────────────────────────────────────────
@@ -44,6 +45,13 @@ app.layout = html.Div(
     },
     children=[
         dcc.Store(id="selected-prefecture", data=None),
+
+        dcc.Interval(
+            id="play-interval",
+            interval=PLAY_INTERVAL_MS,
+            disabled=True,  # starts paused; callbacks toggle this
+            n_intervals=0,
+        ),
 
         # Header
         html.H2(
@@ -78,39 +86,70 @@ app.layout = html.Div(
             children=render_kpi_cards(build_kpi_data(2000)),
         ),
 
-        # Year Slider
+        # Play Button + Year Slider
         html.Div(
             style={
                 "marginBottom": "1rem",
-                "padding": "0.75rem 1rem 0.5rem 1rem",
-                "backgroundColor": PANEL_BORDER,
-                "borderRadius": "6px",
+                "display": "flex",
+                "alignItems": "center",
+                "gap": "0.4rem",
             },
             children=[
-                dcc.Slider(
-                    id="year-slider",
-                    min=min(CENSUS_YEARS),
-                    max=max(CENSUS_YEARS),
-                    step=None,
-                    value=2000,
-                    marks={
-                        yr: {
-                            "label": str(yr),
-                            "style": {
-                                "color": FONT_HEADER_JPRED if yr == 1945 else FONT_MAIN_COLOR,
-                                "fontSize": "13px",
-                                "fontWeight": "bold" if yr == 1945 else "normal",
-                            }
-                        }
-                        for yr in CENSUS_YEARS
+
+                # Play / Pause button
+                html.Button(
+                    "▶",
+                    id="play-btn",
+                    className="play-btn",
+                    # style={
+                    #     "flexShrink": "0",
+                    #     "padding": "6px 16px",
+                    #     "backgroundColor": "rgba(0,0,0,0)",
+                    #     "color": ACCENT_THRESHOLD,
+                    #     "border": f"2px solid {ACCENT_THRESHOLD}",
+                    #     "borderRadius": "5px",
+                    #     "fontSize": "13px",
+                    #     "fontWeight": "600",
+                    #     "cursor": "pointer",
+                    #     "letterSpacing": "0.05em",
+                    #     "whiteSpace": "nowrap",
+                    # }
+                ),
+
+                # Slider panel
+                html.Div(
+                    style={
+                        "flex": "1",
+                        "padding": "0.75rem 1rem 0.5rem 1rem",
+                        "backgroundColor": PANEL_BORDER,
+                        "borderRadius": "6px",
                     },
-                    tooltip={
-                        "placement": "top",
-                        "always_visible": False,
-                        # "template": {str(yr): label for yr, label in YEAR_LABELS.items()},
-                    },
-                    included=False,
-                )
+                    children=[
+                        dcc.Slider(
+                            id="year-slider",
+                            min=min(CENSUS_YEARS),
+                            max=max(CENSUS_YEARS),
+                            step=None,
+                            value=2000,
+                            marks={
+                                yr: {
+                                    "label": str(yr),
+                                    "style": {
+                                        "color": FONT_HEADER_JPRED if yr == 1945 else FONT_MAIN_COLOR,
+                                        "fontSize": "13px",
+                                        "fontWeight": "bold" if yr == 1945 else "normal",
+                                    }
+                                }
+                                for yr in CENSUS_YEARS
+                            },
+                            tooltip={
+                                "placement": "top",
+                                "always_visible": False,
+                            },
+                            included=False,
+                        )
+                    ]
+                ),
             ]
         ),
 
@@ -211,6 +250,41 @@ app.layout = html.Div(
 
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
+@app.callback(
+    Output("play-interval", "disabled"),
+    Output("play-btn", "children"),
+    Input("play-btn", "n_clicks"),
+    State("play-interval", "disabled"),
+    prevent_initial_call=True,
+)
+def toggle_playback(n_clicks, is_disabled):
+    if is_disabled:
+        return False, "⏸"
+    return True, "▶"
+
+@app.callback(
+    Output("year-slider", "value"),
+    Output("play-interval", "disabled", allow_duplicate=True),
+    Output("play-btn", "children", allow_duplicate=True),
+    Input("play-interval", "n_intervals"),
+    State("year-slider", "value"),
+    prevent_initial_call=True,
+)
+def advance_year(n_intervals, current_year):
+    if current_year not in PLAYBACK_YEARS:
+        # If sitting on 1945, jump to the next playback year
+        next_year = next((yr for yr in PLAYBACK_YEARS if yr > current_year), None)
+    else:
+        idx = PLAYBACK_YEARS.index(current_year)
+        next_year = PLAYBACK_YEARS[idx + 1] if idx + 1 < len(PLAYBACK_YEARS) else None
+
+    if next_year is None:
+        # Reached the end — stop and reset
+        return 2015, True, "▶"
+
+    return next_year, False, no_update
+
+
 @app.callback(
     Output("selected-prefecture", "data"),
     Output("choropleth-map", "clickData"),
