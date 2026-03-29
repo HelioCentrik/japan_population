@@ -6,6 +6,7 @@ import duckdb as ddb
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, FONT_HEADER_JPRED, FONT_HEADER_JPWHT,
                         PANEL_H)
+from app.index_string import INDEX_STRING
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -15,6 +16,7 @@ from app.timeseries import build_aging_index_fig
 
 # ── App instance ──────────────────────────────────────────────────────────────
 app = dash.Dash(__name__, title="Japanese Population Dashboard")
+app.index_string = INDEX_STRING
 server = app.server  # expose for deployment (Gunicorn etc.)
 
 # ── Census years for slider ───────────────────────────────────────────────────
@@ -50,7 +52,7 @@ app.layout = html.Div(
                 "textAlign": "center",
                 "fontSize": "40px",
                 "color": FONT_HEADER_JPRED,
-                "marginBottom": "3rem"
+                "marginBottom": "3rem",
             }
         ),
 

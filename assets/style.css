@@ -2,25 +2,23 @@
 
 /* Full page background */
 html, body {
-    background-color: #091023;
+    background-color: var(--page-bg);
     margin: 0;
     padding: 0;
 }
 
-/* Dash's root app div */
 #react-entry-point, ._dash-loading, .dash-loading {
-    background-color: #091023;
+    background-color: var(--page-bg);
 }
 
-/* The main view container Dash renders into */
 .dash-renderer {
-    background-color: #091023;
+    background-color: var(--page-bg);
 }
 
 /* ── KPI / generic panel card ──────────────────────────────────────────────── */
 .card {
-    background    : rgba(0, 0, 0, 0);
-    border        : 1px solid #334477;
+    background    : var(--panel-bg);
+    border        : 1px solid var(--panel-border);
     border-radius : 6px;
     box-shadow    : 0 0 8px rgba(0, 17, 34, 0.4);
     padding       : 12px 16px;
@@ -34,24 +32,24 @@ html, body {
 }
 
 .kpi-label {
-    color      : #aad;
-    font-size  : 11px;
+    color         : var(--font-main);
+    font-size     : 11px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     margin-bottom : 6px;
-    opacity    : 0.75;
+    opacity       : 0.75;
 }
 
 .kpi-value {
-    color      : #e0e8ff;
-    font-size  : 22px;
-    font-weight: 600;
+    color         : #e0e8ff;
+    font-size     : 22px;
+    font-weight   : 600;
     letter-spacing: 0.02em;
-    line-height: 1.15;
+    line-height   : 1.15;
 }
 
 .kpi-sub {
-    color      : #aad;
+    color      : var(--font-main);
     font-size  : 12px;
     margin-top : 4px;
     opacity    : 0.65;
@@ -69,8 +67,8 @@ html, body {
 }
 
 .dash-slider-thumb {
-    background-color: #aad !important;
-    border-color: #aad !important;
+    background-color: var(--font-main) !important;
+    border-color: var(--font-main) !important;
     box-shadow: none !important;
 }
 
