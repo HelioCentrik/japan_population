@@ -88,7 +88,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=national_df["aging_index"],
         mode="lines",
         name="全国 National",
-        line=dict(color=FONT_HEADER_JPRED, width=2),
+        line=dict(color=FONT_MAIN_COLOR, width=2),
         hovertemplate="<b>%{x}</b><br>高齢化指数: <b>%{y:.1f}</b><extra>全国</extra>",
     ))
 
@@ -98,7 +98,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=df_non_1945["aging_index"],
         mode="markers",
         showlegend=False,
-        marker=dict(color=FONT_HEADER_JPRED, size=5),
+        marker=dict(color=FONT_MAIN_COLOR, size=5),
         hoverinfo="skip",
     ))
 
