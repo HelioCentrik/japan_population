@@ -1,11 +1,24 @@
 /* assets/style.css */
+/*
+ * All color, size, font, shadow, and spacing values consumed via CSS custom
+ * properties injected at runtime by app/index_string.py from app/config.py.
+ * Do not hardcode hex values, pixel sizes, or font names here.
+ *
+ * Intentional hardcodes (documented inline where they appear):
+ *   #ccccee      — slider thumb hover micro-state; CSS-only, no Python consumer
+ *   rgba(0,0,0,…) — pure black overlay on reset button; theme-independent
+ *   rgba(100,140,220,0.2) — decorative play-btn glow; not part of color system
+ *   calc(var(--border-radius) * 0.67) — derived ratio for reset btn corner
+ */
+
 
 /* ── Base / Reset ──────────────────────────────────────────────────────────── */
 
 html, body {
-    background-color: var(--page-bg);
-    margin: 0;
-    padding: 0;
+    background-color : var(--page-bg);
+    font-family      : var(--font-sans);
+    margin           : 0;
+    padding          : 0;
 }
 
 #react-entry-point, ._dash-loading, .dash-loading {
@@ -24,7 +37,7 @@ html, body {
     background     : var(--panel-bg);
     border         : 1px solid var(--panel-border);
     border-radius  : var(--border-radius);
-    box-shadow     : 0 0 8px rgba(0, 17, 34, 0.4);
+    box-shadow     : 0 0 8px var(--shadow-panel);
     padding        : 12px 16px;
     overflow       : hidden;
     display        : flex;
@@ -36,8 +49,8 @@ html, body {
 }
 
 .kpi-label {
-    color          : var(--font-main);
-    font-size      : 11px;
+    color          : var(--color-text-mid);
+    font-size      : var(--font-size-kpi-label);
     letter-spacing : 0.06em;
     text-transform : uppercase;
     margin-bottom  : 6px;
@@ -45,16 +58,16 @@ html, body {
 }
 
 .kpi-value {
-    color          : #e0e8ff;
-    font-size      : 22px;
+    color          : var(--color-text-hi);
+    font-size      : var(--font-size-kpi-value);
     font-weight    : 600;
     letter-spacing : 0.02em;
     line-height    : 1.15;
 }
 
 .kpi-sub {
-    color          : var(--font-main);
-    font-size      : 12px;
+    color          : var(--color-text-mid);
+    font-size      : var(--font-size-kpi-sub);
     margin-top     : 4px;
     opacity        : 0.65;
 }
@@ -63,29 +76,29 @@ html, body {
 .play-btn {
     flex-shrink      : 0;
     align-self       : stretch;
-    width            : 52px;
+    width            : var(--play-btn-size);
     aspect-ratio     : 1 / 1;
     background-color : var(--panel-border);
-    color            : var(--font-main);
+    color            : var(--color-text-mid);
     border           : 0px solid rgba(255, 255, 255, 0.07);
     border-radius    : var(--border-radius);
-    font-size        : 28px;
+    font-size        : var(--play-btn-font-size);
     cursor           : pointer;
-    box-shadow       : inset 0 1px 5px rgba(0, 0, 0, 0.55),
-                       inset 0 1px 3px rgba(0, 0, 0, 0.35);
+    box-shadow       : inset 0 1px 5px var(--shadow-map-inset),
+                       inset 0 1px 3px var(--shadow-panel);
     transition       : background-color 0.15s ease, box-shadow 0.1s ease, color 0.15s ease;
 }
 
 .play-btn:hover {
-    background-color: #243558;
-    color           : #e0e8ff;
-    box-shadow      : inset 0 2px 6px rgba(0, 0, 0, 0.4),
+    background-color: var(--color-ui-hover);
+    color           : var(--color-text-hi);
+    box-shadow      : inset 0 2px 6px var(--shadow-panel),
                       0 0 8px rgba(100, 140, 220, 0.2);
 }
 
 .play-btn:active {
-    background-color: #111e33;
-    box-shadow      : inset 0 3px 12px rgba(0, 0, 0, 0.75);
+    background-color: var(--page-bg);
+    box-shadow      : inset 0 3px 12px var(--shadow-map-inset);
 }
 
 /* Reset prefecture button */
@@ -95,23 +108,23 @@ html, body {
     bottom           : 12px;
     right            : 12px;
     background-color : rgba(0, 0, 0, 0.55);
-    color            : var(--font-main);
+    color            : var(--color-text-mid);
     border           : 1px solid var(--panel-border);
-    border-radius    : 4px;
+    border-radius    : calc(var(--border-radius) * 0.67);
     padding          : 4px 10px;
-    font-size        : 12px;
+    font-size        : var(--font-size-kpi-sub);
     cursor           : pointer;
     z-index          : 1000;
 }
 
 #reset-prefecture-btn:hover {
     background-color: rgba(255, 255, 255, 0.08);
-    color           : #e0e8ff;
+    color           : var(--color-text-hi);
 }
 
 /* Year Slider */
 .dash-slider-track {
-    background-color: #1a2a44 !important;
+    background-color: var(--slider-track) !important;
     height          : 3px !important;
 }
 
@@ -120,25 +133,24 @@ html, body {
 }
 
 .dash-slider-thumb {
-    background-color: var(--font-main) !important;
-    border-color    : var(--font-main) !important;
+    background-color: var(--color-text-mid) !important;
+    border-color    : var(--color-text-mid) !important;
     box-shadow      : none !important;
 }
 
 .dash-slider-thumb:hover,
 .dash-slider-thumb:focus,
 .dash-slider-thumb[data-state="dragging"] {
-    background-color: #cce !important;
+    background-color: #ccccee !important;
     box-shadow      : 0 0 5px rgba(170, 170, 221, 0.5) !important;
 }
 
 .dash-slider-mark {
-    color: #e0e8ff !important;
+    color: var(--color-text-hi) !important;
 }
 
 
 /* ── Layout ────────────────────────────────────────────────────────────────── */
-/* Flex ratios and spacing sourced from config.py → injected via index_string.py */
 
 /* Outer wrapper — full viewport height, scrolls below --min-height */
 .dashboard-outer {
@@ -157,9 +169,10 @@ html, body {
 /* Dashboard title */
 .dashboard-title {
     text-align    : center;
-    font-size     : clamp(24px, 3vw, 40px);
+    font-family   : var(--font-serif);
+    font-size     : clamp(24px, 3vw, var(--font-size-title));
     letter-spacing: 0.02em;
-    margin        : 0;         /* gap on parent handles spacing */
+    margin        : 0;
 }
 
 /* KPI row */
@@ -176,13 +189,13 @@ html, body {
 /* Charts area — fills all remaining vertical space */
 .charts-area {
     flex           : 1;
-    min-height     : 0;        /* allows flex children to shrink below content size */
+    min-height     : 0;
     display        : flex;
     flex-direction : column;
     gap            : var(--layout-gap);
 }
 
-/* Map + pyramid row — flex: 3 of charts-area */
+/* Map + pyramid row */
 .map-pyramid-row {
     flex      : var(--charts-row-flex);
     min-height: 0;
@@ -196,8 +209,8 @@ html, body {
     min-height       : var(--map-min-height);
     border-radius    : var(--border-radius);
     border           : 1px solid var(--panel-border);
-    box-shadow       : inset 0 3px 14px rgba(0,0,0,0.65),
-                       inset 0 1px 4px rgba(0,0,0,0.4);
+    box-shadow       : inset 0 3px 14px var(--shadow-map-inset),
+                       inset 0 1px 4px var(--shadow-panel);
     overflow         : hidden;
     background-color : var(--page-bg);
     position         : relative;
@@ -209,18 +222,18 @@ html, body {
     min-height       : 0;
     border-radius    : var(--border-radius);
     border           : 1px solid var(--panel-border);
-    box-shadow       : 0 0 8px #00112266;
+    box-shadow       : 0 0 8px var(--shadow-panel);
     overflow         : hidden;
     background-color : var(--page-bg);
 }
 
-/* Timeseries panel — flex: 1 of charts-area */
+/* Timeseries panel */
 .timeseries-panel {
     flex             : var(--charts-ts-flex);
     min-height       : 0;
     border-radius    : var(--border-radius);
     border           : 1px solid var(--panel-border);
-    box-shadow       : 0 0 8px #00112266;
+    box-shadow       : 0 0 8px var(--shadow-panel);
     overflow         : hidden;
     background-color : var(--page-bg);
 }
@@ -247,7 +260,7 @@ html, body {
 
     .map-pyramid-row {
         flex-direction: column;
-        flex          : none;        /* exit the flex-fill chain on mobile */
+        flex          : none;
         height        : auto;
     }
 

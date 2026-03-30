@@ -4,7 +4,7 @@ from dash import html, dcc, Input, Output, State, no_update, ctx
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
-                        FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, FONT_COLOR_JPRED, FONT_COLOR_JPWHT,
+                        FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, COLOR_PRIMARY, COLOR_SECONDARY,
                         PLAY_INTERVAL_MS)
 from app.index_string import INDEX_STRING
 from app.maps import build_japan_map_fig
@@ -61,7 +61,7 @@ app.layout = html.Div(
             "日本の人口統計 Japanese Population",
             className="dashboard-title",
             style={
-                "color": FONT_COLOR_JPRED,
+                "color": COLOR_PRIMARY,
             }
         ),
 
@@ -69,7 +69,7 @@ app.layout = html.Div(
             id="era-label",
             style={
                 "textAlign": "center",
-                "color": FONT_COLOR_JPWHT,
+                "color": COLOR_SECONDARY,
                 "fontSize": "28px",
                 "marginBottom": "1.25rem",
                 "letterSpacing": "0.05em",
@@ -117,7 +117,7 @@ app.layout = html.Div(
                                 yr: {
                                     "label": str(yr),
                                     "style": {
-                                        "color": FONT_COLOR_JPRED if yr == 1945 else FONT_MAIN_COLOR,
+                                        "color": COLOR_PRIMARY if yr == 1945 else FONT_MAIN_COLOR,
                                         "fontSize": "13px",
                                         "fontWeight": "bold" if yr == 1945 else "normal",
                                     }
