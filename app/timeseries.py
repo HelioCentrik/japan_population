@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 from app.config import (
     PANEL_BG, PANEL_BORDER, FONT_MAIN, FONT_MAIN_COLOR, FONT_COLOR_JPRED, FONT_COLOR_JPWHT,
-    ACCENT_THRESHOLD,
+    ACCENT_THRESHOLD, CHART_GRID_COLOR,
     TIMESERIES_PREF_COLOR,
 )
 
@@ -182,7 +182,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         ),
         xaxis=dict(
             tickfont=dict(color=FONT_MAIN_COLOR, size=11),
-            gridcolor="#1a2440",
+            gridcolor=CHART_GRID_COLOR,   # was "#1a2440"
             showline=False,
             dtick=10,
         ),
@@ -192,7 +192,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
                 font=dict(color=FONT_MAIN_COLOR, size=11),
             ),
             tickfont=dict(color=FONT_MAIN_COLOR, size=11),
-            gridcolor="#1a2440",
+            gridcolor=CHART_GRID_COLOR,   # was "#1a2440"
             showline=False,
             zeroline=False,
         ),

@@ -9,6 +9,8 @@ from plotly import graph_objects as go
 
 from app.config import (
     PANEL_BG, FONT_MAIN, FONT_MAIN_COLOR, MAP_GEO,
+    MAP_COLORSCALE, MAP_TILE_STYLE,
+    MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
 )
 
@@ -62,8 +64,8 @@ def build_japan_map_fig(year: int = 2015, area_estat: str | None = None) -> go.F
         locations=prefectures["area_estat"],
         z=prefectures["log_population"],
         featureidkey="properties.area_estat",
-        colorscale="plasma_r",
-        marker_line_width=0.8,
+        colorscale=MAP_COLORSCALE,
+        marker_line_width=MAP_BORDER_WIDTH,
         marker_line_color=MAP_GEO.get("line_color"),
         customdata=prefectures[[
             "prefecture_name_ja",        # customdata[0]
@@ -125,9 +127,9 @@ def build_japan_map_fig(year: int = 2015, area_estat: str | None = None) -> go.F
 
     fig.update_layout(
         mapbox=dict(
-            style="carto-darkmatter",
-            center=dict(lat=35.5, lon=135.5),
-            zoom=3.75,
+            style=MAP_TILE_STYLE,
+            center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
+            zoom=MAP_DEFAULT_ZOOM,
         ),
         margin=dict(l=6, r=7, t=6, b=6),
         autosize=True,

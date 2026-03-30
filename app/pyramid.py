@@ -11,6 +11,7 @@ from app.config import (
     FONT_MAIN, FONT_MAIN_COLOR,
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
+    PYRAMID_BARGAP, COHORT_OUTLINE_WIDTH, CHART_GRID_COLOR,
 )
 
 
@@ -300,7 +301,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     # ── Cohort outline shapes ──────────────────────────────────────────────────
     # 3 lines per band: top, bottom, outer left (male), outer right (female).
     # Deliberately no center line.
-    bar_half = (1 - 0.15) / 2
+    bar_half = (1 - PYRAMID_BARGAP) / 2
     for band_start, color in cohort_bands.items():
         if band_start not in age_starts:
             continue
@@ -315,13 +316,13 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             dict(x0=f_pop,  x1=f_pop,  y0=y0,  y1=y1),   # right (female outer)
         ]:
             fig.add_shape(type="line", xref="x", yref="y",
-                          line=dict(color=color, width=3.5), **shape)
+                          line=dict(color=color, width=COHORT_OUTLINE_WIDTH), **shape)
 
     dtick, half_range = _nice_axis(axis_max)
 
     fig.update_layout(
         barmode="overlay",          # bars share the same y-position, not stacked
-        bargap=0.15,
+        bargap=PYRAMID_BARGAP,
         paper_bgcolor=PANEL_BG,
         plot_bgcolor=PANEL_BG,
         margin=dict(l=16, r=16, t=44, b=20),
@@ -335,7 +336,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         xaxis=dict(
             tickformat="~s",
             tickfont=dict(color=FONT_MAIN_COLOR, size=12),
-            gridcolor="#1a2440",
+            gridcolor=CHART_GRID_COLOR,
             zeroline=True,
             zerolinewidth=1,
             zerolinecolor=PANEL_BORDER,
