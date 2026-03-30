@@ -1,7 +1,7 @@
 # app/config.py ────────────────────────────────────────────────────────────────────
 
 PAGE_BG = str("#091023")
-PANEL_BG = str("rgba(0, 0, 0, 0)")
+PANEL_BG = str("#06091a")
 PANEL_BORDER = str("#334477")
 FONT_HEADER = str("serif")
 FONT_HEADER_JPRED = str("#bc002d")

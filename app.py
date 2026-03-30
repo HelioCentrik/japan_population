@@ -173,7 +173,7 @@ app.layout = html.Div(
                             "inset 0 1px 4px rgba(0,0,0,0.4)"
                         ),
                         "overflow": "hidden",
-                        "backgroundColor": "#06091a",
+                        "backgroundColor": f"{PAGE_BG}",
                         "position": "relative",  # ← enables absolute child positioning
                     },
                     children=[
@@ -213,7 +213,7 @@ app.layout = html.Div(
                         "border": f"1px solid {PANEL_BORDER}",
                         "boxShadow": "0 0 8px #00112266",
                         "overflow": "hidden",
-                        "backgroundColor": "#06091a",
+                        "backgroundColor": f"{PAGE_BG}",
                     },
                     children=[
                         dcc.Graph(
@@ -237,7 +237,7 @@ app.layout = html.Div(
                 "border": f"1px solid {PANEL_BORDER}",
                 "boxShadow": "0 0 8px #00112266",
                 "overflow": "hidden",
-                "backgroundColor": "#06091a",
+                "backgroundColor": f"{PAGE_BG}",
             },
             children=[
                 dcc.Graph(

@@ -70,7 +70,7 @@ def _nice_axis(max_val: int) -> tuple[float, float]:
 
     dtick      = snapped * magnitude
     n_ticks    = math.ceil(max_val / dtick)   # minimum ticks to cover the data
-    half_range = dtick * (n_ticks + 1)        # +1 full tick of headroom
+    half_range = dtick * (n_ticks + 0.25)        # +1 full tick of headroom
     return dtick, half_range
 
 
@@ -79,6 +79,13 @@ _COHORTS = {
     "dankai":    (1947, 1949, ACCENT_DANKAI),      # 団塊の世代
     "dankai_jr": (1971, 1974, ACCENT_DANKAI_JR),   # 団塊ジュニア
 }
+# Canonical scheme_a labels in display order — y-axis pinned to this so
+# early years with fewer bands (80+ terminal instead of 85+) don't collapse the axis
+_SCHEME_A_LABELS = [
+    "0–4", "5–9", "10–14", "15–19", "20–24", "25–29",
+    "30–34", "35–39", "40–44", "45–49", "50–54", "55–59",
+    "60–64", "65–69", "70–74", "75–79", "80+"
+]
 
 
 def _shorten_label(label: str) -> str:
@@ -118,24 +125,39 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
 
     if area_estat is not None:
         df = con.execute("""
-            SELECT age_group, age_start, sex, population
-            FROM v_census
-            WHERE year       = ?
-              AND age_scheme  = 'scheme_a'
-              AND age_group  != 'Total'
-              AND sex        != 'total'
-              AND area_estat  = ?
+            SELECT age_group, age_start, sex, SUM(population) AS population
+            FROM (
+                SELECT
+                    CASE WHEN age_start >= 80 THEN '80+' ELSE age_group END AS age_group,
+                    CASE WHEN age_start >= 80 THEN 80    ELSE age_start END AS age_start,
+                    sex,
+                    population
+                FROM v_census
+                WHERE year       = ?
+                  AND age_scheme  = 'scheme_a'
+                  AND age_group  != 'Total'
+                  AND sex        != 'total'
+                  AND area_estat  = ?
+            )
+            GROUP BY age_group, age_start, sex
             ORDER BY age_start
         """, [year, area_estat]).df()
     else:
         df = con.execute(f"""
             SELECT age_group, age_start, sex, SUM(population) AS population
-            FROM v_census
-            WHERE year      = {year}
-              AND age_scheme = 'scheme_a'
-              AND age_group != 'Total'
-              AND sex       != 'total'
-              AND area_level = 2
+            FROM (
+                SELECT
+                    CASE WHEN age_start >= 80 THEN '80+' ELSE age_group END AS age_group,
+                    CASE WHEN age_start >= 80 THEN 80    ELSE age_start END AS age_start,
+                    sex,
+                    population
+                FROM v_census
+                WHERE year      = {year}
+                  AND age_scheme = 'scheme_a'
+                  AND age_group != 'Total'
+                  AND sex       != 'total'
+                  AND area_level = 2
+            )
             GROUP BY age_group, age_start, sex
             ORDER BY age_start
         """).df()
@@ -212,15 +234,17 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     # ── 戦中世代 — Wartime cohort marker ──────────────────────────────────────
     # Men born 1910–1925 were prime conscription age during the war.
     # Track by birth year, not sex ratio math — same logic as dankai cohorts.
-    wartime_bands = _cohort_band_range(year, 1910, 1925) if (area_estat is None and 1950 <= year <= 2015) else []
+    valid_bands = set(male_df["age_start"].tolist())
+    wartime_bands = [b for b in _cohort_band_range(year, 1910, 1925) if b in valid_bands] if (
+                area_estat is None and 1950 <= year <= 2015) else []
     war_gen_rows = male_df[male_df["age_start"].isin(wartime_bands)]
 
     war_gen_trace = go.Scatter(
-        x=[-v for v in war_gen_rows["population"]],
-        y=[_shorten_label(l) for l in war_gen_rows["age_group"]],
+        x=[-v for v in war_gen_rows["population"]] if not war_gen_rows.empty else [None],
+        y=[_shorten_label(l) for l in war_gen_rows["age_group"]] if not war_gen_rows.empty else [None],
         mode="markers",
         name="戦中世代",
-        showlegend=len(war_gen_rows) > 0,
+        showlegend=False,
         marker=dict(
             symbol="diamond",
             size=8,
@@ -239,15 +263,16 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     # Birth years 1986–1990: first cohort born into sustained population decline.
     # Diamond at x=0 (center) — symmetric and neutral, distinct from 戦中世代
     # which sits on the male side.
-    shoushika_bands = _cohort_band_range(year, 1986, 1990) if (area_estat is None and year >= 1990) else []
+    shoushika_bands = [b for b in _cohort_band_range(year, 1986, 1990) if b in valid_bands] if (
+                area_estat is None and year >= 1990) else []
     shoushika_rows = male_df[male_df["age_start"].isin(shoushika_bands)]
 
     shoushika_trace = go.Scatter(
-        x=[0] * len(shoushika_rows),
-        y=[_shorten_label(l) for l in shoushika_rows["age_group"]],
+        x=[0] * len(shoushika_rows) if not shoushika_rows.empty else [None],
+        y=[_shorten_label(l) for l in shoushika_rows["age_group"]] if not shoushika_rows.empty else [None],
         mode="markers",
         name="少子化世代",
-        showlegend=len(shoushika_rows) > 0,
+        showlegend=False,
         marker=dict(
             symbol="diamond",
             size=8,
@@ -326,7 +351,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             ),
             tickfont=dict(color=FONT_MAIN_COLOR, size=12),
             showgrid=False,
-            autorange=True,
+            categoryorder="array",
+            categoryarray=_SCHEME_A_LABELS,
         ),
     )
 
