@@ -127,7 +127,7 @@ def build_japan_map_fig(year: int = 2015, area_estat: str | None = None) -> go.F
         mapbox=dict(
             style="carto-darkmatter",
             center=dict(lat=35.5, lon=135.5),
-            zoom=3.9,
+            zoom=3.75,
         ),
         margin=dict(l=6, r=7, t=6, b=6),
         autosize=True,

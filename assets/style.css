@@ -90,7 +90,7 @@ html, body {
 
 /* Reset prefecture button */
 #reset-prefecture-btn {
-    display          : none;       /* default hidden; callback overrides to block */
+    display          : none;
     position         : absolute;
     bottom           : 12px;
     right            : 12px;
@@ -138,41 +138,62 @@ html, body {
 
 
 /* ── Layout ────────────────────────────────────────────────────────────────── */
+/* Flex ratios and spacing sourced from config.py → injected via index_string.py */
 
-/* Outer wrapper — prevents content kissing the viewport edge */
+/* Outer wrapper — full viewport height, scrolls below --min-height */
 .dashboard-outer {
-    padding-left : 1rem;
-    padding-right: 1rem;
+    height           : 100vh;
+    min-height       : var(--min-height);
+    overflow-y       : auto;
+    display          : flex;
+    flex-direction   : column;
+    gap              : var(--layout-gap);
+    padding-left     : var(--outer-pad);
+    padding-right    : var(--outer-pad);
+    padding-bottom   : var(--layout-gap);
+    box-sizing       : border-box;
 }
 
 /* Dashboard title */
 .dashboard-title {
     text-align    : center;
-    font-size     : clamp(24px, 3vw, 40px);  /* scales between 24–40px with viewport */
+    font-size     : clamp(24px, 3vw, 40px);
     letter-spacing: 0.02em;
-    margin-bottom : 3rem;
+    margin        : 0;         /* gap on parent handles spacing */
 }
 
-/* KPI row — wraps to multiple rows at narrow widths */
+/* KPI row */
 #kpi-row {
-    /* no flex-wrap here — cards stay on one row at full width */
+    display  : flex;
+    gap      : var(--layout-gap);
 }
 
 #kpi-row .card {
-    min-width: 180px;
+    min-width: 140px;
     flex     : 1 1 14%;
 }
 
-/* Map + pyramid row */
-.map-pyramid-row {
-    display      : flex;
-    gap          : 1rem;
-    margin-bottom: 1rem;
+/* Charts area — fills all remaining vertical space */
+.charts-area {
+    flex           : 1;
+    min-height     : 0;        /* allows flex children to shrink below content size */
+    display        : flex;
+    flex-direction : column;
+    gap            : var(--layout-gap);
 }
 
+/* Map + pyramid row — flex: 3 of charts-area */
+.map-pyramid-row {
+    flex      : var(--charts-row-flex);
+    min-height: 0;
+    display   : flex;
+    gap       : var(--layout-gap);
+}
+
+/* Map panel */
 .map-panel {
-    flex             : 7;
-    height           : 56vh;
+    flex             : var(--map-flex);
+    min-height       : var(--map-min-height);
     border-radius    : 8px;
     border           : 1px solid var(--panel-border);
     box-shadow       : inset 0 3px 14px rgba(0,0,0,0.65),
@@ -182,9 +203,10 @@ html, body {
     position         : relative;
 }
 
+/* Pyramid panel */
 .pyramid-panel {
-    flex             : 3;
-    height           : 56vh;
+    flex             : var(--pyramid-flex);
+    min-height       : 0;
     border-radius    : 6px;
     border           : 1px solid var(--panel-border);
     box-shadow       : 0 0 8px #00112266;
@@ -192,15 +214,15 @@ html, body {
     background-color : var(--page-bg);
 }
 
+/* Timeseries panel — flex: 1 of charts-area */
 .timeseries-panel {
-    height           : 26vh;
-    min-height       : 200px;
+    flex             : var(--charts-ts-flex);
+    min-height       : 0;
     border-radius    : 6px;
     border           : 1px solid var(--panel-border);
     box-shadow       : 0 0 8px #00112266;
     overflow         : hidden;
     background-color : var(--page-bg);
-    margin-bottom    : 1rem;
 }
 
 
@@ -211,7 +233,7 @@ html, body {
         flex-wrap: wrap;
     }
     #kpi-row .card {
-        flex: 1 1 30%;      /* 3 per row */
+        flex: 1 1 30%;
     }
 }
 
@@ -220,11 +242,13 @@ html, body {
         flex-wrap: wrap;
     }
     #kpi-row .card {
-        flex: 1 1 45%;      /* 2 per row */
+        flex: 1 1 45%;
     }
 
     .map-pyramid-row {
         flex-direction: column;
+        flex          : none;        /* exit the flex-fill chain on mobile */
+        height        : auto;
     }
 
     .map-panel,
@@ -234,6 +258,7 @@ html, body {
     }
 
     .timeseries-panel {
+        flex  : none;
         height: 30vh;
     }
 }

@@ -1,5 +1,22 @@
 # app/config.py ────────────────────────────────────────────────────────────────────
 
+# ── Layout ────────────────────────────────────────────────────────────────────
+LAYOUT_GAP          = "0.5rem"   # uniform gap between all dashboard rows/panels
+LAYOUT_OUTER_PAD    = "1rem"     # left/right padding on dashboard-outer
+LAYOUT_MIN_HEIGHT   = "700px"    # below this viewport height, page scrolls
+
+# Flex ratios — charts-area children (map+pyramid row vs timeseries)
+CHARTS_ANCHOR       = 10
+CHARTS_ROW_FLEX     = 7
+CHARTS_TS_FLEX      = CHARTS_ANCHOR - CHARTS_ROW_FLEX
+
+# Flex ratios — map+pyramid row children
+MAP_MIN_HEIGHT      = "320px"
+MAP_FLEX            = 7
+PYRAMID_FLEX        = 3
+
+
+# ── Display ────────────────────────────────────────────────────────────────────
 PAGE_BG = str("#091023")
 PANEL_BG = str("#06091a")
 PANEL_BORDER = str("#334477")

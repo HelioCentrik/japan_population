@@ -38,13 +38,12 @@ PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS if yr != 1945]
 
 # ── Layout ────────────────────────────────────────────────────────────────────
 app.layout = html.Div(
-    className="dashboard-outer",
-    style={
-        "backgroundColor": PAGE_BG,
-        "minHeight": "100vh",
-        "maxWidth": "1400px",
-        "margin": "0 auto",
-    },
+        className="dashboard-outer",
+        style={
+            "backgroundColor": PAGE_BG,
+            "maxWidth": "1400px",
+            "margin": "0 auto",
+        },
     children=[
         dcc.Store(id="selected-prefecture", data=None),
         dcc.Store(id="resume-year", data=None),
@@ -80,21 +79,15 @@ app.layout = html.Div(
         # KPI Cards
         html.Div(
             id="kpi-row",
-            style={
-                "display": "flex",
-                "gap": "0.75rem",
-                "marginBottom": "1rem",
-            },
             children=render_kpi_cards(build_kpi_data(YEAR_MAX)),
         ),
 
         # Play Button + Year Slider
         html.Div(
             style={
-                "marginBottom": "1rem",
                 "display": "flex",
                 "alignItems": "stretch",
-                "gap": "0.4rem",
+                "gap": "var(--layout-gap)",
             },
             children=[
 
@@ -103,19 +96,6 @@ app.layout = html.Div(
                     "▶",
                     id="play-btn",
                     className="play-btn",
-                    # style={
-                    #     "flexShrink": "1",
-                    #     "padding": "6px 16px",
-                    #     "backgroundColor": "rgba(0,0,0,0)",
-                    #     "color": ACCENT_THRESHOLD,
-                    #     "border": f"2px solid {ACCENT_THRESHOLD}",
-                    #     "borderRadius": "5px",
-                    #     "fontSize": "13px",
-                    #     "fontWeight": "600",
-                    #     "cursor": "pointer",
-                    #     "letterSpacing": "0.05em",
-                    #     "whiteSpace": "nowrap",
-                    # }
                 ),
 
                 # Slider panel
@@ -155,56 +135,62 @@ app.layout = html.Div(
             ]
         ),
 
-        # Map + Pyramid columns
         html.Div(
-            className="map-pyramid-row",
-            style={},
+            className="charts-area",
             children=[
-                # Map container — the styled bezel
+
+                # Map + Pyramid columns
                 html.Div(
-                    className="map-panel",
+                    className="map-pyramid-row",
                     style={},
                     children=[
-                        dcc.Graph(
-                            id="choropleth-map",
-                            figure=build_japan_map_fig(year=YEAR_MAX),
-                            config={"displayModeBar": False, "responsive": True},
-                            style={"height": "100%"},
+                        # Map container
+                        html.Div(
+                            className="map-panel",
+                            style={},
+                            children=[
+                                dcc.Graph(
+                                    id="choropleth-map",
+                                    figure=build_japan_map_fig(year=YEAR_MAX),
+                                    config={"displayModeBar": False, "responsive": True},
+                                    style={"height": "100%"},
+                                ),
+                                html.Button(
+                                    "✕ Clear",
+                                    id="reset-prefecture-btn",
+                                ),
+                            ]
                         ),
-                        html.Button(
-                            "✕ Clear",
-                            id="reset-prefecture-btn",
+
+                        # Population Pyramid
+                        html.Div(
+                            className="pyramid-panel",
+                            style={},
+                            children=[
+                                dcc.Graph(
+                                    id="pyramid-chart",
+                                    figure=build_pyramid_fig(year=YEAR_MAX),
+                                    config={"displayModeBar": False, "responsive": True},
+                                    style={"height": "100%"},
+                                ),
+                            ]
                         ),
                     ]
                 ),
 
-                # Population Pyramid
+                # Time Series
                 html.Div(
-                    className="pyramid-panel",
-                    style={},
+                    className="timeseries-panel",
                     children=[
                         dcc.Graph(
-                            id="pyramid-chart",
-                            figure=build_pyramid_fig(year=YEAR_MAX),
+                            id="timeseries-chart",
+                            figure=build_aging_index_fig(selected_year=YEAR_MAX),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
                         ),
                     ]
                 ),
-            ]
-        ),
-
-        # Time Series
-        html.Div(
-            className="timeseries-panel",
-            children=[
-                dcc.Graph(
-                    id="timeseries-chart",
-                    figure=build_aging_index_fig(selected_year=YEAR_MAX),
-                    config={"displayModeBar": False, "responsive": True},
-                    style={"height": "100%"},
-                ),
-            ]
+            ]  # end charts-area
         ),
     ]
 )
