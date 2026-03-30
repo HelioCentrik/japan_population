@@ -4,8 +4,8 @@ from dash import html, dcc, Input, Output, State, no_update, ctx
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
-                        FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, FONT_HEADER_JPRED, FONT_HEADER_JPWHT,
-                        PANEL_H, PLAY_INTERVAL_MS, ACCENT_THRESHOLD)
+                        FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, FONT_COLOR_JPRED, FONT_COLOR_JPWHT,
+                        PLAY_INTERVAL_MS)
 from app.index_string import INDEX_STRING
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
@@ -38,10 +38,10 @@ PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS if yr != 1945]
 
 # ── Layout ────────────────────────────────────────────────────────────────────
 app.layout = html.Div(
+    className="dashboard-outer",
     style={
         "backgroundColor": PAGE_BG,
         "minHeight": "100vh",
-        "padding": "0rem",
         "maxWidth": "1400px",
         "margin": "0 auto",
     },
@@ -57,13 +57,12 @@ app.layout = html.Div(
         ),
 
         # Header
+        # app.py — header
         html.H2(
             "日本の人口統計 Japanese Population",
+            className="dashboard-title",
             style={
-                "textAlign": "center",
-                "fontSize": "40px",
-                "color": FONT_HEADER_JPRED,
-                "marginBottom": "3rem",
+                "color": FONT_COLOR_JPRED,
             }
         ),
 
@@ -71,7 +70,7 @@ app.layout = html.Div(
             id="era-label",
             style={
                 "textAlign": "center",
-                "color": FONT_HEADER_JPWHT,
+                "color": FONT_COLOR_JPWHT,
                 "fontSize": "28px",
                 "marginBottom": "1.25rem",
                 "letterSpacing": "0.05em",
@@ -138,7 +137,7 @@ app.layout = html.Div(
                                 yr: {
                                     "label": str(yr),
                                     "style": {
-                                        "color": FONT_HEADER_JPRED if yr == 1945 else FONT_MAIN_COLOR,
+                                        "color": FONT_COLOR_JPRED if yr == 1945 else FONT_MAIN_COLOR,
                                         "fontSize": "13px",
                                         "fontWeight": "bold" if yr == 1945 else "normal",
                                     }
@@ -158,24 +157,13 @@ app.layout = html.Div(
 
         # Map + Pyramid columns
         html.Div(
-            style={"marginBottom": "1rem", "display": "flex", "gap": "1rem"},
+            className="map-pyramid-row",
+            style={},
             children=[
-
                 # Map container — the styled bezel
                 html.Div(
-                    style={
-                        "flex": "7",
-                        "height": "56vh",
-                        "borderRadius": "8px",
-                        "border": f"1px solid {PANEL_BORDER}",
-                        "boxShadow": (
-                            "inset 0 3px 14px rgba(0,0,0,0.65), "
-                            "inset 0 1px 4px rgba(0,0,0,0.4)"
-                        ),
-                        "overflow": "hidden",
-                        "backgroundColor": f"{PAGE_BG}",
-                        "position": "relative",  # ← enables absolute child positioning
-                    },
+                    className="map-panel",
+                    style={},
                     children=[
                         dcc.Graph(
                             id="choropleth-map",
@@ -186,35 +174,14 @@ app.layout = html.Div(
                         html.Button(
                             "✕ Clear",
                             id="reset-prefecture-btn",
-                            style={
-                                "display": "none",  # shown/hidden via callback
-                                "position": "absolute",
-                                "bottom": "12px",
-                                "right": "12px",
-                                "backgroundColor": "rgba(0,0,0,0.55)",
-                                "color": FONT_MAIN_COLOR,
-                                "border": f"1px solid {PANEL_BORDER}",
-                                "borderRadius": "4px",
-                                "padding": "4px 10px",
-                                "fontSize": "12px",
-                                "cursor": "pointer",
-                                "zIndex": "1000",
-                            }
                         ),
                     ]
                 ),
 
                 # Population Pyramid
                 html.Div(
-                    style={
-                        "flex": "3",
-                        "height": "56vh",
-                        "borderRadius": "6px",
-                        "border": f"1px solid {PANEL_BORDER}",
-                        "boxShadow": "0 0 8px #00112266",
-                        "overflow": "hidden",
-                        "backgroundColor": f"{PAGE_BG}",
-                    },
+                    className="pyramid-panel",
+                    style={},
                     children=[
                         dcc.Graph(
                             id="pyramid-chart",
@@ -229,16 +196,7 @@ app.layout = html.Div(
 
         # Time Series
         html.Div(
-            style={
-                "marginTop": "0rem",
-                "marginBottom": "1rem",
-                "height": "260px",
-                "borderRadius": "6px",
-                "border": f"1px solid {PANEL_BORDER}",
-                "boxShadow": "0 0 8px #00112266",
-                "overflow": "hidden",
-                "backgroundColor": f"{PAGE_BG}",
-            },
+            className="timeseries-panel",
             children=[
                 dcc.Graph(
                     id="timeseries-chart",
@@ -320,21 +278,7 @@ def update_selected_prefecture(click_data, reset_clicks, current_area):
     Input("selected-prefecture", "data"),
 )
 def toggle_reset_button(area_estat):
-    base = {
-        "position": "absolute",
-        "bottom": "12px",
-        "right": "12px",
-        "backgroundColor": "rgba(0,0,0,0.55)",
-        "color": FONT_MAIN_COLOR,
-        "border": f"1px solid {PANEL_BORDER}",
-        "borderRadius": "4px",
-        "padding": "4px 10px",
-        "fontSize": "12px",
-        "cursor": "pointer",
-        "zIndex": "1000",
-        "display": "block" if area_estat else "none",
-    }
-    return base
+    return {"display": "block" if area_estat else "none"}
 
 @app.callback(
     Output("choropleth-map", "figure"),
