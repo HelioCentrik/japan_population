@@ -86,7 +86,7 @@ app.layout = html.Div(
                 "gap": "0.75rem",
                 "marginBottom": "1rem",
             },
-            children=render_kpi_cards(build_kpi_data(2000)),
+            children=render_kpi_cards(build_kpi_data(YEAR_MAX)),
         ),
 
         # Play Button + Year Slider
@@ -133,7 +133,7 @@ app.layout = html.Div(
                             min=min(CENSUS_YEARS),
                             max=max(CENSUS_YEARS),
                             step=None,
-                            value=2000,
+                            value=YEAR_MAX,
                             marks={
                                 yr: {
                                     "label": str(yr),
@@ -179,7 +179,7 @@ app.layout = html.Div(
                     children=[
                         dcc.Graph(
                             id="choropleth-map",
-                            figure=build_japan_map_fig(year=2000),
+                            figure=build_japan_map_fig(year=YEAR_MAX),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
                         ),
@@ -218,7 +218,7 @@ app.layout = html.Div(
                     children=[
                         dcc.Graph(
                             id="pyramid-chart",
-                            figure=build_pyramid_fig(year=2000),
+                            figure=build_pyramid_fig(year=YEAR_MAX),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
                         ),
@@ -242,7 +242,7 @@ app.layout = html.Div(
             children=[
                 dcc.Graph(
                     id="timeseries-chart",
-                    figure=build_aging_index_fig(selected_year=2000),
+                    figure=build_aging_index_fig(selected_year=YEAR_MAX),
                     config={"displayModeBar": False, "responsive": True},
                     style={"height": "100%"},
                 ),
