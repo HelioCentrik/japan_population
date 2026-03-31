@@ -185,6 +185,6 @@ THEMES = {
 }
 
 # ↓ Change this line to swap themes. Restart the app after changing.
-ACTIVE_THEME_NAME = "dark"
+ACTIVE_THEME_NAME = "light"
 
 ACTIVE_THEME = THEMES[ACTIVE_THEME_NAME]
