@@ -1,273 +1,272 @@
 # app/config.py
+"""
+Single source of truth for all dashboard constants.
+
+Colors and shadows come from the active theme in app/themes.py.
+Everything else (layout, fonts, sizes, structural map config, etc.) is defined here.
+
+To swap themes: change ACTIVE_THEME_NAME in app/themes.py and restart the app.
+
+Sections:
+  1.  Private helpers     (hex parsing, rgba builder, HSL adjustment utility)
+  2.  Layout
+  3.  Colors              (unpacked from active theme — do not hardcode here)
+  4.  Shadows             (derived from theme's shadow_color × shadow_darkness)
+  5.  Fonts
+  6.  Font sizes
+  7.  Spacing & borders
+  8.  Map configuration   (structural — center, zoom, widths are theme-independent)
+  9.  Pyramid configuration
+  10. Play button
+  11. Playback
+  12. Markers & lines
+  13. THEME dict
+  14. Legacy constants
+"""
+
 import colorsys
 
 from app.fonts import _stack
+from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Private helpers — run once at import time, not called at runtime
-# ─────────────────────────────────────────────────────────────────────────────
+# ── 1. Private helpers ────────────────────────────────────────────────────────
 
-def _expand_hex(h: str) -> str:
-    """Normalize 3- or 6-digit hex (with or without #) to 6 lowercase digits."""
-    h = h.lstrip("#")
-    if len(h) == 3:
-        h = "".join(c * 2 for c in h)
-    return h.lower()
+def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
+    """Parse a 6-digit hex color string into (r, g, b) ints."""
+    h = hex_color.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
 
 
 def _rgba(hex_color: str, alpha: float) -> str:
-    """Convert a hex color + alpha to a CSS rgba() string."""
-    h = _expand_hex(hex_color)
-    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-    return f"rgba({r}, {g}, {b}, {alpha:.2f})"
+    """Return a CSS rgba() string from a hex color and alpha in [0, 1]."""
+    r, g, b = _hex_to_rgb(hex_color)
+    a = max(0.0, min(1.0, alpha))
+    return f"rgba({r}, {g}, {b}, {a:.2f})"
 
 
-def _derive_tone(hex_mid: str, target_lightness: float) -> str:
+def _hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> str:
     """
-    Derive a hex color from hex_mid by pinning its HSL lightness to target_lightness.
-    Hue and saturation are preserved — the result is a darker/lighter tint of the
-    same hue family, suitable for building a text hierarchy below COLOR_TEXT_MID.
-
-    Note: colorsys.rgb_to_hls returns (H, L, S) order — not (H, S, L).
+    Utility: derive a color from hex_color with lightness and saturation scaled.
+    Useful for building subordinate or hover variants from a base color.
+    Not used at module load time — theme text scales are defined explicitly in themes.py.
     """
-    h = _expand_hex(hex_mid)
-    r, g, b = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
-    hue, _, sat = colorsys.rgb_to_hls(r, g, b)
-    nr, ng, nb = colorsys.hls_to_rgb(hue, max(0.0, min(1.0, target_lightness)), sat)
-    return "#{:02x}{:02x}{:02x}".format(round(nr * 255), round(ng * 255), round(nb * 255))
+    r, g, b = _hex_to_rgb(hex_color)
+    h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
+    l_new = max(0.0, min(1.0, l * l_scale))
+    s_new = max(0.0, min(1.0, s * s_scale))
+    r2, g2, b2 = colorsys.hls_to_rgb(h, l_new, s_new)
+    return f"#{round(r2 * 255):02x}{round(g2 * 255):02x}{round(b2 * 255):02x}"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Layout
-# ─────────────────────────────────────────────────────────────────────────────
-LAYOUT_GAP        = "0.5rem"   # uniform gap between all dashboard rows / panels
-LAYOUT_OUTER_PAD  = "1rem"     # left/right padding on .dashboard-outer
-LAYOUT_MIN_HEIGHT = "700px"    # below this viewport height the page scrolls
+# ── 2. Layout ─────────────────────────────────────────────────────────────────
 
-# Flex ratios — charts-area row vs timeseries
-CHARTS_ANCHOR   = 10
-CHARTS_ROW_FLEX = 7
-CHARTS_TS_FLEX  = CHARTS_ANCHOR - CHARTS_ROW_FLEX   # = 3
+LAYOUT_GAP          = "0.5rem"
+LAYOUT_OUTER_PAD    = "1rem"
+LAYOUT_MIN_HEIGHT   = "700px"
 
-# Flex ratios — map vs pyramid within the row
-MAP_MIN_HEIGHT = "320px"
-MAP_FLEX       = 7
-PYRAMID_FLEX   = 3
+CHARTS_ANCHOR       = 10
+CHARTS_ROW_FLEX     = 7
+CHARTS_TS_FLEX      = CHARTS_ANCHOR - CHARTS_ROW_FLEX  # = 3
+
+MAP_MIN_HEIGHT      = "320px"
+MAP_FLEX            = 7
+PYRAMID_FLEX        = 3
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Color Palette
-# ─────────────────────────────────────────────────────────────────────────────
+# ── 3. Colors ─────────────────────────────────────────────────────────────────
+# All color constants are unpacked from the active theme.
+# Do not hardcode hex values here — add them to themes.py instead.
 
-# ── Surface colors ────────────────────────────────────────────────────────────
-PAGE_BG      = "#091023"   # outermost background — dark navy
-PANEL_BG     = "#06091a"   # chart / card interiors — near-black
-PANEL_BORDER = "#334477"   # border stroke + slider track background
+# Surfaces
+PAGE_BG         = _t["page_bg"]
+PANEL_BG        = _t["panel_bg"]
+PANEL_BORDER    = _t["panel_border"]
 
-# ── Panel geometry ────────────────────────────────────────────────────────────
-PANEL_BORDER_RADIUS = "6px"
+# Brand
+COLOR_PRIMARY   = _t["primary"]
+COLOR_SECONDARY = _t["secondary"]
 
-# ── Brand / primary ───────────────────────────────────────────────────────────
-COLOR_PRIMARY   = "#bc002d"   # Japan flag red — title, 1945 marker, wartime accent
-COLOR_SECONDARY = "#ffffff"   # pure white — secondary emphasis
+# Text scale
+COLOR_TEXT_HI   = _t["text_hi"]
+COLOR_TEXT_MID  = _t["text_mid"]
+COLOR_TEXT_LO   = _t["text_lo"]
+COLOR_TEXT_HINT = _t["text_hint"]
 
-# ── Text hierarchy (light-on-dark) ────────────────────────────────────────────
-COLOR_TEXT_HI   = "#e0e8ff"   # highest contrast — KPI values, selected labels
-COLOR_TEXT_MID  = "#aad"      # mid-tone — axis labels, legends, body  (= #aaaadd)
+# UI interaction
+COLOR_UI_HOVER     = _t["ui_hover"]
+SLIDER_TRACK_COLOR = _t["slider_track"]
 
-# LO and HINT are derived from COLOR_TEXT_MID by reducing HSL lightness.
-# They preserve the hue/saturation of COLOR_TEXT_MID (#aad, H=240°, S≈43%).
-# Computed values: LO ≈ #4646af (L=0.48), HINT ≈ #2c2c6d (L=0.30).
-# These will diverge from the current hardcoded #667799 / #445566 in maps.py
-# hovertemplate — reconcile during the maps.py update step.
-COLOR_TEXT_LO   = _derive_tone(COLOR_TEXT_MID, 0.48)   # dim labels, secondary annotations
-COLOR_TEXT_HINT = _derive_tone(COLOR_TEXT_MID, 0.30)   # hairline separators, placeholder text
+# Chart
+CHART_GRID_COLOR      = _t["chart_grid"]
+ACCENT_THRESHOLD      = _t["accent_threshold"]
+TIMESERIES_PREF_COLOR = _t["timeseries_pref"]
 
-# ── UI interaction ─────────────────────────────────────────────────────────────
-COLOR_UI_HOVER     = "#243558"   # button / element hover fill
-SLIDER_TRACK_COLOR = "#1a2a44"   # slider rail
-CHART_GRID_COLOR   = "#1a2440"   # chart gridlines (Plotly gridcolor)
+# Cohort annotations
+ACCENT_DANKAI       = _t["accent_dankai"]
+ACCENT_DANKAI_JR    = _t["accent_dankai_jr"]
+ACCENT_WARTIME_GEN  = _t["accent_wartime_gen"]
+ACCENT_SHOUSHIKA    = _t["accent_shoushika"]
 
-# ── Cohort & annotation accents ───────────────────────────────────────────────
-ACCENT_DANKAI      = "#f5a623"        # 団塊の世代 — primary baby boom cohort
-ACCENT_DANKAI_JR   = "#7ed321"        # 団塊ジュニア — secondary cohort
-ACCENT_WARTIME_GEN = COLOR_PRIMARY    # 戦中世代 — matches Japan red
-ACCENT_SHOUSHIKA   = "#9ee0ff"        # 少子化世代 — first gen born into sustained decline
-ACCENT_THRESHOLD   = "#50e3c2"        # aging index = 100 reference line
-
-WWII_SEX_RATIO_THRESHOLD = 90         # sex ratio below this → flag as WWII scar
+WWII_SEX_RATIO_THRESHOLD = 90   # structural threshold — not a color
 
 COHORT_COLORS = {
-    "dankai":     ACCENT_DANKAI,
-    "dankai_jr":  ACCENT_DANKAI_JR,
-    "wwii_scar":  ACCENT_WARTIME_GEN,
-    "shoushika":  ACCENT_SHOUSHIKA,
-    "threshold":  ACCENT_THRESHOLD,
+    "dankai":       ACCENT_DANKAI,
+    "dankai_jr":    ACCENT_DANKAI_JR,
+    "wwii_scar":    ACCENT_WARTIME_GEN,
+    "shoushika":    ACCENT_SHOUSHIKA,
+    "threshold":    ACCENT_THRESHOLD,
 }
 
-# ── Map colors ────────────────────────────────────────────────────────────────
-MAP_GEO = {
-    "bg_color":   PANEL_BG,      # ocean / base layer — matches panel background
-    "land_color": "#1c1f30",     # surrounding land (Korea, Russia) — mid-tier
-    "line_color": "#6089A0",     # prefecture border stroke — creates lift
-}
+# Pyramid
+PYRAMID_MALE_COLOR   = _t["pyramid_male"]
+PYRAMID_FEMALE_COLOR = _t["pyramid_female"]
 
-MAP_COLORSCALE           = "plasma_r"
-MAP_TILE_STYLE           = "carto-darkmatter"
-MAP_CENTER_LAT           = 35.5
-MAP_CENTER_LON           = 135.5
-MAP_DEFAULT_ZOOM         = 3.75   # reference zoom (see also map_resize.js REF_ZOOM)
-MAP_BORDER_WIDTH         = 0.8    # default prefecture marker_line_width
-MAP_HIGHLIGHT_LINE_COLOR = "#ffffff"
-MAP_HIGHLIGHT_LINE_WIDTH = 2.5
-MAP_HIGHLIGHT_FILL       = "rgba(255,255,255,0.08)"   # barely-there selected-prefecture fill
-
-# ── Population pyramid colors ─────────────────────────────────────────────────
-PYRAMID_MALE_COLOR   = "#4a90d9"
-PYRAMID_FEMALE_COLOR = "#e07b8a"
-
-# ── Time series colors ─────────────────────────────────────────────────────────
-TIMESERIES_PREF_COLOR = COLOR_SECONDARY   # prefecture overlay line
+# Map colors
+MAP_GEO                  = _t["map_geo"]
+MAP_HIGHLIGHT_LINE_COLOR = _t["map_highlight_line_color"]
+MAP_HIGHLIGHT_FILL       = _t["map_highlight_fill"]
+MAP_COLORSCALE           = _t["map_colorscale"]
+MAP_TILE_STYLE           = _t["map_tile_style"]
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Typography
-# ─────────────────────────────────────────────────────────────────────────────
+# ── 4. Shadows ────────────────────────────────────────────────────────────────
+# Derived from the theme's shadow_color and shadow_darkness knob.
+# Using an explicit shadow_color (rather than PAGE_BG) lets light themes
+# use dark shadows without coupling shadow depth to background hue.
 
-# ── Font stacks ───────────────────────────────────────────────────────────────
-# [GF] families require a <link> or @import in index_string.py to load.
-# System fonts and CSS generics resolve without loading.
+SHADOW_DARKNESS  = _t["shadow_darkness"]
+_SHADOW_COLOR    = _t["shadow_color"]
+SHADOW_PANEL     = _rgba(_SHADOW_COLOR, SHADOW_DARKNESS)
+SHADOW_MAP_INSET = _rgba(_SHADOW_COLOR, min(1.0, SHADOW_DARKNESS * 1.6))
+
+
+# ── 5. Fonts ──────────────────────────────────────────────────────────────────
+# Font names match the catalogue in app/fonts.py.
+# [GF] families must be linked in app/index_string.py to load on client.
+
 FONT_STACK_SANS = _stack(
-    "Noto Sans JP",     # [GF] — primary, best JP coverage
-    "M PLUS 1p",        # [GF] — fallback sans
-    "Hiragino Sans",    # macOS
-    "Yu Gothic UI",     # Windows
-    "Meiryo",           # Windows legacy
+    "Noto Sans JP",   # [GF]
+    "M PLUS 1p",      # [GF]
+    "BIZ UDGothic",   # [GF]
+    "Hiragino Sans",  # macOS system
+    "Yu Gothic UI",   # Windows 10+ system
+    "Meiryo",         # Windows legacy
     "system-ui",
     "sans-serif",
 )
 
 FONT_STACK_SERIF = _stack(
-    "Noto Serif JP",        # [GF] — primary
-    "Hiragino Mincho Pro",  # macOS
-    "Yu Mincho",            # Windows
+    "Noto Serif JP",       # [GF]
+    "Hiragino Mincho Pro", # macOS system
+    "Yu Mincho",           # Windows system
     "serif",
 )
 
 FONT_STACK_MONO = _stack(
-    "JetBrains Mono",   # [GF] — primary
-    "Source Code Pro",  # [GF] — fallback
-    "Noto Sans Mono",   # [GF] — Noto-consistent
+    "JetBrains Mono",  # [GF]
+    "Source Code Pro", # [GF]
+    "Noto Sans Mono",  # [GF]
     "monospace",
 )
 
-# ── Font sizes ─────────────────────────────────────────────────────────────────
-# Integers = pixel values for Plotly font dicts (dict(size=N)).
-# CSS injections (index_string.py, style.css) append "px" as needed.
-FONT_SIZE_AXIS_TICK    = 11   # axis tick labels on all charts
-FONT_SIZE_AXIS_TITLE   = 11   # axis title text
-FONT_SIZE_LEGEND       = 14   # chart legend entries (pyramid)
-FONT_SIZE_CHART_TITLE  = 13   # per-chart title (e.g., pyramid prefecture label)
-FONT_SIZE_COLORBAR     = 12   # colorbar title
-FONT_SIZE_COLORBAR_TICK = 14  # colorbar tick labels
-FONT_SIZE_KPI_LABEL    = 11   # KPI card label line
-FONT_SIZE_KPI_VALUE    = 22   # KPI card primary value
-FONT_SIZE_KPI_SUB      = 12   # KPI card sub-label
 
-# Dashboard title uses a CSS clamp — not a single px value.
-# Injected as --font-size-title in index_string.py; consumed by .dashboard-title.
-FONT_SIZE_TITLE = "clamp(24px, 3vw, 40px)"
+# ── 6. Font sizes ─────────────────────────────────────────────────────────────
+
+FONT_SIZE_AXIS_TICK     = 11
+FONT_SIZE_AXIS_TITLE    = 11
+FONT_SIZE_LEGEND        = 14
+FONT_SIZE_CHART_TITLE   = 13
+FONT_SIZE_COLORBAR      = 12
+FONT_SIZE_COLORBAR_TICK = 14
+FONT_SIZE_KPI_LABEL     = 11
+FONT_SIZE_KPI_VALUE     = 22
+FONT_SIZE_KPI_SUB       = 12
+FONT_SIZE_TITLE         = 32
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Panel & Shadow System
-# ─────────────────────────────────────────────────────────────────────────────
-# Adjust SHADOW_DARKNESS (0.0–1.0) to globally scale all shadow depth.
-# The two rgba strings become CSS variables injected via index_string.py.
-#   --shadow-panel-color  →  standard box-shadow color
-#   --shadow-map-color    →  deeper inset shadow on the map panel (1.6× darker)
+# ── 7. Spacing & borders ──────────────────────────────────────────────────────
 
-SHADOW_DARKNESS    = 0.4
-SHADOW_PANEL = _rgba(PAGE_BG, SHADOW_DARKNESS)                      # rgba(9, 16, 35, 0.40)
-SHADOW_MAP_INSET   = _rgba(PAGE_BG, min(1.0, SHADOW_DARKNESS * 1.6))      # rgba(9, 16, 35, 0.64)
+PANEL_BORDER_RADIUS = "6px"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Chart Constants
-# ─────────────────────────────────────────────────────────────────────────────
-CHART_ZEROLINE_COLOR = PANEL_BORDER   # x=0 zeroline on pyramid
+# ── 8. Map configuration ──────────────────────────────────────────────────────
+# Structural values — these don't vary by theme.
+
+MAP_CENTER_LAT           = 35.5
+MAP_CENTER_LON           = 135.5
+MAP_DEFAULT_ZOOM         = 3.75
+MAP_BORDER_WIDTH         = 0.8
+MAP_HIGHLIGHT_LINE_WIDTH = 2.5
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Pyramid Constants
-# ─────────────────────────────────────────────────────────────────────────────
-PYRAMID_BARGAP       = 0.15   # gap between age-band bars (Plotly barmode layout bargap)
-COHORT_OUTLINE_WIDTH = 3.5    # line width for dankai / dankai_jr outline shapes
+# ── 9. Pyramid configuration ─────────────────────────────────────────────────
+
+PYRAMID_BARGAP       = 0.15
+COHORT_OUTLINE_WIDTH = 3.5
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Marker & Line Constants
-# ─────────────────────────────────────────────────────────────────────────────
+# ── 10. Play button ───────────────────────────────────────────────────────────
 
-# Marker sizes (Plotly marker.size — diameter in px)
-MARKER_SIZE_DOT       = 5    # regular census year dot on time series
-MARKER_SIZE_1945      = 11   # open-circle for the 1945 provisional census
-MARKER_SIZE_DIAMOND   = 8    # cohort annotation diamonds (戦中世代, 少子化世代)
-MARKER_SIZE_LEGEND_SQ = 10   # invisible legend-only square markers on pyramid
-
-# Line widths (Plotly line.width)
-LINE_WIDTH_MAIN        = 2    # national aging-index primary line
-LINE_WIDTH_PREF        = 1.5  # prefecture overlay on time series
-LINE_WIDTH_1945        = 2.5  # open-circle stroke for the 1945 marker
-LINE_WIDTH_THRESHOLD   = 1.2  # aging-index = 100 horizontal reference line
-LINE_WIDTH_YEAR_MARKER = 1    # vertical selected-year cursor line
-
-# Opacities
-OPACITY_THRESHOLD_LINE = 0.55   # aging-index = 100 dashed reference line
-OPACITY_YEAR_VLINE     = 0.35   # selected-year cursor vline
+PLAY_BTN_SIZE_PX   = 52
+PLAY_BTN_SIZE      = f"{PLAY_BTN_SIZE_PX}px"
+PLAY_BTN_FONT_SIZE = f"{round(PLAY_BTN_SIZE_PX * 0.538)}px"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Playback
-# ─────────────────────────────────────────────────────────────────────────────
-PLAY_INTERVAL_MS   = 800                                      # ms per year step
-PLAY_BTN_SIZE_PX   = 52                                       # button square size in px
-PLAY_BTN_SIZE      = f"{PLAY_BTN_SIZE_PX}px"                  # CSS string → "52px"
-PLAY_BTN_FONT_SIZE = f"{round(PLAY_BTN_SIZE_PX * 0.538)}px"  # ≈ 28px — icon scales with button
+# ── 11. Playback ──────────────────────────────────────────────────────────────
+
+PLAY_INTERVAL_MS = 1000
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# THEME — consolidated reference dict
-# ─────────────────────────────────────────────────────────────────────────────
-# For external portability and introspection. Python modules import constants
-# directly — this dict is not used at runtime within the app itself.
+# ── 12. Markers & lines ───────────────────────────────────────────────────────
+
+MARKER_SIZE_DOT         = 5
+MARKER_SIZE_1945        = 11
+MARKER_SIZE_DIAMOND     = 8
+MARKER_SIZE_LEGEND_SQ   = 10
+
+LINE_WIDTH_MAIN         = 2.0
+LINE_WIDTH_PREF         = 1.5
+LINE_WIDTH_1945         = 2.5
+LINE_WIDTH_THRESHOLD    = 1.2
+LINE_WIDTH_YEAR_MARKER  = 1.0
+
+OPACITY_THRESHOLD_LINE  = 0.55
+OPACITY_YEAR_VLINE      = 0.35
+
+
+# ── 13. THEME dict ────────────────────────────────────────────────────────────
 
 THEME = {
+    "active_theme": ACTIVE_THEME_NAME,
     "colors": {
-        "page_bg":            PAGE_BG,
-        "panel_bg":           PANEL_BG,
-        "border":             PANEL_BORDER,
-        "primary":            COLOR_PRIMARY,
-        "secondary":          COLOR_SECONDARY,
-        "text_hi":            COLOR_TEXT_HI,
-        "text_mid":           COLOR_TEXT_MID,
-        "text_lo":            COLOR_TEXT_LO,
-        "text_hint":          COLOR_TEXT_HINT,
-        "ui_hover":           COLOR_UI_HOVER,
-        "grid":               CHART_GRID_COLOR,
-        "slider_track":       SLIDER_TRACK_COLOR,
-        "shadow_panel":       SHADOW_PANEL,
-        "shadow_map":         SHADOW_MAP_INSET,
-        "accent_dankai":      ACCENT_DANKAI,
-        "accent_dankai_jr":   ACCENT_DANKAI_JR,
-        "accent_wartime":     ACCENT_WARTIME_GEN,
-        "accent_shoushika":   ACCENT_SHOUSHIKA,
-        "accent_threshold":   ACCENT_THRESHOLD,
-        "map_highlight_line": MAP_HIGHLIGHT_LINE_COLOR,
-        "map_highlight_fill": MAP_HIGHLIGHT_FILL,
-        "pyramid_male":       PYRAMID_MALE_COLOR,
-        "pyramid_female":     PYRAMID_FEMALE_COLOR,
+        "page_bg":              PAGE_BG,
+        "panel_bg":             PANEL_BG,
+        "panel_border":         PANEL_BORDER,
+        "primary":              COLOR_PRIMARY,
+        "secondary":            COLOR_SECONDARY,
+        "text_hi":              COLOR_TEXT_HI,
+        "text_mid":             COLOR_TEXT_MID,
+        "text_lo":              COLOR_TEXT_LO,
+        "text_hint":            COLOR_TEXT_HINT,
+        "ui_hover":             COLOR_UI_HOVER,
+        "slider_track":         SLIDER_TRACK_COLOR,
+        "chart_grid":           CHART_GRID_COLOR,
+        "threshold":            ACCENT_THRESHOLD,
+        "dankai":               ACCENT_DANKAI,
+        "dankai_jr":            ACCENT_DANKAI_JR,
+        "wartime_gen":          ACCENT_WARTIME_GEN,
+        "shoushika":            ACCENT_SHOUSHIKA,
+        "pyramid_male":         PYRAMID_MALE_COLOR,
+        "pyramid_female":       PYRAMID_FEMALE_COLOR,
+        "timeseries_pref":      TIMESERIES_PREF_COLOR,
+        "map_highlight_line":   MAP_HIGHLIGHT_LINE_COLOR,
+        "map_highlight_fill":   MAP_HIGHLIGHT_FILL,
+    },
+    "shadows": {
+        "darkness":  SHADOW_DARKNESS,
+        "panel":     SHADOW_PANEL,
+        "map_inset": SHADOW_MAP_INSET,
     },
     "fonts": {
         "sans":  FONT_STACK_SANS,
@@ -287,33 +286,66 @@ THEME = {
         },
     },
     "layout": {
-        "gap":           LAYOUT_GAP,
-        "outer_pad":     LAYOUT_OUTER_PAD,
-        "min_height":    LAYOUT_MIN_HEIGHT,
-        "border_radius": PANEL_BORDER_RADIUS,
+        "gap":             LAYOUT_GAP,
+        "outer_pad":       LAYOUT_OUTER_PAD,
+        "min_height":      LAYOUT_MIN_HEIGHT,
+        "border_radius":   PANEL_BORDER_RADIUS,
+        "charts_row_flex": CHARTS_ROW_FLEX,
+        "charts_ts_flex":  CHARTS_TS_FLEX,
+        "map_flex":        MAP_FLEX,
+        "pyramid_flex":    PYRAMID_FLEX,
     },
     "map": {
-        "colorscale": MAP_COLORSCALE,
-        "tile_style": MAP_TILE_STYLE,
-        "center_lat": MAP_CENTER_LAT,
-        "center_lon": MAP_CENTER_LON,
-        "zoom":       MAP_DEFAULT_ZOOM,
+        "colorscale":           MAP_COLORSCALE,
+        "tile_style":           MAP_TILE_STYLE,
+        "center_lat":           MAP_CENTER_LAT,
+        "center_lon":           MAP_CENTER_LON,
+        "default_zoom":         MAP_DEFAULT_ZOOM,
+        "border_width":         MAP_BORDER_WIDTH,
+        "highlight_line_color": MAP_HIGHLIGHT_LINE_COLOR,
+        "highlight_line_width": MAP_HIGHLIGHT_LINE_WIDTH,
+        "highlight_fill":       MAP_HIGHLIGHT_FILL,
+        "geo":                  MAP_GEO,
+    },
+    "pyramid": {
+        "bargap":               PYRAMID_BARGAP,
+        "cohort_outline_width": COHORT_OUTLINE_WIDTH,
+        "male_color":           PYRAMID_MALE_COLOR,
+        "female_color":         PYRAMID_FEMALE_COLOR,
     },
     "playback": {
         "interval_ms": PLAY_INTERVAL_MS,
         "btn_size":    PLAY_BTN_SIZE,
         "btn_font":    PLAY_BTN_FONT_SIZE,
     },
+    "markers": {
+        "dot":         MARKER_SIZE_DOT,
+        "marker_1945": MARKER_SIZE_1945,
+        "diamond":     MARKER_SIZE_DIAMOND,
+        "legend_sq":   MARKER_SIZE_LEGEND_SQ,
+    },
+    "lines": {
+        "main":               LINE_WIDTH_MAIN,
+        "pref":               LINE_WIDTH_PREF,
+        "marker_1945":        LINE_WIDTH_1945,
+        "threshold":          LINE_WIDTH_THRESHOLD,
+        "year_marker":        LINE_WIDTH_YEAR_MARKER,
+        "opacity_threshold":  OPACITY_THRESHOLD_LINE,
+        "opacity_year_vline": OPACITY_YEAR_VLINE,
+    },
 }
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Deprecated aliases — zero-breakage bridge while downstream modules update
-# Remove once maps.py, pyramid.py, timeseries.py, kpi.py, index_string.py,
-# app.py, and style.css have been updated to use the new names.
-# ─────────────────────────────────────────────────────────────────────────────
-FONT_MAIN        = FONT_STACK_SANS     # → FONT_STACK_SANS
-FONT_HEADER      = FONT_STACK_SERIF    # → FONT_STACK_SERIF
-FONT_MAIN_COLOR  = COLOR_TEXT_MID      # → COLOR_TEXT_MID
-FONT_COLOR_JPRED = COLOR_PRIMARY       # → COLOR_PRIMARY
-FONT_COLOR_JPWHT = COLOR_SECONDARY     # → COLOR_SECONDARY
+# ── 14. Legacy constants ──────────────────────────────────────────────────────
+# Aliases for renamed constants — kept for backward compat with older imports.
+# Remove once all consumers have been updated.
+
+FONT_COLOR_JPRED   = COLOR_PRIMARY
+FONT_COLOR_JPWHT   = COLOR_SECONDARY
+FONT_MAIN_COLOR    = COLOR_TEXT_MID
+FONT_MAIN          = FONT_STACK_SANS
+FONT_HEADER        = FONT_STACK_SERIF
+
+PANEL_H            = 720
+LEGEND_H           = int(PANEL_H * 1.03)
+TIME_H             = 180
