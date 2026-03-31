@@ -5,13 +5,17 @@ import duckdb as ddb
 import plotly.graph_objects as go
 
 from app.config import (
-    PANEL_BG, PANEL_BORDER, FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY,
-    ACCENT_THRESHOLD, CHART_GRID_COLOR,
-    TIMESERIES_PREF_COLOR,
+    PANEL_BG, COLOR_TEXT_MID, COLOR_PRIMARY,
+    ACCENT_THRESHOLD, CHART_GRID_COLOR, TIMESERIES_PREF_COLOR,
+    LINE_WIDTH_MAIN, LINE_WIDTH_PREF, LINE_WIDTH_1945,
+    LINE_WIDTH_THRESHOLD, LINE_WIDTH_YEAR_MARKER,
+    MARKER_SIZE_DOT, MARKER_SIZE_1945,
+    OPACITY_THRESHOLD_LINE, OPACITY_YEAR_VLINE,
+    FONT_SIZE_AXIS_TICK, FONT_SIZE_AXIS_TITLE, FONT_SIZE_LEGEND,
 )
 
 # Aging index crossed 100 between the 1995 and 2000 census years.
-# We annotate at ~1997 — the midpoint, not a data point.
+# Annotated at ~1997 — the midpoint, not a data point.
 _CROSSOVER_YEAR = 1997
 
 
@@ -88,7 +92,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=national_df["aging_index"],
         mode="lines",
         name="全国 National",
-        line=dict(color=FONT_MAIN_COLOR, width=2),
+        line=dict(color=COLOR_TEXT_MID, width=LINE_WIDTH_MAIN),
         hovertemplate="<b>%{x}</b><br>高齢化指数: <b>%{y:.1f}</b><extra>全国</extra>",
     ))
 
@@ -98,7 +102,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=df_non_1945["aging_index"],
         mode="markers",
         showlegend=False,
-        marker=dict(color=FONT_MAIN_COLOR, size=5),
+        marker=dict(color=COLOR_TEXT_MID, size=MARKER_SIZE_DOT),
         hoverinfo="skip",
     ))
 
@@ -111,9 +115,9 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             name="1945 臨時国勢調査",
             marker=dict(
                 symbol="circle-open",
-                size=11,
-                color="#d0021b",
-                line=dict(width=2.5, color="#d0021b"),
+                size=MARKER_SIZE_1945,
+                color=COLOR_PRIMARY,
+                line=dict(width=LINE_WIDTH_1945, color=COLOR_PRIMARY),
             ),
             hovertemplate=(
                 "<b>1945</b><br>"
@@ -131,8 +135,8 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             y=pref_df["aging_index"],
             mode="lines+markers",
             name=pref_label,
-            line=dict(color=TIMESERIES_PREF_COLOR, width=1.5, dash="dot"),
-            marker=dict(size=4, color=TIMESERIES_PREF_COLOR),
+            line=dict(color=TIMESERIES_PREF_COLOR, width=LINE_WIDTH_PREF, dash="dot"),
+            marker=dict(size=4, color=TIMESERIES_PREF_COLOR),  # 4px — intentionally smaller than national dots
             hovertemplate=f"<b>%{{x}}</b><br>高齢化指数: <b>%{{y:.1f}}</b><extra>{pref_label}</extra>",
         ))
 
@@ -143,8 +147,8 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=100,
         line_dash="dash",
         line_color=ACCENT_THRESHOLD,
-        line_width=1.2,
-        opacity=0.55,
+        line_width=LINE_WIDTH_THRESHOLD,
+        opacity=OPACITY_THRESHOLD_LINE,
     )
 
     # ── Crossover annotation ──────────────────────────────────────────────────
@@ -162,10 +166,10 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     # ── Selected year indicator ───────────────────────────────────────────────
     fig.add_vline(
         x=selected_year,
-        line_color=FONT_MAIN_COLOR,
-        line_width=1,
+        line_color=COLOR_TEXT_MID,
+        line_width=LINE_WIDTH_YEAR_MARKER,
         line_dash="dot",
-        opacity=0.35,
+        opacity=OPACITY_YEAR_VLINE,
     )
 
     fig.update_layout(
@@ -177,22 +181,22 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             orientation="h",
             x=0.01, xanchor="left",
             y=0.99, yanchor="top",
-            font=dict(color=FONT_MAIN_COLOR, size=12),
+            font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_LEGEND),
             bgcolor="rgba(0,0,0,0)",
         ),
         xaxis=dict(
-            tickfont=dict(color=FONT_MAIN_COLOR, size=11),
-            gridcolor=CHART_GRID_COLOR,   # was "#1a2440"
+            tickfont=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TICK),
+            gridcolor=CHART_GRID_COLOR,
             showline=False,
             dtick=10,
         ),
         yaxis=dict(
             title=dict(
                 text="高齢化指数",
-                font=dict(color=FONT_MAIN_COLOR, size=11),
+                font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
             ),
-            tickfont=dict(color=FONT_MAIN_COLOR, size=11),
-            gridcolor=CHART_GRID_COLOR,   # was "#1a2440"
+            tickfont=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TICK),
+            gridcolor=CHART_GRID_COLOR,
             showline=False,
             zeroline=False,
         ),

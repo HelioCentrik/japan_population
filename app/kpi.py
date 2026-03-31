@@ -4,8 +4,6 @@ from functools import lru_cache
 import duckdb as ddb
 from dash import html
 
-from app.config import FONT_MAIN
-
 
 
 @lru_cache(maxsize=32)

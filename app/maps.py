@@ -1,4 +1,4 @@
-# app/maps.py ────────────────────────────────────────────────────────────────────
+# app/maps.py
 import json
 import numpy as np
 from functools import lru_cache
@@ -8,10 +8,11 @@ import duckdb as ddb
 from plotly import graph_objects as go
 
 from app.config import (
-    PANEL_BG, FONT_MAIN, FONT_MAIN_COLOR, MAP_GEO,
+    PANEL_BG, COLOR_TEXT_MID, MAP_GEO,
     MAP_COLORSCALE, MAP_TILE_STYLE,
     MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
+    FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
 )
 
 
@@ -90,14 +91,14 @@ def build_japan_map_fig(year: int = 2015, area_estat: str | None = None) -> go.F
             title=dict(
                 text="人口 (log)",
                 side="bottom",
-                font=dict(size=12, color=FONT_MAIN_COLOR)
+                font=dict(size=FONT_SIZE_COLORBAR, color=COLOR_TEXT_MID),
             ),
             x=0.02,
             xanchor="left",
             thickness=16,
             len=0.6,
-            tickfont=dict(size=14, color=FONT_MAIN_COLOR),
-        )
+            tickfont=dict(size=FONT_SIZE_COLORBAR_TICK, color=COLOR_TEXT_MID),
+        ),
     )
 
     traces = [base_trace]
