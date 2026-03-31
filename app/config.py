@@ -61,7 +61,7 @@ def _hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> s
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
 
-LAYOUT_GAP          = "0.5rem"
+LAYOUT_GAP          = "0.8rem"
 LAYOUT_OUTER_PAD    = "1rem"
 LAYOUT_MIN_HEIGHT   = "700px"
 

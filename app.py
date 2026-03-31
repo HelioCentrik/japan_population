@@ -26,6 +26,12 @@ con = ddb.connect("data/japan_population.duckdb")
 years_df = con.execute(
     "SELECT DISTINCT year, era_name, era_year FROM d_years ORDER BY year"
 ).df()
+PREFECTURE_LOOKUP = {
+    row.area_estat: (row.prefecture_name_ja, row.prefecture_name)
+    for row in con.execute(
+        "SELECT area_estat, prefecture_name_ja, prefecture_name FROM d_prefectures WHERE level = 2"
+    ).df().itertuples()
+}
 con.close()
 
 CENSUS_YEARS = years_df["year"].tolist()
@@ -279,7 +285,12 @@ def toggle_reset_button(area_estat):
 )
 def update_charts(year, area_estat):
     y = int(year)
-    label = YEAR_LABELS.get(y, str(y))
+    year_part = YEAR_LABELS.get(y, str(y))
+    if area_estat and area_estat in PREFECTURE_LOOKUP:
+        name_ja, name_en = PREFECTURE_LOOKUP[area_estat]
+        label = f"{year_part}  ｜  {name_ja}  {name_en}"
+    else:
+        label = year_part
     axis_max = get_pyramid_axis_max(area_estat)
     kpi_data = build_kpi_data(y)
     return (

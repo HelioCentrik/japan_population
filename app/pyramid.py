@@ -340,14 +340,14 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         ),
     )
 
-    fig.update_layout(
-        title=dict(
-            text=pref_label,
-            x=0.12,
-            y=0.95,
-            xanchor="center",
-            font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_CHART_TITLE),
-        )
-    )
+    # fig.update_layout(
+    #     title=dict(
+    #         text=pref_label,
+    #         x=0.12,
+    #         y=0.95,
+    #         xanchor="center",
+    #         font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_CHART_TITLE),
+    #     )
+    # )
 
     return fig

@@ -105,9 +105,9 @@ html, body {
 #reset-prefecture-btn {
     display          : none;
     position         : absolute;
-    bottom           : 12px;
-    right            : 12px;
-    background-color : rgba(0, 0, 0, 0.55);
+    top              : 32px;
+    left             : 112px;
+    background-color : var(--panel-bg);
     color            : var(--color-text-mid);
     border           : 1px solid var(--panel-border);
     border-radius    : calc(var(--border-radius) * 0.67);
@@ -162,7 +162,8 @@ html, body {
     gap              : var(--layout-gap);
     padding-left     : var(--outer-pad);
     padding-right    : var(--outer-pad);
-    padding-bottom   : var(--layout-gap);
+    padding-top      : var(--outer-pad);
+    padding-bottom   : var(--outer-pad);
     box-sizing       : border-box;
 }
 
