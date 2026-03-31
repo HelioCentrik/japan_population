@@ -5,13 +5,13 @@ import duckdb as ddb
 import plotly.graph_objects as go
 
 from app.config import (
-    PANEL_BG, COLOR_TEXT_MID, COLOR_PRIMARY,
-    ACCENT_THRESHOLD, CHART_GRID_COLOR, TIMESERIES_PREF_COLOR,
+    COLOR_TEXT_MID, COLOR_PRIMARY,
+    ACCENT_THRESHOLD, TIMESERIES_PREF_COLOR,
     LINE_WIDTH_MAIN, LINE_WIDTH_PREF, LINE_WIDTH_1945,
     LINE_WIDTH_THRESHOLD, LINE_WIDTH_YEAR_MARKER,
     MARKER_SIZE_DOT, MARKER_SIZE_1945,
     OPACITY_THRESHOLD_LINE, OPACITY_YEAR_VLINE,
-    FONT_SIZE_AXIS_TICK, FONT_SIZE_AXIS_TITLE, FONT_SIZE_LEGEND,
+    FONT_SIZE_AXIS_TITLE,
 )
 
 # Aging index crossed 100 between the 1995 and 2000 census years.
@@ -173,21 +173,14 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     )
 
     fig.update_layout(
-        paper_bgcolor=PANEL_BG,
-        plot_bgcolor=PANEL_BG,
         margin=dict(l=48, r=24, t=28, b=32),
         autosize=True,
         legend=dict(
             orientation="h",
             x=0.01, xanchor="left",
             y=0.99, yanchor="top",
-            font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_LEGEND),
-            bgcolor="rgba(0,0,0,0)",
         ),
         xaxis=dict(
-            tickfont=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TICK),
-            gridcolor=CHART_GRID_COLOR,
-            showline=False,
             dtick=10,
         ),
         yaxis=dict(
@@ -195,9 +188,6 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
                 text="高齢化指数",
                 font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
             ),
-            tickfont=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TICK),
-            gridcolor=CHART_GRID_COLOR,
-            showline=False,
             zeroline=False,
         ),
     )

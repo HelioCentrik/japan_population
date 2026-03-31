@@ -8,7 +8,7 @@ import duckdb as ddb
 from plotly import graph_objects as go
 
 from app.config import (
-    PANEL_BG, COLOR_TEXT_MID, MAP_GEO,
+    COLOR_TEXT_MID, MAP_GEO,
     MAP_COLORSCALE, MAP_TILE_STYLE,
     MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
@@ -134,8 +134,6 @@ def build_japan_map_fig(year: int = 2015, area_estat: str | None = None) -> go.F
         ),
         margin=dict(l=6, r=7, t=6, b=6),
         autosize=True,
-        paper_bgcolor=PANEL_BG,
-        plot_bgcolor=PANEL_BG,
     )
 
     return fig

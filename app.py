@@ -7,16 +7,18 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, COLOR_PRIMARY, COLOR_SECONDARY,
                         PLAY_INTERVAL_MS)
 from app.index_string import INDEX_STRING
+from app.kpi import build_kpi_data, render_kpi_cards
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
-from app.kpi import build_kpi_data, render_kpi_cards
 from app.timeseries import build_aging_index_fig
+from app.plotly_template import register_plotly_template
 
 
 
 # ── App instance ──────────────────────────────────────────────────────────────
 app = dash.Dash(__name__, title="Japanese Population Dashboard")
 app.index_string = INDEX_STRING
+register_plotly_template()
 server = app.server  # expose for deployment (Gunicorn etc.)
 
 # ── Census years for slider ───────────────────────────────────────────────────

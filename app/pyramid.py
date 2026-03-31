@@ -6,12 +6,12 @@ import duckdb as ddb
 import plotly.graph_objects as go
 
 from app.config import (
-    PANEL_BG, PANEL_BORDER,
+    PANEL_BORDER,
     COLOR_TEXT_MID,
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
-    PYRAMID_BARGAP, COHORT_OUTLINE_WIDTH, CHART_GRID_COLOR,
-    FONT_SIZE_AXIS_TICK, FONT_SIZE_AXIS_TITLE, FONT_SIZE_LEGEND, FONT_SIZE_CHART_TITLE,
+    PYRAMID_BARGAP, COHORT_OUTLINE_WIDTH,
+    FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
     MARKER_SIZE_DIAMOND, MARKER_SIZE_LEGEND_SQ,
 )
 
@@ -315,24 +315,17 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     fig.update_layout(
         barmode="overlay",
         bargap=PYRAMID_BARGAP,
-        paper_bgcolor=PANEL_BG,
-        plot_bgcolor=PANEL_BG,
         margin=dict(l=16, r=16, t=44, b=20),
         legend=dict(
             orientation="h",
             x=0.5, xanchor="center",
             y=1.02, yanchor="bottom",
-            font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_LEGEND),
-            bgcolor="rgba(0,0,0,0)",
         ),
         xaxis=dict(
             tickformat="~s",
-            tickfont=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TICK),
-            gridcolor=CHART_GRID_COLOR,
             zeroline=True,
             zerolinewidth=1,
             zerolinecolor=PANEL_BORDER,
-            showline=False,
             range=[-half_range, half_range],
             dtick=dtick,
         ),
@@ -341,7 +334,6 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
                 text="Age (Years)",
                 font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
             ),
-            tickfont=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TICK),
             showgrid=False,
             categoryorder="array",
             categoryarray=_SCHEME_A_LABELS,
