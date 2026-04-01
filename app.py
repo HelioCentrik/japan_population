@@ -5,7 +5,7 @@ import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, COLOR_PRIMARY, COLOR_SECONDARY,
-                        PLAY_INTERVAL_MS)
+                        PLAY_INTERVAL_MS, MAP_METRICS, MAP_METRIC_DEFAULT)
 from app.index_string import INDEX_STRING
 from app.kpi import build_kpi_data, render_kpi_cards
 from app.maps import build_japan_map_fig
@@ -157,9 +157,24 @@ app.layout = html.Div(
                             className="map-panel",
                             style={},
                             children=[
+                                html.Div(
+                                    className="metric-selector-strip",
+                                    children=[
+                                        dcc.RadioItems(
+                                            id="metric-selector",
+                                            options=[
+                                                {"label": meta["label"], "value": key}
+                                                for key, meta in MAP_METRICS.items()
+                                            ],
+                                            value=MAP_METRIC_DEFAULT,
+                                            inline=True,
+                                            inputStyle={"display": "none"},
+                                        ),
+                                    ]
+                                ),
                                 dcc.Graph(
                                     id="choropleth-map",
-                                    figure=build_japan_map_fig(year=YEAR_MAX),
+                                    figure=build_japan_map_fig(year=YEAR_MAX, metric=MAP_METRIC_DEFAULT),
                                     config={"displayModeBar": False, "responsive": True},
                                     style={"height": "100%"},
                                 ),
@@ -282,8 +297,9 @@ def toggle_reset_button(area_estat):
     Output("timeseries-chart", "figure"),
     Input("year-slider", "value"),
     Input("selected-prefecture", "data"),
+    Input("metric-selector", "value"),        # ← add this
 )
-def update_charts(year, area_estat):
+def update_charts(year, area_estat, metric):
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:
@@ -294,7 +310,7 @@ def update_charts(year, area_estat):
     axis_max = get_pyramid_axis_max(area_estat)
     kpi_data = build_kpi_data(y)
     return (
-        build_japan_map_fig(year=y, area_estat=area_estat),
+        build_japan_map_fig(year=y, area_estat=area_estat, metric=metric),
         build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
         label,
         render_kpi_cards(kpi_data),

@@ -199,6 +199,47 @@ MAP_DEFAULT_ZOOM         = 3.65
 MAP_BORDER_WIDTH         = 0.8
 MAP_HIGHLIGHT_LINE_WIDTH = 2.5
 
+# ── 8b. Metric selector ───────────────────────────────────────────────────────
+
+OKINAWA_AREA_ESTAT = "47000"
+
+MAP_METRICS = {
+    "population": {
+        "label":      "人口  Population",
+        "colorscale": MAP_COLORSCALE,   # theme-aware
+        "diverging":  False,
+        "midpoint":   None,
+        "fmt":        lambda v: f"{int(v):,}" if v == v else "—",
+        "delta_fmt":  lambda v: f"{int(v):+,}" if v == v else "—",
+    },
+    "aging_index": {
+        "label":      "高齢化指数  Aging Index",
+        "colorscale": [[0, "#4575b4"], [0.5, "#ffffbf"], [1, "#d73027"]],
+        "diverging":  True,
+        "midpoint":   100.0,
+        "fmt":        lambda v: f"{v:.1f}" if v == v else "—",
+        "delta_fmt":  lambda v: f"{v:+.1f}" if v == v else "—",
+    },
+    "old_age_dep": {
+        "label":      "老年従属人口指数  Old-Age Dependency",
+        "colorscale": "YlOrRd",
+        "diverging":  False,
+        "midpoint":   None,
+        "fmt":        lambda v: f"{v:.1f}%" if v == v else "—",
+        "delta_fmt":  lambda v: f"{v:+.1f}%" if v == v else "—",
+    },
+    "working_age_share": {
+        "label":      "生産年齢人口割合  Working-Age Share",
+        "colorscale": "YlGnBu",
+        "diverging":  False,
+        "midpoint":   None,
+        "fmt":        lambda v: f"{v:.1f}%" if v == v else "—",
+        "delta_fmt":  lambda v: f"{v:+.1f}%" if v == v else "—",
+    },
+}
+
+MAP_METRIC_DEFAULT = "population"
+
 
 # ── 9. Pyramid configuration ─────────────────────────────────────────────────
 
