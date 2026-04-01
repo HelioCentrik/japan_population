@@ -1,4 +1,4 @@
-# app/ui_styles.py ────────────────────────────────────────────────────────────────────
+# app/ui_styles_streamlit_backup.py ────────────────────────────────────────────────────────────────────
 import streamlit as st
 
 from app.config import PAGE_BG, PANEL_BG, PANEL_H, PANEL_BORDER, LEGEND_H

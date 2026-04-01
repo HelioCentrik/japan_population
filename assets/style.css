@@ -101,44 +101,100 @@ html, body {
     box-shadow      : inset 0 3px 12px var(--shadow-map-inset);
 }
 
-/* Metric selector strip */
+/* Metric selector strip — overlays top-left of .map-panel */
 .metric-selector-strip {
+    position   : absolute;
+    top        : 10px;
+    left       : 10px;
+    z-index    : 10;
     display    : flex;
+    align-items: center;
     gap        : 6px;
-    padding    : 6px 10px;
-    flex-shrink: 0;
 }
 
-.metric-selector-strip label {
-    cursor       : pointer;
-    padding      : 3px 10px;
-    border-radius: calc(var(--border-radius) * 0.67);
-    font-size    : var(--font-size-kpi-sub);
-    color        : var(--color-text-mid);
-    border       : 1px solid var(--panel-border);
-    user-select  : none;
-    transition   : background-color 0.15s ease, color 0.15s ease;
+/* Dropdown inside the overlay strip */
+.metric-selector-strip .Select-control,
+.metric-selector-strip .VirtualizedSelectFocusedOption,
+.metric-selector-strip .dash-dropdown .Select.is-focused > .Select-control {
+    background-color: transparent;
 }
 
-.metric-selector-strip label:hover {
+/* Dropdown trigger button */
+.metric-selector-strip button.dash-dropdown {
+    background-color : var(--panel-bg);
+    color            : var(--color-text-hi);
+    border           : 1px solid var(--panel-border);
+    border-radius    : calc(var(--border-radius) * 0.67);
+    font-size        : var(--font-size-kpi-sub);
+    width            : 200px;
+    height           : 32px;
+    cursor           : pointer;
+    display          : flex;
+    align-items      : center;
+    padding          : 0px;
+}
+
+.metric-selector-strip button.dash-dropdown:hover {
     background-color: var(--color-ui-hover);
     color           : var(--color-text-hi);
+}
+
+.metric-selector-strip button.dash-dropdown svg {
+    color       : var(--color-text-mid);
+    flex-shrink : 0;
+}
+
+.metric-selector-strip button.dash-dropdown:hover svg {
+    color: var(--color-text-hi);
+}
+
+.metric-selector-strip .dash-dropdown-grid-container {
+    display              : grid;
+    grid-template-columns: 1fr auto;
+    align-items          : center;
+    width                : 100%;
+}
+
+/* Dropdown menu container */
+.dash-dropdown-content {
+    background-color : var(--panel-bg) !important;
+    border           : 1px solid var(--panel-border) !important;
+    border-radius    : calc(var(--border-radius) * 0.67) !important;
+    z-index          : 1000 !important;
+}
+
+/* Options */
+.dash-dropdown-content [role="option"] {
+    background-color : var(--panel-bg);
+    color            : var(--color-text-mid);
+    font-size        : var(--font-size-kpi-sub);
+    padding          : 6px 10px;
+    cursor           : pointer;
+}
+
+.dash-dropdown-content [role="option"]:hover,
+.dash-dropdown-content [role="option"][data-highlighted] {
+    background-color : var(--color-ui-hover) !important;
+    color            : var(--color-text-hi) !important;
+}
+
+.dash-dropdown-content [role="option"][data-state="checked"],
+.dash-dropdown-content [role="option"][aria-selected="true"] {
+    background-color : var(--panel-border) !important;
+    color            : var(--color-text-hi) !important;
 }
 
 /* Reset prefecture button */
 #reset-prefecture-btn {
     display          : none;
-    position         : absolute;
-    top              : 32px;
-    left             : 112px;
-    background-color : var(--panel-bg);
+    background-color : transparent;
+    height           : 32px;
     color            : var(--color-text-mid);
     border           : 1px solid var(--panel-border);
     border-radius    : calc(var(--border-radius) * 0.67);
-    padding          : 4px 10px;
+    padding          : 3px 10px;
     font-size        : var(--font-size-kpi-sub);
     cursor           : pointer;
-    z-index          : 1000;
 }
 
 #reset-prefecture-btn:hover {

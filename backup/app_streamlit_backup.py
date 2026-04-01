@@ -1,9 +1,8 @@
 # app/app.py
 import streamlit as st
-import pandas as pd
 
 from app.config import PANEL_BG, PANEL_H
-from app.ui_styles import inject_dashboard_style
+from backup.ui_styles_streamlit_backup import inject_dashboard_style
 from app.maps import build_japan_map_fig
 
 

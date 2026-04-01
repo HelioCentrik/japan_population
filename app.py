@@ -155,20 +155,24 @@ app.layout = html.Div(
                         # Map container
                         html.Div(
                             className="map-panel",
-                            style={},
+                            style={"overflow": "visible"},
                             children=[
                                 html.Div(
                                     className="metric-selector-strip",
                                     children=[
-                                        dcc.RadioItems(
+                                        dcc.Dropdown(
                                             id="metric-selector",
                                             options=[
                                                 {"label": meta["label"], "value": key}
                                                 for key, meta in MAP_METRICS.items()
                                             ],
                                             value=MAP_METRIC_DEFAULT,
-                                            inline=True,
-                                            inputStyle={"display": "none"},
+                                            clearable=False,
+                                            searchable=False,
+                                        ),
+                                        html.Button(
+                                            "✕ Clear",
+                                            id="reset-prefecture-btn",
                                         ),
                                     ]
                                 ),
@@ -177,10 +181,6 @@ app.layout = html.Div(
                                     figure=build_japan_map_fig(year=YEAR_MAX, metric=MAP_METRIC_DEFAULT),
                                     config={"displayModeBar": False, "responsive": True},
                                     style={"height": "100%"},
-                                ),
-                                html.Button(
-                                    "✕ Clear",
-                                    id="reset-prefecture-btn",
                                 ),
                             ]
                         ),
