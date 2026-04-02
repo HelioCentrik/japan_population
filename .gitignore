@@ -7,10 +7,13 @@ env/
 api.py
 
 # Project Folders
+source/*
 !source/jp_census_historical_1920_2015.csv
-source
+data/*
+!data/japan_prefectures_simplified.parquet
+scripts/*
+!scripts/load_jp_census_csv.py
 !scripts/prefectures_to_parquet.py
-scripts
 backup
 test
 
