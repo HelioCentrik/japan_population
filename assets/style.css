@@ -5,10 +5,21 @@
  * Do not hardcode hex values, pixel sizes, or font names here.
  *
  * Intentional hardcodes (documented inline where they appear):
- *   #ccccee      — slider thumb hover micro-state; CSS-only, no Python consumer
- *   rgba(0,0,0,…) — pure black overlay on reset button; theme-independent
- *   rgba(100,140,220,0.2) — decorative play-btn glow; not part of color system
- *   calc(var(--border-radius) * 0.67) — derived ratio for reset btn corner
+ *   #ccccee           — slider thumb hover micro-state; CSS-only, no Python consumer
+ *   rgba(0,0,0,…)     — pure black overlay on reset button; theme-independent
+ *   rgba(100,140,220,…) — decorative play-btn glow; not part of color system
+ *   calc(var(--border-radius) * 0.67) — derived ratio for pill/button corners
+ *
+ * Dash component CSS notes:
+ *   dcc.Dropdown uses Radix UI (Dash 2.x) — NOT React Select. Selectors like
+ *   .Select-control, .Select-menu-outer are dead. Use button.dash-dropdown,
+ *   .dash-dropdown-content, and [role="option"] instead. Menu background and
+ *   option backgrounds require !important to override Dash's bundled stylesheet.
+ *   Internal button layout is controlled by span.dash-dropdown-grid-container
+ *   (CSS grid) — style that element, not the button's own flex properties.
+ *
+ *   dcc.Slider uses Radix UI (not RC Slider). Target .dash-slider-track,
+ *   .dash-slider-thumb, .dash-slider-mark — not rc-slider-* classes.
  */
 
 
