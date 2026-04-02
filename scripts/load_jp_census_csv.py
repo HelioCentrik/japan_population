@@ -5,7 +5,7 @@ import duckdb as ddb
 
 
 # Load historical CSV
-df_ja = pd.read_csv("../docs/jp_census_historical_1920_2015.csv", encoding="cp932")
+df_ja = pd.read_csv("../source/jp_census_historical_1920_2015.csv", encoding="cp932")
 # print(f"\nColumns: {df_ja.columns}")
 # for i, d in enumerate(df_ja.values):
 #     if i < 10:

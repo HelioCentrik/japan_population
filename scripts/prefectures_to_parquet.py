@@ -3,7 +3,7 @@ import geopandas as gpd
 
 
 
-gdf = gpd.read_file('../data/japan_prefectures.geojson')
+gdf = gpd.read_file('../source/japan_prefectures.geojson')
 gdf = gdf.rename(columns={"nam": "prefecture_name", "nam_ja": "prefecture_name_ja"})
 gdf["prefecture_code"] = gdf["id"].apply(lambda x: str(x * 1000).zfill(5))
 gdf = gdf.sort_values(by="id").reset_index(drop=True)

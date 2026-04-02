@@ -6,8 +6,17 @@ env/
 # API keys / secrets
 api.py
 
+# Project Folders
+!source/jp_census_historical_1920_2015.csv
+source
+!scripts/prefectures_to_parquet.py
+scripts
+backup
+test
+
 # Data files (regenerable via scripts/)
 data/*.geojson
+data/*.duckdb
 
 # Python
 __pycache__/
