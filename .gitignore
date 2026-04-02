@@ -7,9 +7,7 @@ env/
 api.py
 
 # Data files (regenerable via scripts/)
-data/
-!data/japan_population.duckdb
-!data/japan_prefectures_simplified.parquet
+data/*.geojson
 
 # Python
 __pycache__/
