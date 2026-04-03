@@ -19,10 +19,13 @@ from pathlib import Path
 import pandas as pd
 import duckdb as ddb
 
+from app.config import DB_PATH
+
+
+
 # ── Paths ─────────────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).parent.parent
 CSV_PATH     = PROJECT_ROOT / "source" / "jp_census_historical_1920_2015.csv"
-DB_PATH      = PROJECT_ROOT / "data" / "japan_population.duckdb"
 
 # ── Column rename map ─────────────────────────────────────────────────────────
 _COL_MAP = {

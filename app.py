@@ -85,6 +85,7 @@ app.layout = html.Div(
             className="dashboard-title",
             style={
                 "color": COLOR_PRIMARY,
+                "marginBottom": "16px",
             }
         ),
 
@@ -94,7 +95,6 @@ app.layout = html.Div(
                 "textAlign": "center",
                 "color": COLOR_SECONDARY,
                 "fontSize": "28px",
-                "marginBottom": "1.25rem",
                 "letterSpacing": "0.05em",
             }
         ),
@@ -232,6 +232,19 @@ app.layout = html.Div(
         ),
     ]
 )
+
+
+# ── Cache pre-warm ────────────────────────────────────────────────────────────
+# Populates @lru_cache for all 20 census years at startup.
+# Cold renders during normal use are instant after this runs.
+print("Pre-warming figure cache...")
+_prewarm_axis_max = get_pyramid_axis_max(None)
+for _yr in CENSUS_YEARS:
+    build_kpi_data(_yr)
+    build_japan_map_fig(year=_yr, metric=MAP_METRIC_DEFAULT)
+    build_pyramid_fig(year=_yr, area_estat=None, axis_max=_prewarm_axis_max)
+    build_aging_index_fig(selected_year=_yr)
+print(f"  Cache warm — {len(CENSUS_YEARS)} years × 4 builders ready.")
 
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────

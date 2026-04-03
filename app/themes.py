@@ -104,8 +104,8 @@ def _build_light_theme() -> dict:
         150: "#ede2d0",  # → panel_bg
         200: "#ece4d8",  # → ui_hover
         250: "#dfcdb7",  # → chart_grid
-        300: "#d4c4aa",  # → slider_track
-        350: "#c8b99a",  # → panel_border
+        300: "#e7dbc6",  # → slider_track
+        350: "#d0c19f",  # → panel_border
         500: "#b0a090",  # → text_hint
         600: "#8a7a6a",  # → text_lo
         700: "#4a3f30",  # → text_mid
@@ -117,8 +117,8 @@ def _build_light_theme() -> dict:
         "primary": "#bc002d",  # Japan red
         "ink":     "#2d1f0e",  # sumi dark brown
         "forest":  "#2d6a4f",  # threshold reference line (legible on light)
-        "amber":   "#e69225",  # 団塊の世代 (darkened for light bg)
-        "lime":    "#6bbb26",  # 団塊ジュニア
+        "amber":   "#faa434",  # 団塊の世代 (darkened for light bg)
+        "lime":    "#6bd211",  # 団塊ジュニア
         "sky":     "#9ee0ff",  # 少子化世代
     }
 

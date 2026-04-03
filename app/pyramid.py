@@ -2,7 +2,6 @@
 import math
 from functools import lru_cache
 
-import duckdb as ddb
 import plotly.graph_objects as go
 
 from app.config import (
@@ -14,6 +13,7 @@ from app.config import (
     FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
     MARKER_SIZE_DIAMOND, MARKER_SIZE_LEGEND_SQ,
 )
+from app.db import get_con
 
 
 
@@ -23,7 +23,7 @@ def get_pyramid_axis_max(area_estat: str | None) -> int:
     Pre-query the maximum single-sex band population across ALL years for this
     selection. Cached per area_estat so the axis stays stable while scrubbing years.
     """
-    con = ddb.connect("data/japan_population.duckdb")
+    con = get_con()
     if area_estat is not None:
         result = con.execute("""
             SELECT MAX(population) AS max_pop
@@ -46,7 +46,6 @@ def get_pyramid_axis_max(area_estat: str | None) -> int:
                 GROUP BY year, age_start, sex
             )
         """).fetchone()
-    con.close()
     return int(result[0]) if result and result[0] else 5_000_000
 
 
@@ -122,7 +121,7 @@ def _cohort_band_range(year: int, birth_start: int, birth_end: int) -> list[int]
 
 @lru_cache(maxsize=64)
 def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 5_000_000) -> go.Figure:
-    con = ddb.connect("data/japan_population.duckdb")
+    con = get_con()
 
     if area_estat is not None:
         df = con.execute("""
@@ -171,8 +170,6 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         pref_label = f"<b>{name_row[0]}<br>{name_row[1]}</b>" if name_row else area_estat
     else:
         pref_label = "<b>全国<br>National</b>"
-
-    con.close()
 
     male_df   = df[df["sex"] == "male"  ].sort_values("age_start")
     female_df = df[df["sex"] == "female"].sort_values("age_start")

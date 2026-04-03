@@ -4,7 +4,7 @@ import numpy as np
 from functools import lru_cache
 
 import geopandas as gpd
-import duckdb as ddb
+from app.db import get_con
 from plotly import graph_objects as go
 
 from app.config import (
@@ -31,7 +31,7 @@ def build_japan_map_fig(
     prefectures = gpd.read_parquet("data/japan_prefectures_simplified.parquet").to_crs(epsg=4326)
     prefectures = prefectures.rename(columns={"prefecture_code": "area_estat"})
 
-    con = ddb.connect("data/japan_population.duckdb")
+    con = get_con()
     df = con.execute(f"""
         SELECT
             area_estat,
@@ -41,7 +41,6 @@ def build_japan_map_fig(
         FROM v_map_metrics
         WHERE year = {year}
     """).df()
-    con.close()
 
     prefectures = prefectures.merge(df, on="area_estat", how="left")
     meta = MAP_METRICS[metric]

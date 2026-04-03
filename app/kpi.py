@@ -1,8 +1,9 @@
 # app/kpi.py
 from functools import lru_cache
 
-import duckdb as ddb
 from dash import html
+
+from app.db import get_con
 
 
 
@@ -12,7 +13,7 @@ def build_kpi_data(year: int) -> dict:
     Computes the six KPI values for a given census year.
     Cached on year — queries only run once per year per session.
     """
-    con = ddb.connect("data/japan_population.duckdb")
+    con = get_con()
 
     # ── National population — from pre-stored Total row ───────────────────────
     pop_row = con.execute(f"""
@@ -63,8 +64,6 @@ def build_kpi_data(year: int) -> dict:
         ORDER BY aging_index ASC
         LIMIT 1
     """).fetchone()
-
-    con.close()
 
     return {
         "national_pop":      int(pop_row[0]) if pop_row[0] is not None else None,

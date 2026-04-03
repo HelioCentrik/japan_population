@@ -1,7 +1,6 @@
 # app/timeseries.py
 from functools import lru_cache
 
-import duckdb as ddb
 import plotly.graph_objects as go
 
 from app.config import (
@@ -13,6 +12,8 @@ from app.config import (
     OPACITY_THRESHOLD_LINE, OPACITY_YEAR_VLINE,
     FONT_SIZE_AXIS_TITLE,
 )
+from app.db import get_con
+
 
 # Aging index crossed 100 between the 1995 and 2000 census years.
 # Annotated at ~1997 — the midpoint, not a data point.
@@ -25,7 +26,7 @@ def _get_aging_index_data(area_estat: str | None) -> tuple:
     Returns (national_df, pref_df_or_None, pref_label_or_None).
     Cached on area_estat only — year is not a factor in the underlying data.
     """
-    con = ddb.connect("data/japan_population.duckdb")
+    con = get_con()
 
     national_df = con.execute("""
         WITH age_buckets AS (
@@ -73,7 +74,6 @@ def _get_aging_index_data(area_estat: str | None) -> tuple:
             ORDER BY year
         """, [area_estat]).df()
 
-    con.close()
     return national_df, pref_df, pref_label
 
 

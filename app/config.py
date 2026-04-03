@@ -24,10 +24,12 @@ Sections:
   14. Legacy constants
 """
 
+from pathlib import Path
 import colorsys
 
 from app.fonts import _stack
 from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
+
 
 
 # ── 1. Private helpers ────────────────────────────────────────────────────────
@@ -61,8 +63,10 @@ def _hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> s
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
 
+DB_PATH             = Path("data/japan_population.duckdb")
+
 LAYOUT_GAP          = "0.8rem"
-LAYOUT_OUTER_PAD    = "1rem"
+LAYOUT_OUTER_PAD    = "1.5rem"
 LAYOUT_MIN_HEIGHT   = "700px"
 
 CHARTS_ANCHOR       = 10
@@ -187,7 +191,8 @@ FONT_SIZE_TITLE         = 32
 
 # ── 7. Spacing & borders ──────────────────────────────────────────────────────
 
-PANEL_BORDER_RADIUS = "6px"
+PANEL_BORDER_RADIUS    = "6px"
+PANEL_BORDER_THICKNESS = "1.5px"
 
 
 # ── 8. Map configuration ──────────────────────────────────────────────────────
