@@ -1,4 +1,9 @@
 # app.py — Dash entrypoint
+import sys
+sys.path.insert(0, ".")
+from pathlib import Path
+
+
 import dash
 from dash import html, dcc, Input, Output, State, no_update, ctx
 import duckdb as ddb
@@ -7,6 +12,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, COLOR_PRIMARY, COLOR_SECONDARY,
                         PLAY_INTERVAL_MS, MAP_METRICS, MAP_METRIC_DEFAULT)
 from app.index_string import INDEX_STRING
+import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
@@ -20,6 +26,15 @@ app = dash.Dash(__name__, title="Japanese Population Dashboard")
 app.index_string = INDEX_STRING
 register_plotly_template()
 server = app.server  # expose for deployment (Gunicorn etc.)
+
+
+# ── Build DuckDB ───────────────────────────────────────────────────
+_DB_PATH = Path("data/japan_population.duckdb")
+if not _DB_PATH.exists():
+    print("Database not found — running build_db.py ...")
+    from scripts.build_db import build
+    build()
+
 
 # ── Census years for slider ───────────────────────────────────────────────────
 con = ddb.connect("data/japan_population.duckdb")

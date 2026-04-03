@@ -12,8 +12,7 @@ source/*
 data/*
 !data/japan_prefectures_simplified.parquet
 scripts/*
-!scripts/load_jp_census_csv.py
-!scripts/prefectures_to_parquet.py
+!scripts/build_db.py
 backup
 test
 
