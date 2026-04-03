@@ -316,8 +316,25 @@ html, body {
     border           : 1px solid var(--panel-border);
     box-shadow       : 0 0 8px var(--shadow-panel);
     overflow         : hidden;
-    background-color : var(--page-bg);
+    background-color : var(--panel-bg);
+    display          : flex;
+    flex-direction   : column;
 }
+.pyramid-panel .dash-graph {
+    height: 100% !important;   /* was: unset */
+    flex: 1;
+    min-height: 0;
+}
+.pyramid-legend {
+    padding     : 10px 16px 0 16px;
+    font-size   : var(--font-size-kpi-sub);
+    color       : var(--color-text-mid);
+    flex-shrink : 0;
+    display     : flex;
+    align-items : center;
+    gap         : 6px;
+}
+
 
 /* Timeseries panel */
 .timeseries-panel {

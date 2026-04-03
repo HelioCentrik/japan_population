@@ -63,7 +63,7 @@ def _hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> s
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
 
-DB_PATH             = Path("data/japan_population.duckdb")
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "japan_population.duckdb"
 
 LAYOUT_GAP          = "0.8rem"
 LAYOUT_OUTER_PAD    = "1.5rem"
@@ -250,6 +250,11 @@ MAP_METRIC_DEFAULT = "population"
 
 PYRAMID_BARGAP       = 0.15
 COHORT_OUTLINE_WIDTH = 3.5
+PYRAMID_MAX_BANDS = 18
+PYRAMID_MARGIN_T     = 44
+PYRAMID_MARGIN_B     = 32
+PYRAMID_MARGIN_L     = 16
+PYRAMID_MARGIN_R     = 16
 
 
 # ── 10. Play button ───────────────────────────────────────────────────────────
@@ -386,12 +391,12 @@ THEME = {
 # Aliases for renamed constants — kept for backward compat with older imports.
 # Remove once all consumers have been updated.
 
-FONT_COLOR_JPRED   = COLOR_PRIMARY
-FONT_COLOR_JPWHT   = COLOR_SECONDARY
+# FONT_COLOR_JPRED   = COLOR_PRIMARY
+# FONT_COLOR_JPWHT   = COLOR_SECONDARY
 FONT_MAIN_COLOR    = COLOR_TEXT_MID
 FONT_MAIN          = FONT_STACK_SANS
 FONT_HEADER        = FONT_STACK_SERIF
-
-PANEL_H            = 720
-LEGEND_H           = int(PANEL_H * 1.03)
-TIME_H             = 180
+#
+# PANEL_H            = 720
+# LEGEND_H           = int(PANEL_H * 1.03)
+# TIME_H             = 180

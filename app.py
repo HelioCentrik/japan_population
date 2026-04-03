@@ -10,7 +10,8 @@ import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, COLOR_PRIMARY, COLOR_SECONDARY,
-                        PLAY_INTERVAL_MS, MAP_METRICS, MAP_METRIC_DEFAULT)
+                        PLAY_INTERVAL_MS, MAP_METRICS, MAP_METRIC_DEFAULT,
+                        PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,)
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -203,13 +204,24 @@ app.layout = html.Div(
                         # Population Pyramid
                         html.Div(
                             className="pyramid-panel",
-                            style={},
                             children=[
-                                dcc.Graph(
-                                    id="pyramid-chart",
-                                    figure=build_pyramid_fig(year=YEAR_MAX),
-                                    config={"displayModeBar": False, "responsive": True},
-                                    style={"height": "100%"},
+                                html.Div(className="pyramid-legend", children=[
+                                    html.Span("■", style={"color": PYRAMID_MALE_COLOR}),
+                                    html.Span("男 Male", style={"marginRight": "16px"}),
+                                    html.Span("■", style={"color": PYRAMID_FEMALE_COLOR}),
+                                    html.Span("女 Female"),
+                                ]),
+                                html.Div(
+                                    style={"flex": "1", "minHeight": "0"},  # replaces marginTop: auto
+                                    children=[
+                                        dcc.Graph(
+                                            id="pyramid-chart",
+                                            className="pyramid-graph",
+                                            figure=build_pyramid_fig(year=YEAR_MAX),
+                                            config={"displayModeBar": False, "responsive": True},  # add responsive
+                                            style={"height": "100%"},  # add this
+                                        ),
+                                    ]
                                 ),
                             ]
                         ),

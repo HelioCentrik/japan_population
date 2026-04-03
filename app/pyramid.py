@@ -9,7 +9,8 @@ from app.config import (
     COLOR_TEXT_MID,
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
-    PYRAMID_BARGAP, COHORT_OUTLINE_WIDTH,
+    PYRAMID_BARGAP, PYRAMID_MAX_BANDS, COHORT_OUTLINE_WIDTH,
+    PYRAMID_MARGIN_T, PYRAMID_MARGIN_B, PYRAMID_MARGIN_L, PYRAMID_MARGIN_R,
     FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
     MARKER_SIZE_DIAMOND, MARKER_SIZE_LEGEND_SQ,
 )
@@ -82,11 +83,11 @@ _COHORTS = {
 }
 # Canonical scheme_a labels in display order — y-axis pinned to this so
 # early years with fewer bands (80+ terminal instead of 85+) don't collapse the axis
-_SCHEME_A_LABELS = [
-    "0–4", "5–9", "10–14", "15–19", "20–24", "25–29",
-    "30–34", "35–39", "40–44", "45–49", "50–54", "55–59",
-    "60–64", "65–69", "70–74", "75–79", "80+"
-]
+# _SCHEME_A_LABELS = [
+#     "0–4", "5–9", "10–14", "15–19", "20–24", "25–29",
+#     "30–34", "35–39", "40–44", "45–49", "50–54", "55–59",
+#     "60–64", "65–69", "70–74", "75–79", "80+"
+# ]
 
 
 def _shorten_label(label: str) -> str:
@@ -126,41 +127,27 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     if area_estat is not None:
         df = con.execute("""
             SELECT age_group, age_start, sex, SUM(population) AS population
-            FROM (
-                SELECT
-                    CASE WHEN age_start >= 80 THEN '80+' ELSE age_group END AS age_group,
-                    CASE WHEN age_start >= 80 THEN 80    ELSE age_start END AS age_start,
-                    sex,
-                    population
-                FROM v_census
-                WHERE year       = ?
-                  AND age_scheme  = 'scheme_a'
-                  AND age_group  != 'Total'
-                  AND sex        != 'total'
-                  AND area_estat  = ?
-            )
+            FROM v_census
+            WHERE year       = ?
+              AND age_scheme  = 'scheme_a'
+              AND age_group  != 'Total'
+              AND sex        != 'total'
+              AND area_estat  = ?
             GROUP BY age_group, age_start, sex
             ORDER BY age_start
         """, [year, area_estat]).df()
     else:
-        df = con.execute(f"""
+        df = con.execute("""
             SELECT age_group, age_start, sex, SUM(population) AS population
-            FROM (
-                SELECT
-                    CASE WHEN age_start >= 80 THEN '80+' ELSE age_group END AS age_group,
-                    CASE WHEN age_start >= 80 THEN 80    ELSE age_start END AS age_start,
-                    sex,
-                    population
-                FROM v_census
-                WHERE year      = {year}
-                  AND age_scheme = 'scheme_a'
-                  AND age_group != 'Total'
-                  AND sex       != 'total'
-                  AND area_level = 2
-            )
+            FROM v_census
+            WHERE year      = ?
+              AND age_scheme = 'scheme_a'
+              AND age_group != 'Total'
+              AND sex       != 'total'
+              AND area_level = 2
             GROUP BY age_group, age_start, sex
             ORDER BY age_start
-        """).df()
+        """, [year]).df()
 
     if area_estat is not None:
         name_row = con.execute(
@@ -176,6 +163,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
 
     age_labels = [_shorten_label(l) for l in male_df["age_group"].tolist()]
     age_starts = male_df["age_start"].tolist()
+
+    # fig_height = len(age_labels) * PYRAMID_BAND_HEIGHT + PYRAMID_MARGIN_T + PYRAMID_MARGIN_B
 
     # ── Cohort colour mapping ─────────────────────────────────────────────────
     cohort_bands = {}
@@ -281,8 +270,6 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     fig = go.Figure(data=[
         male_trace,
         female_trace,
-        legend_male,
-        legend_female,
         war_gen_trace,
         shoushika_trace,
     ])
@@ -312,7 +299,9 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     fig.update_layout(
         barmode="overlay",
         bargap=PYRAMID_BARGAP,
-        margin=dict(l=16, r=16, t=44, b=20),
+        autosize=True,
+        # height=fig_height,
+        margin=dict(l=PYRAMID_MARGIN_L, r=PYRAMID_MARGIN_R, t=PYRAMID_MARGIN_T, b=PYRAMID_MARGIN_B),
         legend=dict(
             orientation="h",
             x=0.5, xanchor="center",
@@ -333,7 +322,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             ),
             showgrid=False,
             categoryorder="array",
-            categoryarray=_SCHEME_A_LABELS,
+            categoryarray=age_labels,
+            range=[-0.5, PYRAMID_MAX_BANDS - 0.5],  # always 18 slots — 1920's 80+ terminal leaves top empty
         ),
     )
 
