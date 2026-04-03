@@ -14,6 +14,16 @@ def build_kpi_data(year: int) -> dict:
     """
     con = ddb.connect("data/japan_population.duckdb")
 
+    # ── National population — from pre-stored Total row ───────────────────────
+    pop_row = con.execute(f"""
+        SELECT SUM(population) AS national_pop
+        FROM v_census
+        WHERE year       = {year}
+          AND age_group  = 'Total'
+          AND sex        = 'total'
+          AND area_level = 2
+    """).fetchone()
+
     # ── Four scalar national metrics via age_buckets CTE ─────────────────────
     row = con.execute(f"""
         WITH age_buckets AS (
@@ -57,10 +67,10 @@ def build_kpi_data(year: int) -> dict:
     con.close()
 
     return {
-        "national_pop":      int(row[0])   if row[0] is not None else None,
-        "aging_index":       float(row[1]) if row[1] is not None else None,
-        "old_age_dep":       float(row[2]) if row[2] is not None else None,
-        "working_age_share": float(row[3]) if row[3] is not None else None,
+        "national_pop":      int(pop_row[0]) if pop_row[0] is not None else None,
+        "aging_index":       float(row[0])   if row[0]     is not None else None,
+        "old_age_dep":       float(row[1])   if row[1]     is not None else None,
+        "working_age_share": float(row[2])   if row[2]     is not None else None,
         "most_aged_ja":      most[0]  if most  else "—",
         "most_aged_en":      most[1]  if most  else "—",
         "most_aged_val":     float(most[2])  if most  and most[2]  is not None else None,
