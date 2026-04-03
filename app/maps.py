@@ -21,6 +21,34 @@ _OKINAWA_GREY_FILL  = "rgba(140, 140, 140, 0.55)"
 _OKINAWA_GREY_LINE  = "rgba(180, 180, 180, 0.7)"
 
 
+@lru_cache(maxsize=1)
+def _get_global_metric_bounds() -> dict:
+    """
+    Queries global min/max for each metric across all years and prefectures.
+    Cached once — bounds are fixed for the lifetime of the process.
+    Pins colorscale ranges so the map scale stays stable while scrubbing years.
+    """
+    con = get_con()  # shared in-memory singleton — do NOT close
+    row = con.execute("""
+        SELECT
+            MIN(population),        MAX(population),
+            MIN(aging_index),       MAX(aging_index),
+            MIN(old_age_dep),       MAX(old_age_dep),
+            MIN(working_age_share), MAX(working_age_share)
+        FROM v_map_metrics
+    """).fetchone()
+
+    aging_mid     = 100.0
+    aging_max_dev = max(abs(row[3] - aging_mid), abs(row[2] - aging_mid))
+
+    return {
+        "population":        (float(np.log1p(row[0])), float(np.log1p(row[1]))),
+        "aging_index":       (aging_mid - aging_max_dev, aging_mid + aging_max_dev),
+        "old_age_dep":       (float(row[4]), float(row[5])),
+        "working_age_share": (float(row[6]), float(row[7])),
+    }
+
+
 @lru_cache(maxsize=256)
 def build_japan_map_fig(
     year: int = 2015,
@@ -72,14 +100,15 @@ def build_japan_map_fig(
         prefectures["_z"] = prefectures[metric]
         colorbar_label    = meta["label"].split("  ")[0]   # JA half only
 
-    if meta["diverging"] and meta["midpoint"] is not None:
-        mid     = meta["midpoint"]
-        valid   = prefectures["_z"].dropna()
-        max_dev = max(abs(valid.max() - mid), abs(valid.min() - mid))
-        zmin, zmax = mid - max_dev, mid + max_dev
+    # ── Z column + colorscale bounds ──────────────────────────────────────────
+    if metric == "population":
+        prefectures["_z"] = np.log1p(prefectures["population"])
+        colorbar_label    = "人口 (log)"
     else:
-        zmin = float(prefectures["_z"].min())
-        zmax = float(prefectures["_z"].max())
+        prefectures["_z"] = prefectures[metric]
+        colorbar_label    = meta["label"].split("  ")[0]   # JA half only
+
+    zmin, zmax = _get_global_metric_bounds()[metric]
 
     prefectures_js = json.loads(prefectures.to_json())
 
