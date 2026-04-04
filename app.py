@@ -111,7 +111,7 @@ app.layout = html.Div(
             style={
                 "display": "flex",
                 "alignItems": "stretch",
-                "gap": "var(--layout-gap)",
+                "gap": "0.4rem",
             },
             children=[
 

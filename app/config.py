@@ -249,12 +249,12 @@ MAP_METRIC_DEFAULT = "population"
 # ── 9. Pyramid configuration ─────────────────────────────────────────────────
 
 PYRAMID_BARGAP       = 0.15
-COHORT_OUTLINE_WIDTH = 3.5
-PYRAMID_MAX_BANDS = 18
-PYRAMID_MARGIN_T     = 44
-PYRAMID_MARGIN_B     = 32
-PYRAMID_MARGIN_L     = 16
-PYRAMID_MARGIN_R     = 16
+COHORT_OUTLINE_WIDTH = 3
+PYRAMID_MAX_BANDS    = 18
+PYRAMID_MARGIN_T     = 20
+PYRAMID_MARGIN_B     = 12
+PYRAMID_MARGIN_L     = 12
+PYRAMID_MARGIN_R     = 12
 
 
 # ── 10. Play button ───────────────────────────────────────────────────────────
