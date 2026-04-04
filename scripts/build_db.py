@@ -114,6 +114,8 @@ _AGE_GROUP_ROWS = [
 # ── View SQL ──────────────────────────────────────────────────────────────────
 _V_CENSUS = """
 CREATE OR REPLACE VIEW v_census AS
+
+-- Standard records: all years, all schemes, as stored
 SELECT
     f.year,
     p.area_estat,
@@ -133,14 +135,43 @@ FROM f_census f
 JOIN d_prefectures p ON f.area_estat    = p.area_estat
 JOIN d_age_groups  a ON f.age_group_id  = a.age_group_id
 JOIN d_sex         s ON f.sex_id        = s.sex_id
+
+UNION ALL
+
+-- 1945 kazoedoshi conversion: scheme_b bands remapped to scheme_a equivalents
+-- via -1 label shift (e.g. 1-5 -> 0-4). Self-join on d_age_groups resolves
+-- the correct scheme_a label, age_start, age_end, and is_open_ended.
+SELECT
+    f.year,
+    p.area_estat,
+    p.prefecture_name_ja,
+    p.prefecture_name,
+    p.level         AS area_level,
+    p.parent_estat,
+    a_mapped.age_group,
+    a_mapped.age_start,
+    a_mapped.age_end,
+    a_mapped.is_open_ended,
+    'scheme_a'      AS age_scheme,
+    s.sex,
+    s.sex_ja,
+    f.population
+FROM f_census      f
+JOIN d_prefectures p       ON f.area_estat    = p.area_estat
+JOIN d_age_groups  a_b     ON f.age_group_id  = a_b.age_group_id
+JOIN d_age_groups  a_mapped ON a_mapped.source_scheme = 'scheme_a'
+                           AND a_mapped.age_start     = a_b.age_start - 1
+JOIN d_sex         s       ON f.sex_id        = s.sex_id
+WHERE f.year            = 1945
+  AND a_b.source_scheme = 'scheme_b'
 """
 
 # v_map_metrics: one row per prefecture × year with pre-computed demographic
 # metrics and period-over-period deltas.
 #
-# 1945 is naturally absent — the census has no scheme_a records for that year,
-# so it produces no rows in the age_buckets CTE. The LAG() window for 1950 then
-# correctly uses 1940 as prev_year (year_gap = 10).
+# 1945 is present via kazoedoshi conversion in v_census (scheme_b → scheme_a
+# label shift). The LAG() window for 1950 correctly uses 1940 as prev_year
+# (year_gap = 10) since 1945 now sits between them.
 #
 # Okinawa 1950/1955: pop_0_14 / pop_15_64 / pop_65_plus will be understated
 # because the 70+ population is in scheme_b and excluded here. The choropleth

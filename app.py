@@ -57,7 +57,7 @@ YEAR_LABELS = {
 }
 YEAR_MIN = min(CENSUS_YEARS)
 YEAR_MAX = max(CENSUS_YEARS)
-PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS if yr != 1945]
+PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS]
 
 
 # ── Layout ────────────────────────────────────────────────────────────────────
