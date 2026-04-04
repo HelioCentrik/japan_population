@@ -16,6 +16,9 @@ from app.config import (
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
     MAX_YEAR,
 )
+from app import figure_cache
+
+
 
 _OKINAWA_GREY_YEARS = {1950, 1955}
 _OKINAWA_GREY_FILL  = "rgba(140, 140, 140, 0.55)"
@@ -50,12 +53,14 @@ def _get_global_metric_bounds() -> dict:
     }
 
 
-@lru_cache(maxsize=256)
 def build_japan_map_fig(
     year: int = MAX_YEAR,
     area_estat: str | None = None,
     metric: str = MAP_METRIC_DEFAULT,
 ) -> go.Figure:
+    _key = figure_cache.make_key("map", year, metric, area_estat)
+    if (fig := figure_cache.get(_key)) is not None:
+        return fig
 
     prefectures = gpd.read_parquet("data/japan_prefectures_simplified.parquet").to_crs(epsg=4326)
     prefectures = prefectures.rename(columns={"prefecture_code": "area_estat"})
@@ -211,4 +216,5 @@ def build_japan_map_fig(
         autosize=True,
     )
 
+    figure_cache.put(_key, fig)
     return fig

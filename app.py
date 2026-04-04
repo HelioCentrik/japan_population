@@ -20,6 +20,7 @@ from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
 from app.timeseries import build_aging_index_fig
 from app.plotly_template import register_plotly_template
+from app import figure_cache
 
 
 
@@ -58,6 +59,30 @@ YEAR_LABELS = {
 }
 YEAR_MIN = min(CENSUS_YEARS)
 PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS]
+
+
+# ── Cache pre-warm ────────────────────────────────────────────────────────────
+_prewarm_axis_max = get_pyramid_axis_max(None)
+
+if figure_cache.is_valid():
+    print("Loading figure cache from disk...")
+    figure_cache.load_all()
+    for _yr in CENSUS_YEARS:
+        build_kpi_data(_yr)
+    print(f"  Disk cache loaded — {len(CENSUS_YEARS)} years ready.")
+else:
+    print("Building figure cache...")
+    figure_cache.clear()
+    for _yr in CENSUS_YEARS:
+        build_kpi_data(_yr)
+        fig = build_japan_map_fig(year=_yr, metric=MAP_METRIC_DEFAULT, area_estat=None)
+        figure_cache.save(figure_cache.make_key("map", _yr, MAP_METRIC_DEFAULT, None), fig)
+        fig = build_pyramid_fig(year=_yr, area_estat=None, axis_max=_prewarm_axis_max)
+        figure_cache.save(figure_cache.make_key("pyramid", _yr, None, _prewarm_axis_max), fig)
+        fig = build_aging_index_fig(selected_year=_yr, area_estat=None)
+        figure_cache.save(figure_cache.make_key("timeseries", _yr, None), fig)
+    figure_cache.write_fingerprint()
+    print(f"  Cache built and saved — {len(CENSUS_YEARS)} years × 3 builders.")
 
 
 # ── Layout ────────────────────────────────────────────────────────────────────
@@ -217,7 +242,8 @@ app.layout = html.Div(
                                         dcc.Graph(
                                             id="pyramid-chart",
                                             className="pyramid-graph",
-                                            figure=build_pyramid_fig(year=MAX_YEAR),
+                                            figure=build_pyramid_fig(year=MAX_YEAR, area_estat=None,
+                                                                     axis_max=_prewarm_axis_max),
                                             config={"displayModeBar": False, "responsive": True},  # add responsive
                                             style={"height": "100%"},  # add this
                                         ),
@@ -234,7 +260,7 @@ app.layout = html.Div(
                     children=[
                         dcc.Graph(
                             id="timeseries-chart",
-                            figure=build_aging_index_fig(selected_year=MAX_YEAR),
+                            figure=build_aging_index_fig(selected_year=MAX_YEAR, area_estat=None),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
                         ),
@@ -244,19 +270,6 @@ app.layout = html.Div(
         ),
     ]
 )
-
-
-# ── Cache pre-warm ────────────────────────────────────────────────────────────
-# Populates @lru_cache for all 20 census years at startup.
-# Cold renders during normal use are instant after this runs.
-print("Pre-warming figure cache...")
-_prewarm_axis_max = get_pyramid_axis_max(None)
-for _yr in CENSUS_YEARS:
-    build_kpi_data(_yr)
-    build_japan_map_fig(year=_yr, metric=MAP_METRIC_DEFAULT)
-    build_pyramid_fig(year=_yr, area_estat=None, axis_max=_prewarm_axis_max)
-    build_aging_index_fig(selected_year=_yr)
-print(f"  Cache warm — {len(CENSUS_YEARS)} years × 4 builders ready.")
 
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
@@ -350,7 +363,7 @@ def update_charts(year, area_estat, metric):
     axis_max = get_pyramid_axis_max(area_estat)
     kpi_data = build_kpi_data(y)
     return (
-        build_japan_map_fig(year=y, area_estat=area_estat, metric=metric),
+        build_japan_map_fig(year=y, metric=metric, area_estat=area_estat),
         build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
         label,
         render_kpi_cards(kpi_data),

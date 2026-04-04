@@ -13,6 +13,7 @@ from app.config import (
     FONT_SIZE_AXIS_TITLE,
 )
 from app.db import get_con
+from app import figure_cache
 
 
 # Aging index crossed 100 between the 1995 and 2000 census years.
@@ -77,8 +78,11 @@ def _get_aging_index_data(area_estat: str | None) -> tuple:
     return national_df, pref_df, pref_label
 
 
-@lru_cache(maxsize=128)
 def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> go.Figure:
+    _key = figure_cache.make_key("timeseries", selected_year, area_estat)
+    if (fig := figure_cache.get(_key)) is not None:
+        return fig
+
     national_df, pref_df, pref_label = _get_aging_index_data(area_estat)
 
     df_non_1945 = national_df[national_df["year"] != 1945]
@@ -192,4 +196,5 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         ),
     )
 
+    figure_cache.put(_key, fig)
     return fig

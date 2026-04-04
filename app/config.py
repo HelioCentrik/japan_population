@@ -36,7 +36,8 @@ from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 # ── 1. Private helpers ────────────────────────────────────────────────────────
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "japan_population.duckdb"
+DB_PATH   = Path(__file__).resolve().parent.parent / "data" / "japan_population.duckdb"
+CACHE_DIR = Path(__file__).resolve().parent.parent / "data" / ".figure_cache"
 
 def _get_max_year() -> int:
     con = ddb.connect(str(DB_PATH), read_only=True)

@@ -19,6 +19,7 @@ test
 # Data files (regenerable via scripts/)
 data/*.geojson
 data/*.duckdb
+data/.figure_cache/
 
 # Python
 __pycache__/

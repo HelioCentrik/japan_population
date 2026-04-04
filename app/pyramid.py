@@ -16,6 +16,7 @@ from app.config import (
     MAX_YEAR,
 )
 from app.db import get_con
+from app import figure_cache
 
 
 
@@ -121,9 +122,10 @@ def _cohort_band_range(year: int, birth_start: int, birth_end: int) -> list[int]
     return [b for b in range(0, 86, 5) if b <= age_high and b + 4 >= age_low]
 
 
-@lru_cache(maxsize=64)
 def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 5_000_000) -> go.Figure:
-    print(f"[CACHE MISS] build_pyramid_fig year={year} area_estat={area_estat} axis_max={axis_max}")
+    _key = figure_cache.make_key("pyramid", year, area_estat, axis_max)
+    if (fig := figure_cache.get(_key)) is not None:
+        return fig
 
     con = get_con()
     if area_estat is not None:
@@ -329,14 +331,5 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         ),
     )
 
-    # fig.update_layout(
-    #     title=dict(
-    #         text=pref_label,
-    #         x=0.12,
-    #         y=0.95,
-    #         xanchor="center",
-    #         font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_CHART_TITLE),
-    #     )
-    # )
-
+    figure_cache.put(_key, fig)
     return fig
