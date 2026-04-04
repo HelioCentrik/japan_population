@@ -20,6 +20,12 @@
  *
  *   dcc.Slider uses Radix UI (not RC Slider). Target .dash-slider-track,
  *   .dash-slider-thumb, .dash-slider-mark — not rc-slider-* classes.
+ *
+ * dcc.Graph renders as a React component with nested wrapper divs.
+ *  CSS flex properties (e.g. margin-top: auto) must be applied to a
+ *  plain html.Div parent, not directly to dcc.Graph — Dash's .dash-graph wrapper
+ *  intercepts them. Do not use responsive=True alongside an explicit height in
+ *  fig.update_layout — on callback updates, responsive wins and overrides the height.
  */
 
 
