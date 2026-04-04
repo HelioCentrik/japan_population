@@ -17,7 +17,7 @@ from app.config import (
     # UI accents
     COLOR_UI_HOVER, SLIDER_TRACK_COLOR, CHART_GRID_COLOR,
     # Shadows (pre-computed rgba strings)
-    SHADOW_PANEL, SHADOW_MAP_INSET,
+    SHADOW_PANEL, SHADOW_MAP_INSET, SHADOW_BEZEL, SHADOW_FULL,
     # Font stacks
     FONT_STACK_SANS, FONT_STACK_SERIF, FONT_STACK_MONO,
     # Font sizes
@@ -74,6 +74,8 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 /* Shadows (derived from PAGE_BG x SHADOW_DARKNESS in config.py) */
                 --shadow-panel     : {SHADOW_PANEL};
                 --shadow-map-inset : {SHADOW_MAP_INSET};
+                --shadow-full      : {SHADOW_FULL};
+                --shadow-bezel     : {SHADOW_BEZEL};
 
                 /* Font stacks */
                 --font-sans        : {FONT_STACK_SANS};

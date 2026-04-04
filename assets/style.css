@@ -54,7 +54,7 @@ html, body {
     background     : var(--panel-bg);
     border         : 1px solid var(--panel-border);
     border-radius  : var(--border-radius);
-    box-shadow     : 0 0 8px var(--shadow-panel);
+    box-shadow     : var(--shadow-full);
     padding        : 12px 16px;
     overflow       : hidden;
     display        : flex;
@@ -101,8 +101,7 @@ html, body {
     border-radius    : var(--border-radius);
     font-size        : var(--play-btn-font-size);
     cursor           : pointer;
-    box-shadow       : inset 0 1px 5px var(--shadow-map-inset),
-                       inset 0 1px 3px var(--shadow-panel);
+    box-shadow       : var(--shadow-full);
     transition       : background-color 0.15s ease, box-shadow 0.1s ease, color 0.15s ease;
 }
 
@@ -204,7 +203,7 @@ html, body {
 /* Reset prefecture button */
 #reset-prefecture-btn {
     display          : none;
-    background-color : transparent;
+    background-color : rgba(240, 240, 240, 0.66);
     height           : 32px;
     color            : var(--color-text-mid);
     border           : 1px solid var(--panel-border);
@@ -215,7 +214,7 @@ html, body {
 }
 
 #reset-prefecture-btn:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.66);
     color           : var(--color-text-hi);
 }
 
@@ -284,6 +283,14 @@ html, body {
     flex     : 1 1 14%;
 }
 
+/* Playback row */
+.playback-panel {
+    flex             : 1;
+    border-radius    : var(--border-radius);
+    box-shadow       : var(--shadow-full);
+    position         : relative;
+}
+
 /* Charts area — fills all remaining vertical space */
 .charts-area {
     flex           : 1;
@@ -307,7 +314,8 @@ html, body {
     min-height       : var(--map-min-height);
     border-radius    : var(--border-radius);
     border           : 1px solid var(--panel-border);
-    box-shadow       : inset 0 3px 14px var(--shadow-map-inset),
+    box-shadow       : var(--shadow-full),
+                       inset 0 3px 14px var(--shadow-map-inset),
                        inset 0 1px 4px var(--shadow-panel);
     overflow         : hidden;
     background-color : var(--page-bg);
@@ -320,11 +328,12 @@ html, body {
     min-height       : 0;
     border-radius    : var(--border-radius);
     border           : 1px solid var(--panel-border);
-    box-shadow       : 0 0 8px var(--shadow-panel);
+    box-shadow       : var(--shadow-full);
     overflow         : hidden;
     background-color : var(--panel-bg);
     display          : flex;
     flex-direction   : column;
+    position         : relative;
 }
 .pyramid-panel .dash-graph {
     height: 100% !important;   /* was: unset */
@@ -342,18 +351,30 @@ html, body {
     gap         : 6px;
 }
 
-
 /* Timeseries panel */
 .timeseries-panel {
     flex             : var(--charts-ts-flex);
     min-height       : 0;
     border-radius    : var(--border-radius);
     border           : 1px solid var(--panel-border);
-    box-shadow       : 0 0 8px var(--shadow-panel);
+    box-shadow       : var(--shadow-full);
     overflow         : hidden;
     background-color : var(--page-bg);
+    position         : relative;
 }
 
+/* Shadow drop and inset after */
+.map-panel::after,
+.pyramid-panel::after,
+.timeseries-panel::after {
+    content          : "";
+    position         : absolute;
+    inset            : 0;
+    border-radius    : var(--border-radius);
+    box-shadow       : var(--shadow-bezel);
+    pointer-events   : none;
+    z-index          : 10;
+}
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 

@@ -155,6 +155,31 @@ _SHADOW_COLOR    = _t["shadow_color"]
 SHADOW_PANEL     = _rgba(_SHADOW_COLOR, SHADOW_DARKNESS)
 SHADOW_MAP_INSET = _rgba(_SHADOW_COLOR, min(1.0, SHADOW_DARKNESS * 1.6))
 
+# Panel drop shadow & bezel knobs — tweak these to adjust the 3-D feel.
+PANEL_SHADOW_Y    = 3     # px — drop shadow Y offset (bottom)
+PANEL_SHADOW_X    = 2     # px — drop shadow X offset (right)
+PANEL_SHADOW_BLUR = 4     # px — drop shadow blur radius
+PANEL_BEZEL_SIZE  = 2     # px — inset highlight/shadow thickness
+BEZEL_BLUR        = 2     # px — bezel edge softness (0 = hard, keep low)
+BEZEL_HI_ALPHA    = 0.4  # top-left catch light opacity
+BEZEL_LO_ALPHA    = 0.2  # bottom-right recess opacity
+
+# Derived — do not edit these; change the knobs above.
+_BEZEL_HI = f"rgba(255, 255, 255, {BEZEL_HI_ALPHA})"
+_BEZEL_LO = _rgba(_SHADOW_COLOR, BEZEL_LO_ALPHA)
+
+SHADOW_DROP = (
+    f"{PANEL_SHADOW_X}px {PANEL_SHADOW_Y}px "
+    f"{PANEL_SHADOW_BLUR}px {_rgba(_SHADOW_COLOR, SHADOW_DARKNESS)}"
+)
+SHADOW_BEZEL = (
+    f"inset 0 {PANEL_BEZEL_SIZE}px {BEZEL_BLUR}px {_BEZEL_HI}, "
+    f"inset {PANEL_BEZEL_SIZE}px 0 {BEZEL_BLUR}px {_BEZEL_HI}, "
+    f"inset 0 -{PANEL_BEZEL_SIZE}px {BEZEL_BLUR}px {_BEZEL_LO}, "
+    f"inset -{PANEL_BEZEL_SIZE}px 0 {BEZEL_BLUR}px {_BEZEL_LO}"
+)
+SHADOW_FULL = f"{SHADOW_DROP}, {SHADOW_BEZEL}"
+
 
 # ── 5. Fonts ──────────────────────────────────────────────────────────────────
 # Font names match the catalogue in app/fonts.py.
@@ -325,10 +350,13 @@ THEME = {
         "map_highlight_line":   MAP_HIGHLIGHT_LINE_COLOR,
         "map_highlight_fill":   MAP_HIGHLIGHT_FILL,
     },
+
     "shadows": {
         "darkness":  SHADOW_DARKNESS,
         "panel":     SHADOW_PANEL,
         "map_inset": SHADOW_MAP_INSET,
+        "full":      SHADOW_FULL,
+        "bezel":     SHADOW_BEZEL,    # ← add
     },
     "fonts": {
         "sans":  FONT_STACK_SANS,

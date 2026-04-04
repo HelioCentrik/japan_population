@@ -169,7 +169,7 @@ def _build_light_theme() -> dict:
         "map_tile_style": "carto-positron",
         # Shadows
         "shadow_color":    A["ink"],
-        "shadow_darkness": 0.12,
+        "shadow_darkness": 0.18,
         # Raw scales for introspection
         "_neutral": N,
         "_accent":  A,
