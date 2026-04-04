@@ -27,12 +27,24 @@ Sections:
 from pathlib import Path
 import colorsys
 
+import duckdb as ddb
+
 from app.fonts import _stack
 from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 
 
 # ── 1. Private helpers ────────────────────────────────────────────────────────
+
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "japan_population.duckdb"
+
+def _get_max_year() -> int:
+    con = ddb.connect(str(DB_PATH), read_only=True)
+    result = con.execute("SELECT MAX(year) FROM d_years").fetchone()[0]
+    con.close()
+    return result
+
+MAX_YEAR: int = _get_max_year()
 
 def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
     """Parse a 6-digit hex color string into (r, g, b) ints."""
@@ -62,8 +74,6 @@ def _hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> s
 
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
-
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "japan_population.duckdb"
 
 LAYOUT_GAP          = "0.8rem"
 LAYOUT_OUTER_PAD    = "1.5rem"

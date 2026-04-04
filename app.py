@@ -9,9 +9,10 @@ from dash import html, dcc, Input, Output, State, no_update, ctx
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
-                        FONT_MAIN, FONT_MAIN_COLOR, FONT_HEADER, COLOR_PRIMARY, COLOR_SECONDARY,
+                        FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY,
                         PLAY_INTERVAL_MS, MAP_METRICS, MAP_METRIC_DEFAULT,
-                        PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,)
+                        PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
+                        MAX_YEAR)
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -56,7 +57,6 @@ YEAR_LABELS = {
     for row in years_df.itertuples()
 }
 YEAR_MIN = min(CENSUS_YEARS)
-YEAR_MAX = max(CENSUS_YEARS)
 PLAYBACK_YEARS = [yr for yr in CENSUS_YEARS]
 
 
@@ -103,7 +103,7 @@ app.layout = html.Div(
         # KPI Cards
         html.Div(
             id="kpi-row",
-            children=render_kpi_cards(build_kpi_data(YEAR_MAX)),
+            children=render_kpi_cards(build_kpi_data(MAX_YEAR)),
         ),
 
         # Play Button + Year Slider
@@ -136,7 +136,7 @@ app.layout = html.Div(
                             min=min(CENSUS_YEARS),
                             max=max(CENSUS_YEARS),
                             step=None,
-                            value=YEAR_MAX,
+                            value=MAX_YEAR,
                             marks={
                                 yr: {
                                     "label": str(yr),
@@ -194,7 +194,7 @@ app.layout = html.Div(
                                 ),
                                 dcc.Graph(
                                     id="choropleth-map",
-                                    figure=build_japan_map_fig(year=YEAR_MAX, metric=MAP_METRIC_DEFAULT),
+                                    figure=build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT),
                                     config={"displayModeBar": False, "responsive": True},
                                     style={"height": "100%"},
                                 ),
@@ -217,7 +217,7 @@ app.layout = html.Div(
                                         dcc.Graph(
                                             id="pyramid-chart",
                                             className="pyramid-graph",
-                                            figure=build_pyramid_fig(year=YEAR_MAX),
+                                            figure=build_pyramid_fig(year=MAX_YEAR),
                                             config={"displayModeBar": False, "responsive": True},  # add responsive
                                             style={"height": "100%"},  # add this
                                         ),
@@ -234,7 +234,7 @@ app.layout = html.Div(
                     children=[
                         dcc.Graph(
                             id="timeseries-chart",
-                            figure=build_aging_index_fig(selected_year=YEAR_MAX),
+                            figure=build_aging_index_fig(selected_year=MAX_YEAR),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
                         ),
@@ -273,8 +273,8 @@ print(f"  Cache warm — {len(CENSUS_YEARS)} years × 4 builders ready.")
 def toggle_playback(n_clicks, is_disabled, current_year):
     if is_disabled:
         # toggle_playback — starting from max year, jump to min
-        if current_year == YEAR_MAX:
-            return False, "⏸", YEAR_MAX, YEAR_MIN
+        if current_year == MAX_YEAR:
+            return False, "⏸", MAX_YEAR, YEAR_MIN
         return False, "⏸", current_year, no_update  # normal: store current, don't move slider
     # Pausing — don't touch resume year or slider
     return True, "▶", no_update, no_update
@@ -297,7 +297,7 @@ def advance_year(n_intervals, current_year, resume_year):
 
     if next_year is None:
         # advance_year — fallback if resume_year store is empty
-        return resume_year if resume_year is not None else YEAR_MAX, True, "▶"
+        return resume_year if resume_year is not None else MAX_YEAR, True, "▶"
 
     return next_year, False, no_update
 

@@ -14,6 +14,7 @@ from app.config import (
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
     FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
+    MAX_YEAR,
 )
 
 _OKINAWA_GREY_YEARS = {1950, 1955}
@@ -51,7 +52,7 @@ def _get_global_metric_bounds() -> dict:
 
 @lru_cache(maxsize=256)
 def build_japan_map_fig(
-    year: int = 2015,
+    year: int = MAX_YEAR,
     area_estat: str | None = None,
     metric: str = MAP_METRIC_DEFAULT,
 ) -> go.Figure:

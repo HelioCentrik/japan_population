@@ -13,6 +13,7 @@ from app.config import (
     PYRAMID_MARGIN_T, PYRAMID_MARGIN_B, PYRAMID_MARGIN_L, PYRAMID_MARGIN_R,
     FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
     MARKER_SIZE_DIAMOND, MARKER_SIZE_LEGEND_SQ,
+    MAX_YEAR,
 )
 from app.db import get_con
 
@@ -122,8 +123,9 @@ def _cohort_band_range(year: int, birth_start: int, birth_end: int) -> list[int]
 
 @lru_cache(maxsize=64)
 def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 5_000_000) -> go.Figure:
-    con = get_con()
+    print(f"[CACHE MISS] build_pyramid_fig year={year} area_estat={area_estat} axis_max={axis_max}")
 
+    con = get_con()
     if area_estat is not None:
         df = con.execute("""
             SELECT age_group, age_start, sex, SUM(population) AS population
@@ -220,7 +222,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     # Men born 1910–1925 were prime conscription age during the war.
     valid_bands  = set(male_df["age_start"].tolist())
     wartime_bands = [b for b in _cohort_band_range(year, 1910, 1925) if b in valid_bands] if (
-                area_estat is None and 1950 <= year <= 2015) else []
+                area_estat is None and 1945 <= year <= MAX_YEAR) else []
     war_gen_rows = male_df[male_df["age_start"].isin(wartime_bands)]
 
     war_gen_trace = go.Scatter(
