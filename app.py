@@ -150,12 +150,6 @@ app.layout = html.Div(
                 # Slider panel
                 html.Div(
                     className="playback-panel",
-                    style={
-                        "flex": "1",
-                        "padding": "0.75rem 1rem 0.5rem 1rem",
-                        "backgroundColor": PANEL_BORDER,
-                        "borderRadius": "6px",
-                    },
                     children=[
                         dcc.Slider(
                             id="year-slider",

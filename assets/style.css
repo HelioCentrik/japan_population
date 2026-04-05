@@ -288,7 +288,9 @@ html, body {
     flex             : 1;
     border-radius    : var(--border-radius);
     box-shadow       : var(--shadow-full);
+    background-color : var(--panel-border);
     position         : relative;
+    padding          : 0.75rem 1rem 0.5rem 1rem;
 }
 
 /* Charts area — fills all remaining vertical space */
@@ -392,7 +394,7 @@ html, body {
 }
 
 /* Shadow drop and inset after */
-.map-inner::after,
+/*.map-inner::after,
 .pyramid-panel::after,
 .timeseries-panel::after {
     content          : "";
@@ -402,7 +404,7 @@ html, body {
     box-shadow       : var(--shadow-bezel);
     pointer-events   : none;
     z-index          : 10;
-}
+}*/
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
