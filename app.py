@@ -197,7 +197,6 @@ app.layout = html.Div(
                         # Map container
                         html.Div(
                             className="map-panel",
-                            style={"overflow": "visible"},
                             children=[
                                 html.Div(
                                     className="metric-selector-strip",
@@ -218,11 +217,16 @@ app.layout = html.Div(
                                         ),
                                     ]
                                 ),
-                                dcc.Graph(
-                                    id="choropleth-map",
-                                    figure=build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT),
-                                    config={"displayModeBar": False, "responsive": True},
-                                    style={"height": "100%"},
+                                html.Div(  # ← new wrapper
+                                    className="map-inner",
+                                    children=[
+                                        dcc.Graph(
+                                            id="choropleth-map",
+                                            figure=build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT),
+                                            config={"displayModeBar": False, "responsive": True},
+                                            style={"height": "100%"},
+                                        ),
+                                    ]
                                 ),
                             ]
                         ),
@@ -233,20 +237,20 @@ app.layout = html.Div(
                             children=[
                                 html.Div(className="pyramid-legend", children=[
                                     html.Span("■", style={"color": PYRAMID_MALE_COLOR}),
-                                    html.Span("男 Male", style={"marginRight": "16px"}),
+                                    html.Span("男 Male", style={"marginRight": "10px"}),
                                     html.Span("■", style={"color": PYRAMID_FEMALE_COLOR}),
                                     html.Span("女 Female"),
                                 ]),
                                 html.Div(
-                                    style={"flex": "1", "minHeight": "0"},  # replaces marginTop: auto
+                                    className="pyramid-graph-container",
                                     children=[
                                         dcc.Graph(
                                             id="pyramid-chart",
                                             className="pyramid-graph",
                                             figure=build_pyramid_fig(year=MAX_YEAR, area_estat=None,
                                                                      axis_max=_prewarm_axis_max),
-                                            config={"displayModeBar": False, "responsive": True},  # add responsive
-                                            style={"height": "100%"},  # add this
+                                            config={"displayModeBar": False, "responsive": True},
+                                            style={"height": "100%"},
                                         ),
                                     ]
                                 ),
@@ -267,7 +271,7 @@ app.layout = html.Div(
                         ),
                     ]
                 ),
-            ]  # end charts-area
+            ]
         ),
     ]
 )

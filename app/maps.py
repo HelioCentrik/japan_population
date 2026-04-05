@@ -207,6 +207,8 @@ def build_japan_map_fig(
 
     fig = go.Figure(data=traces)
     fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         mapbox=dict(
             style=MAP_TILE_STYLE,
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),

@@ -179,6 +179,8 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     fig.update_layout(
         margin=dict(l=48, r=24, t=28, b=32),
         autosize=True,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         legend=dict(
             orientation="h",
             x=0.01, xanchor="left",

@@ -168,8 +168,6 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     age_labels = [_shorten_label(l) for l in male_df["age_group"].tolist()]
     age_starts = male_df["age_start"].tolist()
 
-    # fig_height = len(age_labels) * PYRAMID_BAND_HEIGHT + PYRAMID_MARGIN_T + PYRAMID_MARGIN_B
-
     # ── Cohort colour mapping ─────────────────────────────────────────────────
     cohort_bands = {}
     if area_estat is None:
@@ -301,6 +299,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     dtick, half_range = _nice_axis(axis_max)
 
     fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
         barmode="overlay",
         bargap=PYRAMID_BARGAP,
         autosize=True,
