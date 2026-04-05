@@ -299,8 +299,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     dtick, half_range = _nice_axis(axis_max)
 
     fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
+        # paper_bgcolor='rgba(0,0,0,0)',
+        # plot_bgcolor='rgba(0,0,0,0)',
         barmode="overlay",
         bargap=PYRAMID_BARGAP,
         autosize=True,

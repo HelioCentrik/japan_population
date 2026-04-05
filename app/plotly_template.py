@@ -28,8 +28,8 @@ def register_plotly_template() -> None:
     template = go.layout.Template()
 
     template.layout = go.Layout(
-        paper_bgcolor=PANEL_BG,
-        plot_bgcolor=PANEL_BG,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         font=dict(
             color=COLOR_TEXT_MID,
             family=FONT_STACK_SANS,

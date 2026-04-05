@@ -5,10 +5,23 @@
  * Do not hardcode hex values, pixel sizes, or font names here.
  *
  * Intentional hardcodes (documented inline where they appear):
- *   #ccccee           — slider thumb hover micro-state; CSS-only, no Python consumer
- *   rgba(0,0,0,…)     — pure black overlay on reset button; theme-independent
+ *   #ccccee             — slider thumb hover micro-state; CSS-only, no Python consumer
+ *   rgba(0,0,0,…)       — pure black overlay on reset button; theme-independent
  *   rgba(100,140,220,…) — decorative play-btn glow; not part of color system
  *   calc(var(--border-radius) * 0.67) — derived ratio for pill/button corners
+ *
+ * Panel rendering pattern:
+ *   Every panel element (chart panels, KPI cards, playback slider, play button)
+ *   renders its background and bezel via CSS only. The bezel is baked into
+ *   var(--shadow-full), which is a composite of SHADOW_DROP + SHADOW_BEZEL
+ *   defined in config.py. Apply box-shadow: var(--shadow-full) directly on the
+ *   panel element — no ::after pseudo-element is needed or used.
+ *
+ *   All Plotly figures must set paper_bgcolor and plot_bgcolor to rgba(0,0,0,0)
+ *   so the CSS panel background composites cleanly through the figure layer.
+ *   This is set as the default in app/plotly_template.py. Do not override it
+ *   with an opaque value in a figure builder — doing so dampens the bezel and
+ *   creates a visible compositing seam under the shadow overlay.
  *
  * Dash component CSS notes:
  *   dcc.Dropdown uses Radix UI (Dash 2.x) — NOT React Select. Selectors like
@@ -22,10 +35,10 @@
  *   .dash-slider-thumb, .dash-slider-mark — not rc-slider-* classes.
  *
  * dcc.Graph renders as a React component with nested wrapper divs.
- *  CSS flex properties (e.g. margin-top: auto) must be applied to a
- *  plain html.Div parent, not directly to dcc.Graph — Dash's .dash-graph wrapper
- *  intercepts them. Do not use responsive=True alongside an explicit height in
- *  fig.update_layout — on callback updates, responsive wins and overrides the height.
+ *   CSS flex properties (e.g. margin-top: auto) must be applied to a
+ *   plain html.Div parent, not directly to dcc.Graph — Dash's .dash-graph wrapper
+ *   intercepts them. Do not use responsive=True alongside an explicit height in
+ *   fig.update_layout — on callback updates, responsive wins and overrides the height.
  */
 
 
@@ -392,19 +405,6 @@ html, body {
     overflow         : hidden;
     border-radius    : var(--border-radius);
 }
-
-/* Shadow drop and inset after */
-/*.map-inner::after,
-.pyramid-panel::after,
-.timeseries-panel::after {
-    content          : "";
-    position         : absolute;
-    inset            : 0;
-    border-radius    : var(--border-radius);
-    box-shadow       : var(--shadow-bezel);
-    pointer-events   : none;
-    z-index          : 10;
-}*/
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
