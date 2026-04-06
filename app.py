@@ -10,9 +10,10 @@ import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY,
-                        PLAY_INTERVAL_MS, MAP_METRICS, MAP_METRIC_DEFAULT,
+                        PLAY_INTERVAL_MS,
+                        MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
-                        MAX_YEAR)
+                        MAX_YEAR, OKINAWA_AREA_ESTAT,)
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -211,16 +212,21 @@ app.layout = html.Div(
                                         ),
                                     ]
                                 ),
-                                html.Div(  # ← new wrapper
+                                html.Div(
                                     className="map-inner",
                                     children=[
                                         dcc.Graph(
-                                            id="choropleth-map",
+                                            id="map-graph",
+                                            clear_on_unhover=True,
                                             figure=build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT),
                                             config={"displayModeBar": False, "responsive": True},
                                             style={"height": "100%"},
                                         ),
                                     ]
+                                ),
+                                dcc.Tooltip(
+                                    id="map-tooltip",
+                                    direction="right",
                                 ),
                             ]
                         ),
@@ -316,8 +322,8 @@ def advance_year(n_intervals, current_year, resume_year):
 
 @app.callback(
     Output("selected-prefecture", "data"),
-    Output("choropleth-map", "clickData"),
-    Input("choropleth-map", "clickData"),
+    Output("map-graph", "clickData"),
+    Input("map-graph", "clickData"),
     Input("reset-prefecture-btn", "n_clicks"),
     State("selected-prefecture", "data"),
     prevent_initial_call=True,
@@ -342,7 +348,93 @@ def toggle_reset_button(area_estat):
     return {"display": "block" if area_estat else "none"}
 
 @app.callback(
-    Output("choropleth-map", "figure"),
+    Output("map-tooltip", "show"),
+    Output("map-tooltip", "bbox"),
+    Output("map-tooltip", "children"),
+    Input("map-graph", "hoverData"),
+    State("metric-selector", "value"),
+    prevent_initial_call=True,
+)
+def show_map_tooltip(hover_data, metric):
+    if hover_data is None or not hover_data.get("points"):
+        return False, no_update, no_update
+
+    pt   = hover_data["points"][0]
+    cd   = pt.get("customdata")
+    raw  = pt.get("bbox", {})
+
+    # Push tooltip away from cursor so the hovered feature can breathe
+    bbox = {
+        "x0": raw.get("x0", 0) + MAP_TOOLTIP_OFFSET_X,
+        "x1": raw.get("x1", 0) + MAP_TOOLTIP_OFFSET_X,
+        "y0": raw.get("y0", 0) - MAP_TOOLTIP_OFFSET_Y,
+        "y1": raw.get("y1", 0) - MAP_TOOLTIP_OFFSET_Y,
+    }
+
+    # ── Okinawa warning card ──────────────────────────────────────────────────
+    if cd is None:
+        if pt.get("location") == OKINAWA_AREA_ESTAT:
+            children = html.Div([
+                html.Div("沖縄県  Okinawa", className="map-tt-title"),
+                html.Div("⚠ データ品質に注意", className="map-tt-warning"),
+                html.Div(
+                    "米国統治期の集計方法の違いにより他年度と比較できません。",
+                    className="map-tt-body",
+                ),
+                html.Div(
+                    "Age band inflation under US administration — not comparable to other census years.",
+                    className="map-tt-hint",
+                ),
+            ], className="map-tt-card")
+            return True, bbox, children
+        return False, no_update, no_update
+
+    # ── Normal prefecture card ────────────────────────────────────────────────
+    meta         = MAP_METRICS[metric]
+    name_ja      = cd[0]
+    name_en      = cd[1]
+    population   = cd[2]
+    aging_index  = cd[3]
+    metric_str   = cd[4]
+    delta_str    = cd[5]
+
+    # Suppress redundant secondary rows when they'd duplicate the active metric
+    show_pop    = metric != "population"
+    show_aging  = metric != "aging_index"
+
+    secondary = []
+    if show_pop:
+        secondary.append(
+            html.Div([
+                html.Span("人口  ", className="map-tt-label"),
+                html.Span(f"{int(population):,}", className="map-tt-value"),
+            ])
+        )
+    if show_aging:
+        secondary.append(
+            html.Div([
+                html.Span("高齢化指数  ", className="map-tt-label"),
+                html.Span(f"{aging_index:.1f}", className="map-tt-value"),
+            ])
+        )
+
+    children = html.Div([
+        html.Div([
+            html.Span(name_ja, className="map-tt-name-ja"),
+            html.Span(f"  {name_en}", className="map-tt-name-en"),
+        ], className="map-tt-title"),
+        html.Div(meta["label"], className="map-tt-metric-label"),
+        html.Div(metric_str,    className="map-tt-metric-value"),
+        html.Div(delta_str,     className="map-tt-delta"),
+        html.Hr(className="map-tt-divider") if secondary else None,
+        *secondary,
+        html.Div("再選択でクリア  /  Reselect to clear", className="map-tt-hint"),
+    ], className="map-tt-card")
+
+    return True, bbox, children
+
+@app.callback(
+    Output("map-graph", "figure"),
     Output("pyramid-chart", "figure"),
     Output("era-label", "children"),
     Output("kpi-row", "children"),

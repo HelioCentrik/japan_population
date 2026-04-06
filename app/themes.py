@@ -20,16 +20,17 @@ To swap themes: change ACTIVE_THEME_NAME below and restart.
 def _build_dark_theme() -> dict:
     # ── Neutral scale: navy, 100=near-white → 900=near-black ──────────
     N = {
-        100: "#e0e8ff",  # → text_hi
-        200: "#aaaadd",  # → text_mid
-        300: "#5959a5",  # → text_lo
-        400: "#45456b",  # → text_hint
-        500: "#243558",  # → ui_hover
-        600: "#1a2a44",  # → slider_track
-        700: "#1a2440",  # → chart_grid
-        800: "#334477",  # → panel_border
-        850: "#06091a",  # → panel_bg
-        900: "#091023",  # → page_bg
+        100: "#091023",  # → page_bg
+        150: "#06091a",  # → panel_bg
+        200: "#243558",  # → ui_hover
+        250: "#1a2440",  # → chart_grid
+        260: "#243558",  # → chart_plot
+        300: "#1a2a44",  # → slider_track
+        350: "#334477",  # → panel_border
+        500: "#45456b",  # → text_hint
+        600: "#5959a5",  # → text_lo
+        700: "#aaaadd",  # → text_mid
+        900: "#e0e8ff",  # → text_hi
     }
 
     # ── Accent palette ─────────────────────────────────────────────────
@@ -51,22 +52,23 @@ def _build_dark_theme() -> dict:
 
     return {
         # Surfaces
-        "page_bg":      N[900],
-        "panel_bg":     N[850],
-        "panel_border": N[800],
+        "page_bg":      N[100],
+        "panel_bg":     N[150],
+        "panel_border": N[350],
         # Brand
         "primary":   A["primary"],
         "secondary": A["white"],
         # Text scale
-        "text_hi":   N[100],
-        "text_mid":  N[200],
-        "text_lo":   N[300],
-        "text_hint": N[400],
+        "text_hi":   N[900],
+        "text_mid":  N[700],
+        "text_lo":   N[600],
+        "text_hint": N[500],
         # UI interaction
-        "ui_hover":     N[500],
-        "slider_track": N[600],
+        "ui_hover":     N[200],
+        "slider_track": N[300],
         # Chart
-        "chart_grid":       N[700],
+        "chart_grid":       N[250],
+        "chart_plot_color": N[260],
         "accent_threshold": A["teal"],
         "timeseries_pref":  D["pref"],
         # Cohort annotations
@@ -79,7 +81,7 @@ def _build_dark_theme() -> dict:
         "pyramid_female": D["female"],
         # Map (passthroughs)
         "map_geo": {
-            "bg_color":   N[900],
+            "bg_color":   N[100],
             "land_color": "#1c1f30",  # no neutral-scale equivalent
             "line_color": "#6089A0",  # map-specific mid blue-grey
         },
@@ -88,7 +90,7 @@ def _build_dark_theme() -> dict:
         "map_colorscale": "plasma_r",
         "map_tile_style": "carto-darkmatter",
         # Shadows
-        "shadow_color":    N[900],
+        "shadow_color":    "ink",
         "shadow_darkness": 0.40,
         # Raw scales for introspection
         "_neutral": N,
@@ -102,8 +104,9 @@ def _build_light_theme() -> dict:
     N = {
         100: "#f5f0e8",  # → page_bg
         150: "#ede2d0",  # → panel_bg
-        200: "#ece4d8",  # → ui_hover
+        200: "#ecdfca",  # → ui_hover
         250: "#dfcdb7",  # → chart_grid
+        260: "#f1ece4",  # → chart_plot_color
         300: "#e7dbc6",  # → slider_track
         350: "#d0c19f",  # → panel_border
         500: "#b0a090",  # → text_hint
@@ -146,6 +149,7 @@ def _build_light_theme() -> dict:
         "ui_hover":     N[200],
         "slider_track": N[300],
         # Chart
+        "chart_plot_color": N[260],
         "chart_grid":       N[250],
         "accent_threshold": A["forest"],
         "timeseries_pref":  D["pref"],

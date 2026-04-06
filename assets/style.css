@@ -119,7 +119,7 @@ html, body {
 }
 
 .play-btn:hover {
-    background-color: var(--color-ui-hover);
+    background-color: var(--panel-bg);
     color           : var(--color-text-hi);
     box-shadow      : inset 0 2px 6px var(--shadow-panel),
                       0 0 8px rgba(100, 140, 220, 0.2);
@@ -155,6 +155,7 @@ html, body {
     border           : 1px solid var(--panel-border);
     border-radius    : calc(var(--border-radius) * 0.67);
     font-size        : var(--font-size-kpi-sub);
+    box-shadow       : var(--shadow-full);
     width            : 200px;
     height           : 32px;
     cursor           : pointer;
@@ -186,15 +187,16 @@ html, body {
 
 /* Dropdown menu container */
 .dash-dropdown-content {
-    background-color : var(--panel-bg) !important;
+    background-color : var(--chart-plot-color) !important;
     border           : 1px solid var(--panel-border) !important;
     border-radius    : calc(var(--border-radius) * 0.67) !important;
+    box-shadow       : 0 6px 16px rgba(0, 0, 0, 0.4) !important;
     z-index          : 1000 !important;
 }
 
 /* Options */
 .dash-dropdown-content [role="option"] {
-    background-color : var(--panel-bg);
+    background-color : var(--chart-plot-color);
     color            : var(--color-text-mid);
     font-size        : var(--font-size-kpi-sub);
     padding          : 6px 10px;
@@ -209,7 +211,7 @@ html, body {
 
 .dash-dropdown-content [role="option"][data-state="checked"],
 .dash-dropdown-content [role="option"][aria-selected="true"] {
-    background-color : var(--panel-border) !important;
+    background-color : var(--chart-grid) !important;
     color            : var(--color-text-hi) !important;
 }
 
@@ -404,6 +406,85 @@ html, body {
     inset            : 0;
     overflow         : hidden;
     border-radius    : var(--border-radius);
+}
+
+/* ── Map tooltip ─────────────────────────────────────────────────────────── */
+/* Dash sets --Dash-Tooltip-Background-Color and --Dash-Tooltip-Border-Color
+   as inline custom properties on .dcc-tooltip-bounding-box. Child divs inherit
+   and consume those values. Re-declaring them on the children overrides the
+   inherited value — direct declarations beat inheritance regardless of inline
+   styles on the parent. Also zero out padding/border directly as fallback. */
+.dash-tooltip,
+.dash-tooltip * {
+    --Dash-Tooltip-Background-Color: transparent;
+    --Dash-Tooltip-Border-Color:     transparent;
+    background:       transparent !important;
+    background-color: transparent !important;
+    border:           none        !important;
+    box-shadow:       none        !important;
+    padding:          0           !important;
+    filter:           none        !important;
+}
+
+/* Kill arrows */
+/*
+.dash-tooltip *::before,
+.dash-tooltip *::after {
+    display: none !important;
+}
+*/
+
+.dash-tooltip .map-tt-card {
+    background:     var(--chart-plot-color) !important;
+    border:         1px solid var(--panel-border) !important;
+    border-radius:  3px !important;
+    padding:        12px 16px !important;
+    box-shadow:     0 6px 16px rgba(0, 0, 0, 0.4) !important;
+    color:          var(--color-text-mid);
+    pointer-events: none;
+    min-width:      200px;
+    max-width:      270px;
+}
+
+.dash-tooltip .map-tt-name-ja { color: #ffffff !important; }
+.dash-tooltip .map-tt-name-en { color: #9ba8c0 !important; }
+.dash-tooltip .map-tt-metric-value { color: #ffffff !important; }
+.dash-tooltip .map-tt-delta  { color: #9ba8c0 !important; }
+.dash-tooltip .map-tt-label  { color: #9ba8c0 !important; }
+.dash-tooltip .map-tt-value  { color: #e8eaf0 !important; }
+.dash-tooltip .map-tt-warning { color: #f0a830 !important; }
+.dash-tooltip .map-tt-body   { color: #e8eaf0 !important; }
+.dash-tooltip .map-tt-hint   { color: #5a6580 !important; }
+
+.dash-tooltip .map-tt-title {
+    font-size:     15px;
+    font-weight:   600;
+    color:         #ffffff !important;
+    margin-bottom: 8px;
+    line-height:   1.3;
+}
+
+.dash-tooltip .map-tt-metric-label {
+    font-size:  11px;
+    color:      #9ba8c0 !important;
+    margin-top: 2px;
+}
+
+.dash-tooltip .map-tt-metric-value {
+    font-size:   22px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin:      2px 0 4px;
+}
+
+.dash-tooltip .map-tt-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    margin:     8px 0;
+}
+
+.dash-tooltip .map-tt-hint {
+    font-size:  10px;
+    margin-top: 8px;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */

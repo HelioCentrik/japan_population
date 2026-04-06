@@ -133,21 +133,10 @@ def build_japan_map_fig(
             "prefecture_name",      # [1]
             "population",           # [2]
             "aging_index",          # [3]
-            "metric_value_str",     # [4]  active metric, formatted
-            "metric_delta_str",     # [5]  active metric delta
+            "metric_value_str",     # [4]
+            "metric_delta_str",     # [5]
         ]].values,
-        hovertemplate=(
-            "<b style='font-size:16px'>%{customdata[0]}  "
-            "<span style='font-size:18px'>%{customdata[1]}</span></b><br><br>"
-            f"<b style='font-size:14px'>{meta['label']}</b><br>"
-            "<b style='font-size:16px'>%{customdata[4]}</b><br>"
-            "Change:  %{customdata[5]}<br>"
-            "<span style='color:#445566'>──────────────────</span><br>"
-            "Population:   <b>%{customdata[2]:,.0f}</b><br>"
-            "Aging index:  <b>%{customdata[3]:.1f}</b><br>"
-            "<span style='color:#667799;font-size:11px'>再選択でクリア / Reselect to clear</span><br>"
-            "<extra></extra>"
-        ),
+        hoverinfo="none",           # dcc.Tooltip handles display; hoverData still fires
         colorbar=dict(
             title=dict(
                 text=colorbar_label,
@@ -177,16 +166,7 @@ def build_japan_map_fig(
                 showscale=False,
                 marker_line_width=1.0,
                 marker_line_color=_OKINAWA_GREY_LINE,
-                hovertemplate=(
-                    "<b>沖縄県  Okinawa</b><br><br>"
-                    "<span style='color:#bbbbbb'>⚠ データ品質に注意</span><br>"
-                    "米国統治期の集計方法の違いにより<br>"
-                    "他年度と比較できません。<br>"
-                    "<span style='font-size:11px;color:#999'>"
-                    "Age band inflation under US administration.<br>"
-                    "Not comparable to other census years.</span>"
-                    "<extra></extra>"
-                ),
+                hoverinfo="none",   # content handled in show_map_tooltip callback
             ))
 
     # ── Highlight selected prefecture ─────────────────────────────────────────
@@ -202,7 +182,7 @@ def build_japan_map_fig(
                 showscale=False,
                 marker_line_width=MAP_HIGHLIGHT_LINE_WIDTH,
                 marker_line_color=MAP_HIGHLIGHT_LINE_COLOR,
-                hovertemplate="<extra></extra>",
+                hoverinfo="skip",   # pass hover through to base trace
             ))
 
     fig = go.Figure(data=traces)

@@ -114,6 +114,7 @@ SLIDER_TRACK_COLOR = _t["slider_track"]
 
 # Chart
 CHART_GRID_COLOR      = _t["chart_grid"]
+CHART_PLOT_COLOR      = _t["chart_plot_color"]
 ACCENT_THRESHOLD      = _t["accent_threshold"]
 TIMESERIES_PREF_COLOR = _t["timeseries_pref"]
 
@@ -159,10 +160,10 @@ SHADOW_MAP_INSET = _rgba(_SHADOW_COLOR, min(1.0, SHADOW_DARKNESS * 1.6))
 PANEL_SHADOW_Y    = 3     # px — drop shadow Y offset (bottom)
 PANEL_SHADOW_X    = 2     # px — drop shadow X offset (right)
 PANEL_SHADOW_BLUR = 4     # px — drop shadow blur radius
-PANEL_BEZEL_SIZE  = 2     # px — inset highlight/shadow thickness
+PANEL_BEZEL_SIZE  = 1     # px — inset highlight/shadow thickness
 BEZEL_BLUR        = 2     # px — bezel edge softness (0 = hard, keep low)
-BEZEL_HI_ALPHA    = 0.4  # top-left catch light opacity
-BEZEL_LO_ALPHA    = 0.2  # bottom-right recess opacity
+BEZEL_HI_ALPHA    = 1  # top-left catch light opacity
+BEZEL_LO_ALPHA    = 0.4  # bottom-right recess opacity
 
 # Derived — do not edit these; change the knobs above.
 _BEZEL_HI = f"rgba(255, 255, 255, {BEZEL_HI_ALPHA})"
@@ -239,6 +240,8 @@ MAP_CENTER_LON           = 135.5
 MAP_DEFAULT_ZOOM         = 3.65
 MAP_BORDER_WIDTH         = 0.8
 MAP_HIGHLIGHT_LINE_WIDTH = 2.5
+MAP_TOOLTIP_OFFSET_X     = 32   # px rightward from hovered point
+MAP_TOOLTIP_OFFSET_Y     = 16   # px upward from hovered point
 
 # ── 8b. Metric selector ───────────────────────────────────────────────────────
 

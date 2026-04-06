@@ -15,9 +15,9 @@ from app.config import (
     COLOR_PRIMARY, COLOR_SECONDARY,
     COLOR_TEXT_HI, COLOR_TEXT_MID, COLOR_TEXT_LO, COLOR_TEXT_HINT,
     # UI accents
-    COLOR_UI_HOVER, SLIDER_TRACK_COLOR, CHART_GRID_COLOR,
+    COLOR_UI_HOVER, SLIDER_TRACK_COLOR, CHART_PLOT_COLOR, CHART_GRID_COLOR,
     # Shadows (pre-computed rgba strings)
-    SHADOW_PANEL, SHADOW_MAP_INSET, SHADOW_BEZEL, SHADOW_FULL,
+    SHADOW_PANEL, SHADOW_MAP_INSET, SHADOW_BEZEL, SHADOW_DROP, SHADOW_FULL,
     # Font stacks
     FONT_STACK_SANS, FONT_STACK_SERIF, FONT_STACK_MONO,
     # Font sizes
@@ -69,6 +69,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 /* UI accents */
                 --color-ui-hover   : {COLOR_UI_HOVER};
                 --slider-track     : {SLIDER_TRACK_COLOR};
+                --chart-plot-color : {CHART_PLOT_COLOR};
                 --chart-grid       : {CHART_GRID_COLOR};
 
                 /* Shadows (derived from PAGE_BG x SHADOW_DARKNESS in config.py) */
@@ -76,6 +77,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --shadow-map-inset : {SHADOW_MAP_INSET};
                 --shadow-full      : {SHADOW_FULL};
                 --shadow-bezel     : {SHADOW_BEZEL};
+                --shadow-drop      : {SHADOW_DROP};
 
                 /* Font stacks */
                 --font-sans        : {FONT_STACK_SANS};
