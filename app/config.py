@@ -240,8 +240,8 @@ MAP_CENTER_LON           = 135.5
 MAP_DEFAULT_ZOOM         = 3.65
 MAP_BORDER_WIDTH         = 0.8
 MAP_HIGHLIGHT_LINE_WIDTH = 2.5
-MAP_TOOLTIP_OFFSET_X     = 32   # px rightward from hovered point
-MAP_TOOLTIP_OFFSET_Y     = 16   # px upward from hovered point
+MAP_TOOLTIP_OFFSET_X     = 28   # px rightward from hovered point
+MAP_TOOLTIP_OFFSET_Y     = 40   # px upward from hovered point
 
 # ── 8b. Metric selector ───────────────────────────────────────────────────────
 

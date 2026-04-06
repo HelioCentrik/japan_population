@@ -104,7 +104,7 @@ def _build_light_theme() -> dict:
     N = {
         100: "#f5f0e8",  # → page_bg
         150: "#ede2d0",  # → panel_bg
-        200: "#ecdfca",  # → ui_hover
+        200: "#e7d9c6",  # → ui_hover
         250: "#dfcdb7",  # → chart_grid
         260: "#f1ece4",  # → chart_plot_color
         300: "#e7dbc6",  # → slider_track

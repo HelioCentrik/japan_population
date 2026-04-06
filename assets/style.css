@@ -410,14 +410,25 @@ html, body {
 
 /* ── Map tooltip ─────────────────────────────────────────────────────────── */
 /* Dash sets --Dash-Tooltip-Background-Color and --Dash-Tooltip-Border-Color
-   as inline custom properties on .dcc-tooltip-bounding-box. Child divs inherit
-   and consume those values. Re-declaring them on the children overrides the
-   inherited value — direct declarations beat inheritance regardless of inline
-   styles on the parent. Also zero out padding/border directly as fallback. */
-.dash-tooltip,
+   as inline custom properties on .dcc-tooltip-bounding-box. Redeclare them on
+   .dash-tooltip so descendants inherit card colors. The SVG arrow's fill uses
+   var(--Dash-Tooltip-Background-Color) — setting it here gives the arrow its
+   visible color.
+   DO NOT redeclare these vars on .dash-tooltip * — that direct declaration
+   would override the inherited value and make the SVG fill transparent again.
+   background: transparent !important on * is enough to suppress div backgrounds. */
+.dash-tooltip {
+    --Dash-Tooltip-Background-Color: var(--chart-plot-color);
+    --Dash-Tooltip-Border-Color:     var(--panel-border);
+    background:       transparent !important;
+    background-color: transparent !important;
+    border:           none        !important;
+    box-shadow:       none        !important;
+    padding:          0           !important;
+    filter:           none        !important;
+    overflow:         visible     !important;
+}
 .dash-tooltip * {
-    --Dash-Tooltip-Background-Color: transparent;
-    --Dash-Tooltip-Border-Color:     transparent;
     background:       transparent !important;
     background-color: transparent !important;
     border:           none        !important;
@@ -425,30 +436,61 @@ html, body {
     padding:          0           !important;
     filter:           none        !important;
 }
-
-/* Kill arrows */
-/*
-.dash-tooltip *::before,
-.dash-tooltip *::after {
+.dash-tooltip svg,
+.hover:after,
+.hover-right:after,
+.hover-left:after,
+.hover-top:after,
+.hover-bottom:after {
     display: none !important;
-}
-*/
-
-.dash-tooltip {
-    --Dash-Tooltip-Background-Color: var(--chart-plot-color);
-    --Dash-Tooltip-Border-Color:     var(--panel-border);
 }
 
 .dash-tooltip .map-tt-card {
+    /* Arrow dimensions — tweak these two values to resize */
+    --tt-arrow-h : 4px;   /* half-height: total triangle height = 2× this */
+    --tt-arrow-l : 24px;  /* length: how far it reaches toward the selection */
+    position:       relative;
+    overflow:       visible     !important;
     background:     var(--chart-plot-color) !important;
-    border:         1px solid var(--panel-border) !important;
-    border-radius:  3px !important;
+    border:         2px solid var(--panel-border) !important;
+    border-radius:  4px !important;
     padding:        12px 16px !important;
     box-shadow:     0 6px 16px rgba(0, 0, 0, 0.4) !important;
     color:          var(--color-text-mid);
     pointer-events: none;
     min-width:      200px;
     max-width:      270px;
+}
+/* Arrow border layer */
+.map-tt-card::before {
+    content       : '';
+    position      : absolute;
+    right         : calc(100% + 1px);
+    top           : calc(50% + var(--arrow-y-offset, 0px));
+    transform     : translateY(-50%);
+    width         : 0;
+    height        : 0;
+    border-top    : calc(var(--tt-arrow-h) + 2px) solid transparent;
+    border-bottom : calc(var(--tt-arrow-h) + 2px) solid transparent;
+    border-right  : calc(var(--tt-arrow-l) + 1px) solid var(--panel-border);
+    pointer-events: none;
+}
+
+/* Arrow fill layer */
+.map-tt-card::after {
+    content       : '';
+    position      : absolute;
+    right         : 100%;
+    top           : calc(50% + var(--arrow-y-offset, 0px));
+    transform     : translateY(-50%);
+    z-index       : 1;
+    width         : 0;
+    height        : 0;
+    border-top    : var(--tt-arrow-h) solid transparent;
+    border-bottom : var(--tt-arrow-h) solid transparent;
+    border-right  : var(--tt-arrow-l) solid var(--chart-plot-color);
+    pointer-events: none;
+}
 }
 
 .dash-tooltip .map-tt-name-ja     { color: var(--color-text-hi)   !important; }

@@ -385,7 +385,7 @@ def show_map_tooltip(hover_data, metric):
                     "Age band inflation under US administration — not comparable to other census years.",
                     className="map-tt-hint",
                 ),
-            ], className="map-tt-card")
+            ], className="map-tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
             return True, bbox, children
         return False, no_update, no_update
 
@@ -429,7 +429,7 @@ def show_map_tooltip(hover_data, metric):
         html.Hr(className="map-tt-divider") if secondary else None,
         *secondary,
         html.Div("再選択でクリア  /  Reselect to clear", className="map-tt-hint"),
-    ], className="map-tt-card")
+    ], className="map-tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
 
     return True, bbox, children
 
