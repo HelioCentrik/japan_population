@@ -47,7 +47,7 @@ def _get_global_metric_bounds() -> dict:
 
     return {
         "population":        (float(np.log1p(row[0])), float(np.log1p(row[1]))),
-        "aging_index":       (aging_mid - aging_max_dev, aging_mid + aging_max_dev),
+        "aging_index":       (max(0.0, aging_mid - aging_max_dev), aging_mid + aging_max_dev),
         "old_age_dep":       (float(row[4]), float(row[5])),
         "working_age_share": (float(row[6]), float(row[7])),
     }
