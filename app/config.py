@@ -160,7 +160,7 @@ SHADOW_MAP_INSET = _rgba(_SHADOW_COLOR, min(1.0, SHADOW_DARKNESS * 1.6))
 PANEL_SHADOW_Y    = 3     # px — drop shadow Y offset (bottom)
 PANEL_SHADOW_X    = 2     # px — drop shadow X offset (right)
 PANEL_SHADOW_BLUR = 4     # px — drop shadow blur radius
-PANEL_BEZEL_SIZE  = 1     # px — inset highlight/shadow thickness
+PANEL_BEZEL_SIZE  = 3     # px — inset highlight/shadow thickness
 BEZEL_BLUR        = 2     # px — bezel edge softness (0 = hard, keep low)
 BEZEL_HI_ALPHA    = 1  # top-left catch light opacity
 BEZEL_LO_ALPHA    = 0.4  # bottom-right recess opacity
@@ -235,6 +235,7 @@ PANEL_BORDER_THICKNESS = "1.5px"
 # ── 8. Map configuration ──────────────────────────────────────────────────────
 # Structural values — these don't vary by theme.
 
+POP_DELTA_SIGMA = 2.0
 MAP_CENTER_LAT           = 35.5
 MAP_CENTER_LON           = 135.5
 MAP_DEFAULT_ZOOM         = 3.65
@@ -264,13 +265,19 @@ MAP_METRICS = {
         "fmt":        lambda v: f"{v:.1f}" if v == v else "—",
         "delta_fmt":  lambda v: f"{v:+.1f}" if v == v else "—",
     },
-    "old_age_dep": {
-        "label":      "老年従属人口指数  Old-Age Dependency",
-        "colorscale": "YlOrRd",
-        "diverging":  False,
-        "midpoint":   None,
-        "fmt":        lambda v: f"{v:.1f}%" if v == v else "—",
-        "delta_fmt":  lambda v: f"{v:+.1f}%" if v == v else "—",
+    "pop_delta": {
+        "label":      "人口増減  Population Change",
+        "colorscale": [
+            [0.00, "#c0392b"],  # red    — heavy loss
+            [0.25, "#f5c518"],  # yellow — moderate loss
+            [0.50, "#f7f7f7"],  # white  — no change
+            [0.75, "#4575b4"],  # blue   — moderate gain
+            [1.00, "#5b2c8a"],  # violet — heavy gain
+        ],
+        "diverging":  True,
+        "midpoint":   0.0,
+        "fmt":        lambda v: f"{int(v):+,}" if v == v else "—",
+        "delta_fmt":  lambda v: f"{int(v):+,}" if v == v else "—",
     },
     "working_age_share": {
         "label":      "生産年齢人口割合  Working-Age Share",

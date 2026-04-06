@@ -90,8 +90,8 @@ def _build_dark_theme() -> dict:
         "map_colorscale": "plasma_r",
         "map_tile_style": "carto-darkmatter",
         # Shadows
-        "shadow_color":    "ink",
-        "shadow_darkness": 0.40,
+        "shadow_color":    "#ffffff",
+        "shadow_darkness": 0.0,
         # Raw scales for introspection
         "_neutral": N,
         "_accent":  A,
@@ -189,6 +189,6 @@ THEMES = {
 }
 
 # ↓ Change this line to swap themes. Restart the app after changing.
-ACTIVE_THEME_NAME = "light"
+ACTIVE_THEME_NAME = "dark"
 
 ACTIVE_THEME = THEMES[ACTIVE_THEME_NAME]

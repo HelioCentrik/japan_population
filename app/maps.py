@@ -1,5 +1,6 @@
 # app/maps.py
 import json
+import math
 import numpy as np
 from functools import lru_cache
 
@@ -14,7 +15,7 @@ from app.config import (
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
     FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
-    MAX_YEAR,
+    MAX_YEAR, POP_DELTA_SIGMA,
 )
 from app import figure_cache
 
@@ -37,20 +38,39 @@ def _get_global_metric_bounds() -> dict:
         SELECT
             MIN(population),        MAX(population),
             MIN(aging_index),       MAX(aging_index),
-            MIN(old_age_dep),       MAX(old_age_dep),
+            MIN(pop_delta),         MAX(pop_delta),
             MIN(working_age_share), MAX(working_age_share)
         FROM v_map_metrics
+    """).fetchone()
+    delta_row = con.execute("""
+        SELECT
+            AVG(pop_delta),
+            STDDEV(pop_delta)
+        FROM v_map_metrics
+        WHERE pop_delta IS NOT NULL
     """).fetchone()
 
     aging_mid     = 100.0
     aging_max_dev = max(abs(row[3] - aging_mid), abs(row[2] - aging_mid))
+    delta_mean  = delta_row[0]
+    delta_sigma = delta_row[1]
+    delta_bound = delta_sigma * POP_DELTA_SIGMA
+    delta_lo    = delta_mean - delta_bound
+    delta_hi    = delta_mean + delta_bound
+    delta_dev = _ceil_half_magnitude(max(abs(delta_lo), abs(delta_hi)))
 
     return {
         "population":        (float(np.log1p(row[0])), float(np.log1p(row[1]))),
         "aging_index":       (max(0.0, aging_mid - aging_max_dev), aging_mid + aging_max_dev),
-        "old_age_dep":       (float(row[4]), float(row[5])),
+        "pop_delta":         (-delta_dev, delta_dev),
         "working_age_share": (float(row[6]), float(row[7])),
     }
+
+def _ceil_half_magnitude(val: float) -> float:
+    """Round up to nearest 0.5 × 10^n. E.g. 598,317 → 600,000."""
+    mag  = 10 ** math.floor(math.log10(abs(val)))
+    step = mag * 0.5
+    return math.ceil(val / step) * step
 
 
 def build_japan_map_fig(
@@ -69,8 +89,8 @@ def build_japan_map_fig(
     df = con.execute(f"""
         SELECT
             area_estat,
-            population, aging_index, old_age_dep, working_age_share,
-            pop_delta, aging_index_delta, old_age_dep_delta, working_age_share_delta,
+            population, aging_index, working_age_share,
+            pop_delta, aging_index_delta, working_age_share_delta,
             prev_year, year_gap
         FROM v_map_metrics
         WHERE year = {year}
@@ -83,11 +103,13 @@ def build_japan_map_fig(
     _delta_cols = {
         "population":        "pop_delta",
         "aging_index":       "aging_index_delta",
-        "old_age_dep":       "old_age_dep_delta",
+        "pop_delta":         None,
         "working_age_share": "working_age_share_delta",
     }
 
     def _fmt_delta(row, col):
+        if _delta_cols[col] is None:
+            return ""   # suppressed in tooltip for delta metrics
         d = row[_delta_cols[col]]
         if d != d:  # NaN
             return "First census"
@@ -102,19 +124,29 @@ def build_japan_map_fig(
     if metric == "population":
         prefectures["_z"] = np.log1p(prefectures["population"])
         colorbar_label    = "人口 (log)"
+    elif metric == "pop_delta":
+        zmin, zmax = _get_global_metric_bounds()["pop_delta"]
+        prefectures["_z"] = prefectures["pop_delta"].clip(lower=zmin, upper=zmax)
+        colorbar_label = "人口増減"
     else:
         prefectures["_z"] = prefectures[metric]
-        colorbar_label    = meta["label"].split("  ")[0]   # JA half only
-
-    # ── Z column + colorscale bounds ──────────────────────────────────────────
-    if metric == "population":
-        prefectures["_z"] = np.log1p(prefectures["population"])
-        colorbar_label    = "人口 (log)"
-    else:
-        prefectures["_z"] = prefectures[metric]
-        colorbar_label    = meta["label"].split("  ")[0]   # JA half only
+        colorbar_label    = meta["label"].split("  ")[0]
 
     zmin, zmax = _get_global_metric_bounds()[metric]
+
+    colorbar_extra = {}
+    if metric == "pop_delta":
+        half = int(zmax / 2)
+        colorbar_extra = dict(
+            tickvals=[zmin, -half, 0, half, zmax],
+            ticktext=[
+                f"{abs(int(zmin)):,}▼",
+                f"{half:,}",
+                "0",
+                f"{half:,}",
+                f"{abs(int(zmax)):,}▲",
+            ],
+        )
 
     prefectures_js = json.loads(prefectures.to_json())
 
@@ -146,6 +178,7 @@ def build_japan_map_fig(
             x=0.02, xanchor="left",
             thickness=16, len=0.6,
             tickfont=dict(size=FONT_SIZE_COLORBAR_TICK, color=COLOR_TEXT_MID),
+            **colorbar_extra,
         ),
     )
 
