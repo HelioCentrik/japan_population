@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 from app.config import (
     PANEL_BORDER,
-    COLOR_TEXT_MID,
+    COLOR_TEXT_MID, CHART_PLOT_COLOR,
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
     PYRAMID_BARGAP, PYRAMID_MAX_BANDS, COHORT_OUTLINE_WIDTH,
@@ -300,7 +300,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
 
     fig.update_layout(
         # paper_bgcolor='rgba(0,0,0,0)',
-        # plot_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor=CHART_PLOT_COLOR,
         barmode="overlay",
         bargap=PYRAMID_BARGAP,
         autosize=True,
@@ -312,6 +312,10 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             y=1.02, yanchor="bottom",
         ),
         xaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=2,
+            mirror=True,
             tickformat="~s",
             zeroline=True,
             zerolinewidth=1,
@@ -320,6 +324,10 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             dtick=dtick,
         ),
         yaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=1,
+            mirror=True,
             title=dict(
                 text="Age (Years)",
                 font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),

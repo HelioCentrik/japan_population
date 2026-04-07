@@ -20,33 +20,35 @@ To swap themes: change ACTIVE_THEME_NAME below and restart.
 def _build_dark_theme() -> dict:
     # ── Neutral scale: navy, 100=near-white → 900=near-black ──────────
     N = {
-        100: "#091023",  # → page_bg
-        150: "#06091a",  # → panel_bg
-        200: "#243558",  # → ui_hover
-        250: "#1a2440",  # → chart_grid
-        260: "#243558",  # → chart_plot
+        100: "#06091a",  # → page_bg
+        150: "#142148",  # → panel_bg
+        160: "#324a8f",  # → panel_border
+        200: "#27418e",  # → ui_hover
+        250: "#455892",  # → chart_grid
+        260: "#7684b2",  # → chart_plot
         300: "#1a2a44",  # → slider_track
-        350: "#334477",  # → panel_border
         500: "#45456b",  # → text_hint
+        550: "#2f2f62",  # → text_dark
         600: "#5959a5",  # → text_lo
-        700: "#aaaadd",  # → text_mid
-        900: "#e0e8ff",  # → text_hi
+        700: "#b6b6f6",  # → text_mid
+        900: "#cfdbff",  # → text_hi
     }
 
     # ── Accent palette ─────────────────────────────────────────────────
     A = {
         "primary": "#bc002d",  # Japan red
         "white":   "#ffffff",
-        "teal":    "#50e3c2",  # threshold reference line
-        "amber":   "#f5a623",  # 団塊の世代
-        "lime":    "#7ed321",  # 団塊ジュニア
+        "teal":    "#00ccaa",  # threshold reference line
+        "amber":   "#f08d0b",  # 団塊の世代
+        "lime":    "#64b909",  # 団塊ジュニア
         "sky":     "#9ee0ff",  # 少子化世代
+        "ink":     "#2d1f0e",  # sumi dark brown
     }
 
     # ── Data palette ───────────────────────────────────────────────────
     D = {
-        "male":   "#4a90d9",
-        "female": "#e07b8a",
+        "male":   "#183a95",
+        "female": "#97172a",
         "pref":   "#ffffff",  # timeseries prefecture overlay
     }
 
@@ -54,7 +56,7 @@ def _build_dark_theme() -> dict:
         # Surfaces
         "page_bg":      N[100],
         "panel_bg":     N[150],
-        "panel_border": N[350],
+        "panel_border": N[160],
         # Brand
         "primary":   A["primary"],
         "secondary": A["white"],
@@ -90,8 +92,10 @@ def _build_dark_theme() -> dict:
         "map_colorscale": "plasma_r",
         "map_tile_style": "carto-darkmatter",
         # Shadows
-        "shadow_color":    "#ffffff",
-        "shadow_darkness": 0.0,
+        "bezel_hi_alpha": 0.25,
+        "bezel_lo_alpha": 1,
+        "shadow_color":   A["white"],
+        "shadow_darkness": 0.2,
         # Raw scales for introspection
         "_neutral": N,
         "_accent":  A,
@@ -104,11 +108,11 @@ def _build_light_theme() -> dict:
     N = {
         100: "#f5f0e8",  # → page_bg
         150: "#ede2d0",  # → panel_bg
+        160: "#d0c19f",  # → panel_border
         200: "#e7d9c6",  # → ui_hover
         250: "#dfcdb7",  # → chart_grid
         260: "#f1ece4",  # → chart_plot_color
         300: "#e7dbc6",  # → slider_track
-        350: "#d0c19f",  # → panel_border
         500: "#b0a090",  # → text_hint
         600: "#8a7a6a",  # → text_lo
         700: "#4a3f30",  # → text_mid
@@ -136,7 +140,7 @@ def _build_light_theme() -> dict:
         # Surfaces
         "page_bg":      N[100],
         "panel_bg":     N[150],
-        "panel_border": N[350],
+        "panel_border": N[160],
         # Brand
         "primary":   A["primary"],
         "secondary": A["ink"],
@@ -173,7 +177,9 @@ def _build_light_theme() -> dict:
         "map_tile_style": "carto-positron",
         # Shadows
         "shadow_color":    A["ink"],
-        "shadow_darkness": 0.18,
+        "shadow_darkness": 0.32,
+        "bezel_hi_alpha": 0.9,
+        "bezel_lo_alpha": 0.4,
         # Raw scales for introspection
         "_neutral": N,
         "_accent":  A,

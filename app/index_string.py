@@ -27,7 +27,7 @@ from app.config import (
     FONT_SIZE_KPI_LABEL, FONT_SIZE_KPI_VALUE, FONT_SIZE_KPI_SUB,
     FONT_SIZE_TITLE,
     # Borders
-    PANEL_BORDER_RADIUS,
+    PANEL_BORDER_RADIUS, PANEL_BORDER_THICKNESS,
     # Play button
     PLAY_BTN_SIZE, PLAY_BTN_FONT_SIZE,
     # Layout
@@ -98,7 +98,8 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --font-size-title         : {FONT_SIZE_TITLE}px;
 
                 /* Borders */
-                --border-radius    : {PANEL_BORDER_RADIUS};
+                --border-radius            : {PANEL_BORDER_RADIUS};
+                --panel-border-thickness   : {PANEL_BORDER_THICKNESS};
 
                 /* Play button */
                 --play-btn-size      : {PLAY_BTN_SIZE};

@@ -11,17 +11,25 @@
  *   calc(var(--border-radius) * 0.67) — derived ratio for pill/button corners
  *
  * Panel rendering pattern:
- *   Every panel element (chart panels, KPI cards, playback slider, play button)
- *   renders its background and bezel via CSS only. The bezel is baked into
- *   var(--shadow-full), which is a composite of SHADOW_DROP + SHADOW_BEZEL
- *   defined in config.py. Apply box-shadow: var(--shadow-full) directly on the
- *   panel element — no ::after pseudo-element is needed or used.
+ *   Every panel element renders its drop shadow directly via box-shadow on the
+ *   element itself. The bezel (inset highlights) and border live on a ::after
+ *   pseudo-element that sits above plot content (z-index: 10, pointer-events: none).
+ *   This layering prevents the inset bezel from bleeding into and visually
+ *   cancelling the border, which occurs when both live on the same element.
  *
- *   All Plotly figures must set paper_bgcolor and plot_bgcolor to rgba(0,0,0,0)
- *   so the CSS panel background composites cleanly through the figure layer.
- *   This is set as the default in app/plotly_template.py. Do not override it
- *   with an opaque value in a figure builder — doing so dampens the bezel and
- *   creates a visible compositing seam under the shadow overlay.
+ *   Layer order (bottom → top):
+ *     1. box-shadow: var(--shadow-drop)   — on panel element (behind everything)
+ *     2. background-color                 — on panel element
+ *     3. plot content (Plotly figure)     — transparent, CSS bg shows through
+ *     4. ::after overlay                  — position:absolute, inset:0, z-index:10
+ *          box-shadow: var(--shadow-bezel) — inset catch-light + recession
+ *          border: --panel-border-thickness solid --panel-border
+ *
+ *   All Plotly figures must set paper_bgcolor and plot_bgcolor to rgba(0,0,0,0).
+ *   Set as default in app/plotly_template.py — do not override in figure builders.
+ *
+ *   SHADOW_FULL is retained in config.py for reference but is no longer used in
+ *   style.css. Use --shadow-drop on elements and --shadow-bezel on ::after.
  *
  * Dash component CSS notes:
  *   dcc.Dropdown uses Radix UI (Dash 2.x) — NOT React Select. Selectors like
@@ -65,9 +73,8 @@ html, body {
 /* KPI / generic panel card */
 .card {
     background     : var(--panel-bg);
-    border         : 1px solid var(--panel-border);
     border-radius  : var(--border-radius);
-    box-shadow     : var(--shadow-full);
+    box-shadow     : var(--shadow-drop);
     padding        : 12px 16px;
     overflow       : hidden;
     display        : flex;
@@ -76,6 +83,17 @@ html, body {
     align-items    : center;
     text-align     : center;
     flex           : 1;
+    position       : relative;
+}
+.card::after {
+    content       : '';
+    position      : absolute;
+    inset         : 0;
+    border-radius : var(--border-radius);
+    border        : var(--panel-border-thickness) solid var(--panel-border);
+    box-shadow    : var(--shadow-bezel);
+    pointer-events: none;
+    z-index       : 10;
 }
 
 .kpi-label {
@@ -302,10 +320,20 @@ html, body {
 .playback-panel {
     flex             : 1;
     border-radius    : var(--border-radius);
-    box-shadow       : var(--shadow-full);
+    box-shadow       : var(--shadow-drop);
     background-color : var(--panel-border);
     position         : relative;
     padding          : 0.75rem 1rem 0.5rem 1rem;
+}
+.playback-panel::after {
+    content       : '';
+    position      : absolute;
+    inset         : 0;
+    border-radius : var(--border-radius);
+    border        : var(--panel-border-thickness) solid var(--panel-border);
+    box-shadow    : var(--shadow-bezel);
+    pointer-events: none;
+    z-index       : 10;
 }
 
 /* Charts area — fills all remaining vertical space */
@@ -330,10 +358,19 @@ html, body {
     flex             : var(--map-flex);
     min-height       : var(--map-min-height);
     border-radius    : var(--border-radius);
-    border           : 1px solid var(--panel-border);
-    box-shadow       : var(--shadow-full);
+    box-shadow       : var(--shadow-drop);
     background-color : var(--panel-bg);
     position         : relative;
+}
+.map-panel::after {
+    content       : '';
+    position      : absolute;
+    inset         : 0;
+    border-radius : var(--border-radius);
+    border        : var(--panel-border-thickness) solid var(--panel-border);
+    box-shadow    : var(--shadow-bezel);
+    pointer-events: none;
+    z-index       : 10;
 }
 .map-inner {
     position         : absolute;
@@ -347,11 +384,20 @@ html, body {
     flex             : var(--pyramid-flex);
     min-height       : 0;
     border-radius    : var(--border-radius);
-    border           : 1px solid var(--panel-border);
-    box-shadow       : var(--shadow-full);
+    box-shadow       : var(--shadow-drop);     /* drop shadow only */
     overflow         : hidden;
     background-color : var(--panel-bg);
     position         : relative;
+}
+.pyramid-panel::after {
+    content       : '';
+    position      : absolute;
+    inset         : 0;
+    border-radius : var(--border-radius);
+    border        : var(--panel-border-thickness) solid var(--panel-border);
+    box-shadow    : var(--shadow-bezel);
+    pointer-events: none;
+    z-index       : 10;
 }
 
 .pyramid-inner {
@@ -395,11 +441,20 @@ html, body {
     flex             : var(--charts-ts-flex);
     min-height       : 0;
     border-radius    : var(--border-radius);
-    border           : 1px solid var(--panel-border);
-    box-shadow       : var(--shadow-full);
+    box-shadow       : var(--shadow-drop);     /* drop shadow only */
     overflow         : hidden;
     background-color : var(--panel-bg);
     position         : relative;
+}
+.timeseries-panel::after {
+    content       : '';
+    position      : absolute;
+    inset         : 0;
+    border-radius : var(--border-radius);
+    border        : var(--panel-border-thickness) solid var(--panel-border);
+    box-shadow    : var(--shadow-bezel);
+    pointer-events: none;
+    z-index       : 10;
 }
 .timeseries-inner {
     position         : absolute;

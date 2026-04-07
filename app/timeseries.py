@@ -4,8 +4,8 @@ from functools import lru_cache
 import plotly.graph_objects as go
 
 from app.config import (
-    COLOR_TEXT_MID, COLOR_PRIMARY,
-    ACCENT_THRESHOLD, TIMESERIES_PREF_COLOR,
+    COLOR_TEXT_MID, COLOR_PRIMARY, CHART_PLOT_COLOR,
+    PANEL_BORDER, ACCENT_THRESHOLD, TIMESERIES_PREF_COLOR,
     LINE_WIDTH_MAIN, LINE_WIDTH_PREF, LINE_WIDTH_1945,
     LINE_WIDTH_THRESHOLD, LINE_WIDTH_YEAR_MARKER,
     MARKER_SIZE_DOT, MARKER_SIZE_1945,
@@ -177,19 +177,27 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     )
 
     fig.update_layout(
-        margin=dict(l=48, r=24, t=28, b=32),
+        margin=dict(l=24, r=24, t=20, b=20),
         autosize=True,
         # paper_bgcolor="rgba(0,0,0,0)",
-        # plot_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor=CHART_PLOT_COLOR,
         legend=dict(
             orientation="h",
             x=0.01, xanchor="left",
             y=0.99, yanchor="top",
         ),
         xaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=2,
+            mirror=True,
             dtick=10,
         ),
         yaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=1,
+            mirror=True,
             title=dict(
                 text="高齢化指数",
                 font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),

@@ -84,7 +84,7 @@ CHARTS_ANCHOR       = 10
 CHARTS_ROW_FLEX     = 7
 CHARTS_TS_FLEX      = CHARTS_ANCHOR - CHARTS_ROW_FLEX  # = 3
 
-MAP_MIN_HEIGHT      = "320px"
+MAP_MIN_HEIGHT      = "64px"
 MAP_FLEX            = 7
 PYRAMID_FLEX        = 3
 
@@ -159,15 +159,17 @@ SHADOW_MAP_INSET = _rgba(_SHADOW_COLOR, min(1.0, SHADOW_DARKNESS * 1.6))
 # Panel drop shadow & bezel knobs — tweak these to adjust the 3-D feel.
 PANEL_SHADOW_Y    = 3     # px — drop shadow Y offset (bottom)
 PANEL_SHADOW_X    = 2     # px — drop shadow X offset (right)
-PANEL_SHADOW_BLUR = 4     # px — drop shadow blur radius
-PANEL_BEZEL_SIZE  = 3     # px — inset highlight/shadow thickness
-BEZEL_BLUR        = 2     # px — bezel edge softness (0 = hard, keep low)
-BEZEL_HI_ALPHA    = 1  # top-left catch light opacity
-BEZEL_LO_ALPHA    = 0.4  # bottom-right recess opacity
+PANEL_SHADOW_BLUR = 8     # px — drop shadow blur radius
+PANEL_BEZEL_SIZE  = 2     # px — inset highlight/shadow thickness
+BEZEL_BLUR        = 3     # px — bezel edge softness (0 = hard, keep low)
+BEZEL_HI_ALPHA    = _t["bezel_hi_alpha"]
+BEZEL_LO_ALPHA    = _t["bezel_lo_alpha"]
+BEZEL_HI_COLOR    = _t.get("bezel_hi_color", "#ffffff")
+BEZEL_LO_COLOR    = _t.get("bezel_lo_color", "#000000")
 
 # Derived — do not edit these; change the knobs above.
-_BEZEL_HI = f"rgba(255, 255, 255, {BEZEL_HI_ALPHA})"
-_BEZEL_LO = _rgba(_SHADOW_COLOR, BEZEL_LO_ALPHA)
+_BEZEL_HI = _rgba(BEZEL_HI_COLOR, BEZEL_HI_ALPHA)
+_BEZEL_LO = _rgba(BEZEL_LO_COLOR, BEZEL_LO_ALPHA)
 
 SHADOW_DROP = (
     f"{PANEL_SHADOW_X}px {PANEL_SHADOW_Y}px "
@@ -229,7 +231,7 @@ FONT_SIZE_TITLE         = 32
 # ── 7. Spacing & borders ──────────────────────────────────────────────────────
 
 PANEL_BORDER_RADIUS    = "6px"
-PANEL_BORDER_THICKNESS = "1.5px"
+PANEL_BORDER_THICKNESS = "1px"
 
 
 # ── 8. Map configuration ──────────────────────────────────────────────────────
@@ -298,9 +300,9 @@ PYRAMID_BARGAP       = 0.15
 COHORT_OUTLINE_WIDTH = 3
 PYRAMID_MAX_BANDS    = 18
 PYRAMID_MARGIN_T     = 20
-PYRAMID_MARGIN_B     = 12
-PYRAMID_MARGIN_L     = 12
-PYRAMID_MARGIN_R     = 12
+PYRAMID_MARGIN_B     = 16
+PYRAMID_MARGIN_L     = 24
+PYRAMID_MARGIN_R     = 24
 
 
 # ── 10. Play button ───────────────────────────────────────────────────────────

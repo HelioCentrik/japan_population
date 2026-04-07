@@ -227,7 +227,7 @@ def build_japan_map_fig(
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
             zoom=MAP_DEFAULT_ZOOM,
         ),
-        margin=dict(l=6, r=7, t=6, b=6),
+        margin=dict(l=8, r=8, t=8, b=8),
         autosize=True,
     )
 
