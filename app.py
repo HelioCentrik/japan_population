@@ -169,10 +169,7 @@ app.layout = html.Div(
                                 }
                                 for yr in CENSUS_YEARS
                             },
-                            tooltip={
-                                "placement": "top",
-                                "always_visible": False,
-                            },
+                            tooltip=None,
                             included=False,
                         )
                     ]
