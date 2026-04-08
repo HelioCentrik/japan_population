@@ -51,7 +51,7 @@ def _build_dark_theme() -> dict:
     # ── Data encoding colors ───────────────────────────────────────────
     data = {
         "male":   "#4773eb",
-        "female": "#dd4b61",
+        "female": "#e4536b",
         "pref":   "#ffffff",  # timeseries prefecture overlay
     }
 

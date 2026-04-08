@@ -9,7 +9,7 @@
 
     function getPlotlyDiv() {
         // dcc.Graph wraps a .js-plotly-plot — that's the element Plotly.relayout expects
-        return document.querySelector('#choropleth-map .js-plotly-plot');
+        return document.querySelector('#map-graph .js-plotly-plot');
     }
 
     function updateZoom(height) {
