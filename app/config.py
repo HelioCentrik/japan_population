@@ -145,6 +145,16 @@ MAP_HIGHLIGHT_FILL       = _t["map_highlight_fill"]
 MAP_COLORSCALE           = _t["map_colorscale"]
 MAP_TILE_STYLE           = _t["map_tile_style"]
 
+# Tooltip
+TOOLTIP_BG          = _t["tooltip_bg"]
+TOOLTIP_BORDER      = _t["tooltip_border"]
+TOOLTIP_BORDER_SIZE = _t["tooltip_border_size"]
+TOOLTIP_TEXT_HI     = _t["tooltip_text_hi"]
+TOOLTIP_TEXT_MID    = _t["tooltip_text_mid"]
+TOOLTIP_HINT        = _t["tooltip_hint"]
+TOOLTIP_WARNING     = _t["tooltip_warning"]
+TOOLTIP_DIVIDER     = _t["tooltip_divider"]
+
 
 # ── 4. Shadows ────────────────────────────────────────────────────────────────
 # Derived from the theme's shadow_color and shadow_darkness knob.
@@ -361,6 +371,13 @@ THEME = {
         "timeseries_pref":      TIMESERIES_PREF_COLOR,
         "map_highlight_line":   MAP_HIGHLIGHT_LINE_COLOR,
         "map_highlight_fill":   MAP_HIGHLIGHT_FILL,
+        "tooltip_bg":           TOOLTIP_BG,
+        "tooltip_border":       TOOLTIP_BORDER,
+        "tooltip_text_hi":      TOOLTIP_TEXT_HI,
+        "tooltip_text_mid":     TOOLTIP_TEXT_MID,
+        "tooltip_hint":         TOOLTIP_HINT,
+        "tooltip_warning":      TOOLTIP_WARNING,
+        "tooltip_divider":      TOOLTIP_DIVIDER,
     },
 
     "shadows": {

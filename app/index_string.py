@@ -34,6 +34,10 @@ from app.config import (
     LAYOUT_GAP, LAYOUT_OUTER_PAD, LAYOUT_MIN_HEIGHT,
     CHARTS_ROW_FLEX, CHARTS_TS_FLEX,
     MAP_MIN_HEIGHT, MAP_FLEX, PYRAMID_FLEX,
+    # Tooltip
+    TOOLTIP_BG, TOOLTIP_BORDER, TOOLTIP_BORDER_SIZE,
+    TOOLTIP_TEXT_HI, TOOLTIP_TEXT_MID,
+    TOOLTIP_HINT, TOOLTIP_WARNING, TOOLTIP_DIVIDER,
 )
 
 INDEX_STRING = f'''<!DOCTYPE html>
@@ -115,6 +119,15 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --map-flex         : {MAP_FLEX};
                 --pyramid-flex     : {PYRAMID_FLEX};
 
+                /* Tooltip */
+                --tooltip-bg          : {TOOLTIP_BG};
+                --tooltip-border      : {TOOLTIP_BORDER};
+                --tooltip-border-size : {TOOLTIP_BORDER_SIZE};
+                --tooltip-text-hi     : {TOOLTIP_TEXT_HI};
+                --tooltip-text-mid    : {TOOLTIP_TEXT_MID};
+                --tooltip-hint        : {TOOLTIP_HINT};
+                --tooltip-warning     : {TOOLTIP_WARNING};
+                --tooltip-divider     : {TOOLTIP_DIVIDER};
             }}
         </style>
     </head>

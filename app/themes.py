@@ -5,37 +5,37 @@ Theme definitions for the Japan Population Dashboard.
 Each theme is built by a function that defines three internal color buckets,
 then resolves them into the flat token dict that config.py expects.
 
-  N — Neutral scale: 9–10 steps, low=light, high=dark.
-      Covers all surfaces, borders, and text. One step per semantic token.
-  A — Accent palette: named keys for brand and annotation colors.
-  D — Data palette: named keys for chart data encoding.
+  surface — Named neutrals: surfaces, borders, UI states, and text scale.
+            Keys are descriptive — what the color does, not an abstract index.
+  accent  — Brand and annotation colors: named by intent.
+  data    — Chart data-encoding colors: named by the series they represent.
 
 Non-color values (map config, colorscales, shadow floats) are passthroughs.
-_neutral, _accent, _data expose raw buckets for introspection / template builder.
+All three buckets are internal scaffolding — only semantic tokens leave the
+builder via the return dict. Nothing outside themes.py reads the raw buckets.
 
 To swap themes: change ACTIVE_THEME_NAME below and restart.
 """
 
 
 def _build_dark_theme() -> dict:
-    # ── Neutral scale: navy, 100=near-white → 900=near-black ──────────
-    N = {
-        100: "#06091a",  # → page_bg
-        150: "#142148",  # → panel_bg
-        160: "#324a8f",  # → panel_border
-        200: "#27418e",  # → ui_hover
-        250: "#455892",  # → chart_grid
-        260: "#7684b2",  # → chart_plot
-        300: "#1a2a44",  # → slider_track
-        500: "#45456b",  # → text_hint
-        550: "#2f2f62",  # → text_dark
-        600: "#5959a5",  # → text_lo
-        700: "#b6b6f6",  # → text_mid
-        900: "#cfdbff",  # → text_hi
+    # ── Surfaces, borders, UI states, text scale ───────────────────────
+    surface = {
+        "page":      "#06091a",  # → page_bg
+        "panel":     "#142148",  # → panel_bg
+        "border":    "#324a8f",  # → panel_border
+        "hover":     "#27418e",  # → ui_hover
+        "grid":      "#455892",  # → chart_grid
+        "plot":      "#67749f",  # → chart_plot_color
+        "track":     "#1a2a44",  # → slider_track
+        "text_hint": "#6a6a9e",  # → text_hint  (de-emphasised, still legible)
+        "text_lo":   "#8c8cca",  # → text_lo    (subordinate text)
+        "text_mid":  "#b6b6f6",  # → text_mid   (body / axis text)
+        "text_hi":   "#cfdbff",  # → text_hi    (headings / primary values)
     }
 
-    # ── Accent palette ─────────────────────────────────────────────────
-    A = {
+    # ── Brand and annotation colors ────────────────────────────────────
+    accent = {
         "primary": "#bc002d",  # Japan red
         "white":   "#ffffff",
         "teal":    "#00ccaa",  # threshold reference line
@@ -45,8 +45,8 @@ def _build_dark_theme() -> dict:
         "ink":     "#2d1f0e",  # sumi dark brown
     }
 
-    # ── Data palette ───────────────────────────────────────────────────
-    D = {
+    # ── Data encoding colors ───────────────────────────────────────────
+    data = {
         "male":   "#183a95",
         "female": "#97172a",
         "pref":   "#ffffff",  # timeseries prefecture overlay
@@ -54,83 +54,88 @@ def _build_dark_theme() -> dict:
 
     return {
         # Surfaces
-        "page_bg":      N[100],
-        "panel_bg":     N[150],
-        "panel_border": N[160],
+        "page_bg":      surface["page"],
+        "panel_bg":     surface["panel"],
+        "panel_border": surface["border"],
         # Brand
-        "primary":   A["primary"],
-        "secondary": A["white"],
+        "primary":   accent["primary"],
+        "secondary": accent["white"],
         # Text scale
-        "text_hi":   N[900],
-        "text_mid":  N[700],
-        "text_lo":   N[600],
-        "text_hint": N[500],
+        "text_hi":   surface["text_hi"],
+        "text_mid":  surface["text_mid"],
+        "text_lo":   surface["text_lo"],
+        "text_hint": surface["text_hint"],
         # UI interaction
-        "ui_hover":     N[200],
-        "slider_track": N[300],
+        "ui_hover":     surface["hover"],
+        "slider_track": surface["track"],
         # Chart
-        "chart_grid":       N[250],
-        "chart_plot_color": N[260],
-        "accent_threshold": A["teal"],
-        "timeseries_pref":  D["pref"],
+        "chart_grid":       surface["grid"],
+        "chart_plot_color": surface["plot"],
+        "accent_threshold": accent["teal"],
+        "timeseries_pref":  data["pref"],
         # Cohort annotations
-        "accent_dankai":      A["amber"],
-        "accent_dankai_jr":   A["lime"],
-        "accent_wartime_gen": A["primary"],
-        "accent_shoushika":   A["sky"],
+        "accent_dankai":      accent["amber"],
+        "accent_dankai_jr":   accent["lime"],
+        "accent_wartime_gen": accent["primary"],
+        "accent_shoushika":   accent["sky"],
         # Population pyramid
-        "pyramid_male":   D["male"],
-        "pyramid_female": D["female"],
+        "pyramid_male":   data["male"],
+        "pyramid_female": data["female"],
+        # Tooltip
+        "tooltip_bg": "#1e2644",
+        "tooltip_border": surface["border"],
+        "tooltip_border_size": "1px",
+        "tooltip_text_hi": surface["text_hi"],
+        "tooltip_text_mid": surface["text_mid"],
+        "tooltip_hint": surface["text_hint"],
+        "tooltip_warning": "#f0a830",
+        "tooltip_divider": "rgba(255, 255, 255, 0.10)",
         # Map (passthroughs)
         "map_geo": {
-            "bg_color":   N[100],
-            "land_color": "#1c1f30",  # no neutral-scale equivalent
-            "line_color": "#6089A0",  # map-specific mid blue-grey
+            "bg_color":   surface["page"],
+            "land_color": "#1c1f30",
+            "line_color": "#6089A0",
         },
-        "map_highlight_line_color": A["white"],
+        "map_highlight_line_color": accent["white"],
         "map_highlight_fill":       "rgba(255, 255, 255, 0.08)",
         "map_colorscale": "plasma_r",
         "map_tile_style": "carto-darkmatter",
         # Shadows
-        "bezel_hi_alpha": 0.25,
-        "bezel_lo_alpha": 1,
-        "shadow_color":   A["white"],
+        "bezel_hi_alpha":  0.25,
+        "bezel_lo_alpha":  1,
+        "shadow_color":    accent["white"],
         "shadow_darkness": 0.2,
-        # Raw scales for introspection
-        "_neutral": N,
-        "_accent":  A,
-        "_data":    D,
     }
 
 
 def _build_light_theme() -> dict:
-    # ── Neutral scale: warm paper, 100=near-white → 900=near-black ────
-    N = {
-        100: "#f5f0e8",  # → page_bg
-        150: "#ede2d0",  # → panel_bg
-        160: "#d0c19f",  # → panel_border
-        200: "#e7d9c6",  # → ui_hover
-        250: "#dfcdb7",  # → chart_grid
-        260: "#f1ece4",  # → chart_plot_color
-        300: "#e7dbc6",  # → slider_track
-        500: "#b0a090",  # → text_hint
-        600: "#8a7a6a",  # → text_lo
-        700: "#4a3f30",  # → text_mid
-        900: "#1a1209",  # → text_hi
+    # ── Surfaces, borders, UI states, text scale ───────────────────────
+    surface = {
+        "page":      "#f5f0e8",  # → page_bg
+        "panel":     "#ede2d0",  # → panel_bg
+        "border":    "#d0c19f",  # → panel_border
+        "hover":     "#e7d9c6",  # → ui_hover
+        "grid":      "#dfcdb7",  # → chart_grid
+        "plot":      "#f1ece4",  # → chart_plot_color
+        "track":     "#e7dbc6",  # → slider_track
+        "text_hint": "#b0a090",  # → text_hint
+        "text_lo":   "#8a7a6a",  # → text_lo
+        "text_mid":  "#4a3f30",  # → text_mid
+        "text_hi":   "#1a1209",  # → text_hi
     }
 
-    # ── Accent palette ─────────────────────────────────────────────────
-    A = {
+    # ── Brand and annotation colors ────────────────────────────────────
+    accent = {
         "primary": "#bc002d",  # Japan red
         "ink":     "#2d1f0e",  # sumi dark brown
         "forest":  "#2d6a4f",  # threshold reference line (legible on light)
-        "amber":   "#faa434",  # 団塊の世代 (darkened for light bg)
+        "amber":   "#faa434",  # 団塊の世代
         "lime":    "#6bd211",  # 団塊ジュニア
         "sky":     "#9ee0ff",  # 少子化世代
     }
 
-    # ── Data palette ───────────────────────────────────────────────────
-    D = {
+    # ── Data encoding colors ───────────────────────────────────────────
+    data = {
         "male":   "#2d6a9f",
         "female": "#c0445a",
         "pref":   "#2d4a7a",  # indigo timeseries overlay
@@ -138,52 +143,57 @@ def _build_light_theme() -> dict:
 
     return {
         # Surfaces
-        "page_bg":      N[100],
-        "panel_bg":     N[150],
-        "panel_border": N[160],
+        "page_bg":      surface["page"],
+        "panel_bg":     surface["panel"],
+        "panel_border": surface["border"],
         # Brand
-        "primary":   A["primary"],
-        "secondary": A["ink"],
+        "primary":   accent["primary"],
+        "secondary": accent["ink"],
         # Text scale
-        "text_hi":   N[900],
-        "text_mid":  N[700],
-        "text_lo":   N[600],
-        "text_hint": N[500],
+        "text_hi":   surface["text_hi"],
+        "text_mid":  surface["text_mid"],
+        "text_lo":   surface["text_lo"],
+        "text_hint": surface["text_hint"],
         # UI interaction
-        "ui_hover":     N[200],
-        "slider_track": N[300],
+        "ui_hover":     surface["hover"],
+        "slider_track": surface["track"],
         # Chart
-        "chart_plot_color": N[260],
-        "chart_grid":       N[250],
-        "accent_threshold": A["forest"],
-        "timeseries_pref":  D["pref"],
+        "chart_grid":       surface["grid"],
+        "chart_plot_color": surface["plot"],
+        "accent_threshold": accent["forest"],
+        "timeseries_pref":  data["pref"],
         # Cohort annotations
-        "accent_dankai":      A["amber"],
-        "accent_dankai_jr":   A["lime"],
-        "accent_wartime_gen": A["primary"],
-        "accent_shoushika":   A["sky"],
+        "accent_dankai":      accent["amber"],
+        "accent_dankai_jr":   accent["lime"],
+        "accent_wartime_gen": accent["primary"],
+        "accent_shoushika":   accent["sky"],
         # Population pyramid
-        "pyramid_male":   D["male"],
-        "pyramid_female": D["female"],
+        "pyramid_male":   data["male"],
+        "pyramid_female": data["female"],
+        # Tooltip
+        "tooltip_bg": "#f9f5ee",
+        "tooltip_border": surface["border"],
+        "tooltip_border_size": "1px",
+        "tooltip_text_hi": surface["text_hi"],
+        "tooltip_text_mid": surface["text_mid"],
+        "tooltip_hint": surface["text_hint"],
+        "tooltip_warning": "#c47a00",
+        "tooltip_divider": "rgba(0, 0, 0, 0.10)",
         # Map (passthroughs)
         "map_geo": {
-            "bg_color":   N[100],
+            "bg_color":   surface["page"],
             "land_color": "#e0d5c0",
-            "line_color": N[600],
+            "line_color": surface["text_lo"],
         },
-        "map_highlight_line_color": N[900],
+        "map_highlight_line_color": surface["text_hi"],
         "map_highlight_fill":       "rgba(26, 18, 9, 0.08)",
         "map_colorscale": "YlOrRd",
         "map_tile_style": "carto-positron",
         # Shadows
-        "shadow_color":    A["ink"],
+        "bezel_hi_alpha":  0.9,
+        "bezel_lo_alpha":  0.4,
+        "shadow_color":    accent["ink"],
         "shadow_darkness": 0.32,
-        "bezel_hi_alpha": 0.9,
-        "bezel_lo_alpha": 0.4,
-        # Raw scales for introspection
-        "_neutral": N,
-        "_accent":  A,
-        "_data":    D,
     }
 
 
