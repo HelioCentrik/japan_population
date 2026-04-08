@@ -236,10 +236,10 @@ html, body {
 /* Reset prefecture button */
 #reset-prefecture-btn {
     display          : none;
-    background-color : rgba(240, 240, 240, 0.66);
+    background-color : rgba(80, 80, 80, 0.85);
     height           : 32px;
-    color            : var(--color-text-mid);
-    border           : 1px solid var(--panel-border);
+    color            : rgba(240, 240, 240, 0.85);
+    border           : 1px solid rgba(255, 255, 255, 0.85);
     border-radius    : calc(var(--border-radius) * 0.67);
     padding          : 3px 10px;
     font-size        : var(--font-size-kpi-sub);
@@ -247,8 +247,8 @@ html, body {
 }
 
 #reset-prefecture-btn:hover {
-    background-color: rgba(255, 255, 255, 0.66);
-    color           : var(--color-text-hi);
+    background-color: rgba(52, 52, 52, 0.9);
+    color           : rgba(245, 245, 245, 0.9);
 }
 
 /* Year Slider */
