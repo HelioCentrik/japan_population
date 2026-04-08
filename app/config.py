@@ -25,10 +25,10 @@ Sections:
 """
 
 from pathlib import Path
-import colorsys
 
 import duckdb as ddb
 
+from app.utils import hex_to_rgb as _hex_to_rgb, rgba as _rgba, hsl_adjust as _hsl_adjust
 from app.fonts import _stack
 from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
@@ -46,32 +46,6 @@ def _get_max_year() -> int:
     return result
 
 MAX_YEAR: int = _get_max_year()
-
-def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
-    """Parse a 6-digit hex color string into (r, g, b) ints."""
-    h = hex_color.lstrip("#")
-    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-
-
-def _rgba(hex_color: str, alpha: float) -> str:
-    """Return a CSS rgba() string from a hex color and alpha in [0, 1]."""
-    r, g, b = _hex_to_rgb(hex_color)
-    a = max(0.0, min(1.0, alpha))
-    return f"rgba({r}, {g}, {b}, {a:.2f})"
-
-
-def _hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> str:
-    """
-    Utility: derive a color from hex_color with lightness and saturation scaled.
-    Useful for building subordinate or hover variants from a base color.
-    Not used at module load time — theme text scales are defined explicitly in themes.py.
-    """
-    r, g, b = _hex_to_rgb(hex_color)
-    h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
-    l_new = max(0.0, min(1.0, l * l_scale))
-    s_new = max(0.0, min(1.0, s * s_scale))
-    r2, g2, b2 = colorsys.hls_to_rgb(h, l_new, s_new)
-    return f"#{round(r2 * 255):02x}{round(g2 * 255):02x}{round(b2 * 255):02x}"
 
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────

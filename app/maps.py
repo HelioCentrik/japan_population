@@ -1,6 +1,5 @@
 # app/maps.py
 import json
-import math
 import numpy as np
 from functools import lru_cache
 
@@ -8,6 +7,7 @@ import geopandas as gpd
 from app.db import get_con
 from plotly import graph_objects as go
 
+from app.utils import ceil_half_magnitude
 from app.config import (
     COLOR_TEXT_MID, MAP_GEO,
     MAP_TILE_STYLE,
@@ -57,7 +57,7 @@ def _get_global_metric_bounds() -> dict:
     delta_bound = delta_sigma * POP_DELTA_SIGMA
     delta_lo    = delta_mean - delta_bound
     delta_hi    = delta_mean + delta_bound
-    delta_dev = _ceil_half_magnitude(max(abs(delta_lo), abs(delta_hi)))
+    delta_dev = ceil_half_magnitude(max(abs(delta_lo), abs(delta_hi)))
 
     return {
         "population":        (float(np.log1p(row[0])), float(np.log1p(row[1]))),
@@ -65,12 +65,6 @@ def _get_global_metric_bounds() -> dict:
         "pop_delta":         (-delta_dev, delta_dev),
         "working_age_share": (float(row[6]), float(row[7])),
     }
-
-def _ceil_half_magnitude(val: float) -> float:
-    """Round up to nearest 0.5 × 10^n. E.g. 598,317 → 600,000."""
-    mag  = 10 ** math.floor(math.log10(abs(val)))
-    step = mag * 0.5
-    return math.ceil(val / step) * step
 
 
 def build_japan_map_fig(

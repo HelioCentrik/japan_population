@@ -1,9 +1,9 @@
 # app/pyramid.py
-import math
 from functools import lru_cache
 
 import plotly.graph_objects as go
 
+from app.utils import nice_axis, shorten_age_label, cohort_band, cohort_band_range
 from app.config import (
     PANEL_BORDER,
     COLOR_TEXT_MID, CHART_PLOT_COLOR,
@@ -52,32 +52,6 @@ def get_pyramid_axis_max(area_estat: str | None) -> int:
     return int(result[0]) if result and result[0] else 5_000_000
 
 
-def _nice_axis(max_val: int) -> tuple[float, float]:
-    """
-    Returns (dtick, half_range). half_range is always a clean dtick multiple
-    with one full tick of headroom above max_val — prevents Plotly from snapping
-    the range down and clipping bars.
-    """
-    if max_val <= 0:
-        return 1_000_000, 4_000_000
-
-    raw_step   = max_val / 3
-    magnitude  = 10 ** math.floor(math.log10(raw_step))
-    normalized = raw_step / magnitude
-
-    if normalized < 1.5:
-        snapped = 1
-    elif normalized < 3.5:
-        snapped = 2
-    else:
-        snapped = 5
-
-    dtick      = snapped * magnitude
-    n_ticks    = math.ceil(max_val / dtick)
-    half_range = dtick * (n_ticks + 0.25)
-    return dtick, half_range
-
-
 # ── Cohort birth year ranges ──────────────────────────────────────────────────
 _COHORTS = {
     "dankai":    (1947, 1949, ACCENT_DANKAI),
@@ -90,36 +64,6 @@ _COHORTS = {
 #     "30–34", "35–39", "40–44", "45–49", "50–54", "55–59",
 #     "60–64", "65–69", "70–74", "75–79", "80+"
 # ]
-
-
-def _shorten_label(label: str) -> str:
-    """'0–4 years old' → '0–4',  '85 years and older' → '85+' """
-    return (label
-            .replace(" years and older", "+")
-            .replace(" years old", ""))
-
-
-def _cohort_band(year: int, birth_start: int, birth_end: int) -> int | None:
-    """
-    Return the age_start of the scheme_a band containing the cohort in `year`.
-    The cohort is at ages (year - birth_end) to (year - birth_start).
-    We snap to the 5-year band floor of the older end (year - birth_end).
-    Returns None if the cohort would be outside the 0–85 range.
-    """
-    age_low  = year - birth_end
-    age_high = year - birth_start
-    if age_high < 0 or age_low > 85:
-        return None
-    band_start = (max(age_low, 0) // 5) * 5
-    return band_start
-
-def _cohort_band_range(year: int, birth_start: int, birth_end: int) -> list[int]:
-    """Return all scheme_a band starts containing any birth year in [birth_start, birth_end]."""
-    age_low  = max(year - birth_end, 0)
-    age_high = min(year - birth_start, 85)
-    if age_high < 0 or age_low > 85:
-        return []
-    return [b for b in range(0, 86, 5) if b <= age_high and b + 4 >= age_low]
 
 
 def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 5_000_000) -> go.Figure:
@@ -165,14 +109,14 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     male_df   = df[df["sex"] == "male"  ].sort_values("age_start")
     female_df = df[df["sex"] == "female"].sort_values("age_start")
 
-    age_labels = [_shorten_label(l) for l in male_df["age_group"].tolist()]
+    age_labels = [shorten_age_label(l) for l in male_df["age_group"].tolist()]
     age_starts = male_df["age_start"].tolist()
 
     # ── Cohort colour mapping ─────────────────────────────────────────────────
     cohort_bands = {}
     if area_estat is None:
         for name, (b_start, b_end, color) in _COHORTS.items():
-            band = _cohort_band(year, b_start, b_end)
+            band = cohort_band(year, b_start, b_end)
             if band is not None:
                 cohort_bands[band] = color
 
@@ -221,13 +165,13 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     # ── 戦中世代 — Wartime cohort marker ──────────────────────────────────────
     # Men born 1910–1925 were prime conscription age during the war.
     valid_bands  = set(male_df["age_start"].tolist())
-    wartime_bands = [b for b in _cohort_band_range(year, 1910, 1925) if b in valid_bands] if (
+    wartime_bands = [b for b in cohort_band_range(year, 1910, 1925) if b in valid_bands] if (
                 area_estat is None and 1945 <= year <= MAX_YEAR) else []
     war_gen_rows = male_df[male_df["age_start"].isin(wartime_bands)]
 
     war_gen_trace = go.Scatter(
         x=[-v for v in war_gen_rows["population"]] if not war_gen_rows.empty else [None],
-        y=[_shorten_label(l) for l in war_gen_rows["age_group"]] if not war_gen_rows.empty else [None],
+        y=[shorten_age_label(l) for l in war_gen_rows["age_group"]] if not war_gen_rows.empty else [None],
         mode="markers",
         name="戦中世代",
         showlegend=False,
@@ -245,13 +189,13 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     )
 
     # ── 少子化 — Shoushika cohort marker ─────────────────────────────────────
-    shoushika_bands = [b for b in _cohort_band_range(year, 1986, 1990) if b in valid_bands] if (
+    shoushika_bands = [b for b in cohort_band_range(year, 1986, 1990) if b in valid_bands] if (
                 area_estat is None and year >= 1990) else []
     shoushika_rows = male_df[male_df["age_start"].isin(shoushika_bands)]
 
     shoushika_trace = go.Scatter(
         x=[0] * len(shoushika_rows) if not shoushika_rows.empty else [None],
-        y=[_shorten_label(l) for l in shoushika_rows["age_group"]] if not shoushika_rows.empty else [None],
+        y=[shorten_age_label(l) for l in shoushika_rows["age_group"]] if not shoushika_rows.empty else [None],
         mode="markers",
         name="少子化世代",
         showlegend=False,
@@ -296,7 +240,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             fig.add_shape(type="line", xref="x", yref="y",
                           line=dict(color=color, width=COHORT_OUTLINE_WIDTH), **shape)
 
-    dtick, half_range = _nice_axis(axis_max)
+    dtick, half_range = nice_axis(axis_max)
 
     fig.update_layout(
         # paper_bgcolor='rgba(0,0,0,0)',
