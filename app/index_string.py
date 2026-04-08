@@ -37,7 +37,7 @@ from app.config import (
     # Tooltip
     TOOLTIP_BG, TOOLTIP_BORDER, TOOLTIP_BORDER_SIZE,
     TOOLTIP_TEXT_HI, TOOLTIP_TEXT_MID,
-    TOOLTIP_HINT, TOOLTIP_WARNING, TOOLTIP_DIVIDER,
+    TOOLTIP_HINT, TOOLTIP_DIVIDER,
 )
 
 INDEX_STRING = f'''<!DOCTYPE html>
@@ -126,7 +126,6 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --tooltip-text-hi     : {TOOLTIP_TEXT_HI};
                 --tooltip-text-mid    : {TOOLTIP_TEXT_MID};
                 --tooltip-hint        : {TOOLTIP_HINT};
-                --tooltip-warning     : {TOOLTIP_WARNING};
                 --tooltip-divider     : {TOOLTIP_DIVIDER};
             }}
         </style>

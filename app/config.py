@@ -126,7 +126,6 @@ TOOLTIP_BORDER_SIZE = _t["tooltip_border_size"]
 TOOLTIP_TEXT_HI     = _t["tooltip_text_hi"]
 TOOLTIP_TEXT_MID    = _t["tooltip_text_mid"]
 TOOLTIP_HINT        = _t["tooltip_hint"]
-TOOLTIP_WARNING     = _t["tooltip_warning"]
 TOOLTIP_DIVIDER     = _t["tooltip_divider"]
 
 
@@ -350,7 +349,6 @@ THEME = {
         "tooltip_text_hi":      TOOLTIP_TEXT_HI,
         "tooltip_text_mid":     TOOLTIP_TEXT_MID,
         "tooltip_hint":         TOOLTIP_HINT,
-        "tooltip_warning":      TOOLTIP_WARNING,
         "tooltip_divider":      TOOLTIP_DIVIDER,
     },
 

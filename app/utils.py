@@ -52,7 +52,7 @@ def rgba(hex_color: str, alpha: float) -> str:
     return f"rgba({r}, {g}, {b}, {a:.2f})"
 
 
-def hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> str:
+def hsl_adjust(hex_color: str, h_scale: float = 1.0, l_scale: float = 1.0, s_scale: float = 1.0) -> str:
     """Derive a hex color from hex_color with lightness and saturation scaled.
 
     Useful for building hover variants or subordinate tones from a base color
@@ -67,9 +67,10 @@ def hsl_adjust(hex_color: str, l_scale: float = 1.0, s_scale: float = 1.0) -> st
     """
     r, g, b = hex_to_rgb(hex_color)
     h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
+    h_new = max(0.0, min(1.0, h * h_scale))
     l_new = max(0.0, min(1.0, l * l_scale))
     s_new = max(0.0, min(1.0, s * s_scale))
-    r2, g2, b2 = colorsys.hls_to_rgb(h, l_new, s_new)
+    r2, g2, b2 = colorsys.hls_to_rgb(h_new, l_new, s_new)
     return f"#{round(r2 * 255):02x}{round(g2 * 255):02x}{round(b2 * 255):02x}"
 
 

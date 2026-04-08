@@ -16,6 +16,8 @@ builder via the return dict. Nothing outside themes.py reads the raw buckets.
 
 To swap themes: change ACTIVE_THEME_NAME below and restart.
 """
+from app.utils import hsl_adjust
+
 
 
 def _build_dark_theme() -> dict:
@@ -24,9 +26,9 @@ def _build_dark_theme() -> dict:
         "page":      "#06091a",  # → page_bg
         "panel":     "#142148",  # → panel_bg
         "border":    "#324a8f",  # → panel_border
-        "hover":     "#27418e",  # → ui_hover
-        "grid":      "#455892",  # → chart_grid
-        "plot":      "#67749f",  # → chart_plot_color
+        "hover":     "#162a64",  # → ui_hover
+        "grid":      "#272f53",  # → chart_grid
+        "plot":      "#0f142e",  # → chart_plot_color
         "track":     "#1a2a44",  # → slider_track
         "text_hint": "#6a6a9e",  # → text_hint  (de-emphasised, still legible)
         "text_lo":   "#8c8cca",  # → text_lo    (subordinate text)
@@ -38,6 +40,7 @@ def _build_dark_theme() -> dict:
     accent = {
         "primary": "#bc002d",  # Japan red
         "white":   "#ffffff",
+        "warning": "#f0a830",  # warning red
         "teal":    "#00ccaa",  # threshold reference line
         "amber":   "#f08d0b",  # 団塊の世代
         "lime":    "#64b909",  # 団塊ジュニア
@@ -47,8 +50,8 @@ def _build_dark_theme() -> dict:
 
     # ── Data encoding colors ───────────────────────────────────────────
     data = {
-        "male":   "#183a95",
-        "female": "#97172a",
+        "male":   "#3f67d5",
+        "female": "#ce3b51",
         "pref":   "#ffffff",  # timeseries prefecture overlay
     }
 
@@ -82,14 +85,13 @@ def _build_dark_theme() -> dict:
         "pyramid_male":   data["male"],
         "pyramid_female": data["female"],
         # Tooltip
-        "tooltip_bg": "#1e2644",
+        "tooltip_bg": hsl_adjust(surface["panel"], h_scale=1.035, s_scale=0.7, l_scale=1.15),
         "tooltip_border": surface["border"],
         "tooltip_border_size": "1px",
         "tooltip_text_hi": surface["text_hi"],
         "tooltip_text_mid": surface["text_mid"],
         "tooltip_hint": surface["text_hint"],
-        "tooltip_warning": "#f0a830",
-        "tooltip_divider": "rgba(255, 255, 255, 0.10)",
+        "tooltip_divider": "rgba(255, 255, 255, 0.20)",
         # Map (passthroughs)
         "map_geo": {
             "bg_color":   surface["page"],
@@ -102,9 +104,11 @@ def _build_dark_theme() -> dict:
         "map_tile_style": "carto-darkmatter",
         # Shadows
         "bezel_hi_alpha":  0.25,
-        "bezel_lo_alpha":  1,
+        "bezel_lo_alpha":  0.85,
         "shadow_color":    accent["white"],
         "shadow_darkness": 0.2,
+        # Miscellaneous
+        "warning": accent["warning"],
     }
 
 
@@ -128,6 +132,7 @@ def _build_light_theme() -> dict:
     accent = {
         "primary": "#bc002d",  # Japan red
         "ink":     "#2d1f0e",  # sumi dark brown
+        "warning": "#c47a00",  # warning red
         "forest":  "#2d6a4f",  # threshold reference line (legible on light)
         "amber":   "#faa434",  # 団塊の世代
         "lime":    "#6bd211",  # 団塊ジュニア
@@ -177,7 +182,6 @@ def _build_light_theme() -> dict:
         "tooltip_text_hi": surface["text_hi"],
         "tooltip_text_mid": surface["text_mid"],
         "tooltip_hint": surface["text_hint"],
-        "tooltip_warning": "#c47a00",
         "tooltip_divider": "rgba(0, 0, 0, 0.10)",
         # Map (passthroughs)
         "map_geo": {
@@ -194,6 +198,8 @@ def _build_light_theme() -> dict:
         "bezel_lo_alpha":  0.4,
         "shadow_color":    accent["ink"],
         "shadow_darkness": 0.32,
+        # Miscellaneous
+        "warning": accent["warning"],
     }
 
 
