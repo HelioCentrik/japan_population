@@ -27,6 +27,10 @@
                 updateZoom(entry.contentRect.height);
             }
         }).observe(panel);
+
+        // ResizeObserver fires immediately but Plotly isn't rendered yet —
+        // fire a one-shot zoom after Plotly has had time to mount.
+        setTimeout(() => updateZoom(panel.getBoundingClientRect().height), 500);
         return true;
     }
 
