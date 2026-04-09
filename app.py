@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 import dash
-from dash import html, dcc, Input, Output, State, no_update, ctx
+from dash import Dash, html, dcc, Input, Output, State, ctx, no_update, Patch
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
@@ -76,8 +76,8 @@ else:
     figure_cache.clear()
     for _yr in CENSUS_YEARS:
         build_kpi_data(_yr)
-        fig = build_japan_map_fig(year=_yr, metric=MAP_METRIC_DEFAULT, area_estat=None)
-        figure_cache.save(figure_cache.make_key("map", _yr, MAP_METRIC_DEFAULT, None), fig)
+        fig = build_japan_map_fig(year=_yr, metric=MAP_METRIC_DEFAULT)
+        figure_cache.save(figure_cache.make_key("map", _yr, MAP_METRIC_DEFAULT), fig)
         fig = build_pyramid_fig(year=_yr, area_estat=None, axis_max=_prewarm_axis_max)
         figure_cache.save(figure_cache.make_key("pyramid", _yr, None, _prewarm_axis_max), fig)
         fig = build_aging_index_fig(selected_year=_yr, area_estat=None)
@@ -438,7 +438,7 @@ def show_map_tooltip(hover_data, metric):
     Output("timeseries-chart", "figure"),
     Input("year-slider", "value"),
     Input("selected-prefecture", "data"),
-    Input("metric-selector", "value"),        # ← add this
+    Input("metric-selector", "value"),
 )
 def update_charts(year, area_estat, metric):
     y = int(year)
@@ -450,8 +450,18 @@ def update_charts(year, area_estat, metric):
         label = year_part
     axis_max = get_pyramid_axis_max(area_estat)
     kpi_data = build_kpi_data(y)
+
+    # Prefecture click — patch only the highlight trace, leave the map viewport alone
+    if ctx.triggered_id == "selected-prefecture":
+        patched = Patch()
+        patched["data"][-1]["locations"] = [area_estat] if area_estat else []
+        patched["data"][-1]["z"] = [1] if area_estat else []
+        map_fig = patched
+    else:
+        map_fig = build_japan_map_fig(year=y, metric=metric)
+
     return (
-        build_japan_map_fig(year=y, metric=metric, area_estat=area_estat),
+        map_fig,
         build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
         label,
         render_kpi_cards(kpi_data),

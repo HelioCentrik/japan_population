@@ -87,7 +87,7 @@ def _build_dark_theme() -> dict:
         # Tooltip
         "tooltip_bg": hsl_adjust(surface["plot"], s_scale=1, l_scale=1),
         "tooltip_border": surface["border"],
-        "tooltip_border_size": "1px",
+        "tooltip_border_size": "2.5px",
         "tooltip_text_hi": surface["text_hi"],
         "tooltip_text_mid": surface["text_mid"],
         "tooltip_hint": surface["text_hint"],
@@ -178,7 +178,7 @@ def _build_light_theme() -> dict:
         # Tooltip
         "tooltip_bg": "#f9f5ee",
         "tooltip_border": surface["border"],
-        "tooltip_border_size": "1px",
+        "tooltip_border_size": "2.5px",
         "tooltip_text_hi": surface["text_hi"],
         "tooltip_text_mid": surface["text_mid"],
         "tooltip_hint": surface["text_hint"],

@@ -1,6 +1,4 @@
 // assets/map_resize.js
-// Dynamically adjusts Mapbox zoom as the map panel resizes.
-// Reference point: 582px panel height → zoom 3.75 (calibrated visually).
 (function () {
     const REF_HEIGHT = 582;
     const REF_ZOOM   = 3.75;
@@ -8,8 +6,7 @@
     const ZOOM_MAX   = 5.5;
 
     function getPlotlyDiv() {
-        // dcc.Graph wraps a .js-plotly-plot — that's the element Plotly.relayout expects
-        return document.querySelector('#map-graph .js-plotly-plot');
+        return document.querySelector('#map-graph .js-plotly-plot');  // was #choropleth-map
     }
 
     function updateZoom(height) {
@@ -20,21 +17,19 @@
     }
 
     function attach() {
-        const panel = document.querySelector('.map-panel');
-        if (!panel) return false;
+        const panel   = document.querySelector('.map-panel');
+        const plotDiv = getPlotlyDiv();
+        if (!panel || !plotDiv) return false;   // wait for both before attaching
+
         new ResizeObserver(entries => {
             for (const entry of entries) {
                 updateZoom(entry.contentRect.height);
             }
         }).observe(panel);
 
-        // ResizeObserver fires immediately but Plotly isn't rendered yet —
-        // fire a one-shot zoom after Plotly has had time to mount.
-        setTimeout(() => updateZoom(panel.getBoundingClientRect().height), 500);
         return true;
     }
 
-    // Dash renders async — poll until the panel exists
     const interval = setInterval(() => {
         if (attach()) clearInterval(interval);
     }, 200);

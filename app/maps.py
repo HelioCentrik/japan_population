@@ -67,12 +67,8 @@ def _get_global_metric_bounds() -> dict:
     }
 
 
-def build_japan_map_fig(
-    year: int = MAX_YEAR,
-    area_estat: str | None = None,
-    metric: str = MAP_METRIC_DEFAULT,
-) -> go.Figure:
-    _key = figure_cache.make_key("map", year, metric, area_estat)
+def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figure:
+    _key = figure_cache.make_key("map", year, metric)
     if (fig := figure_cache.get(_key)) is not None:
         return fig
 
@@ -196,26 +192,22 @@ def build_japan_map_fig(
                 hoverinfo="none",   # content handled in show_map_tooltip callback
             ))
 
-    # ── Highlight selected prefecture ─────────────────────────────────────────
-    if area_estat is not None:
-        selected = prefectures[prefectures["area_estat"] == area_estat]
-        if not selected.empty:
-            traces.append(go.Choroplethmapbox(
-                geojson=json.loads(selected.to_json()),
-                locations=selected["area_estat"],
-                z=[1],
-                featureidkey="properties.area_estat",
-                colorscale=[[0, MAP_HIGHLIGHT_FILL], [1, MAP_HIGHLIGHT_FILL]],
-                showscale=False,
-                marker_line_width=MAP_HIGHLIGHT_LINE_WIDTH,
-                marker_line_color=MAP_HIGHLIGHT_LINE_COLOR,
-                hoverinfo="skip",   # pass hover through to base trace
-            ))
+    # ── Highlight trace — always present as last trace, empty until patched ───────
+    traces.append(go.Choroplethmapbox(
+        geojson=json.loads(prefectures.to_json()),  # full geojson so any pref can be highlighted
+        locations=[],
+        z=[],
+        featureidkey="properties.area_estat",
+        colorscale=[[0, MAP_HIGHLIGHT_FILL], [1, MAP_HIGHLIGHT_FILL]],
+        showscale=False,
+        marker_line_width=MAP_HIGHLIGHT_LINE_WIDTH,
+        marker_line_color=MAP_HIGHLIGHT_LINE_COLOR,
+        hoverinfo="skip",
+    ))
 
     fig = go.Figure(data=traces)
     fig.update_layout(
-        # paper_bgcolor="rgba(0,0,0,0)",
-        # plot_bgcolor="rgba(0,0,0,0)",
+        uirevision="map-view",  # constant — Plotly never resets viewport on data updates
         mapbox=dict(
             style=MAP_TILE_STYLE,
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
