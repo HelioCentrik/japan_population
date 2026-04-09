@@ -50,7 +50,7 @@ def _build_dark_theme() -> dict:
 
     # ── Data encoding colors ───────────────────────────────────────────
     data = {
-        "male":   "#4773eb",
+        "male":   "#477eeb",
         "female": "#e4536b",
         "pref":   "#ffffff",  # timeseries prefecture overlay
     }
@@ -85,7 +85,7 @@ def _build_dark_theme() -> dict:
         "pyramid_male":   data["male"],
         "pyramid_female": data["female"],
         # Tooltip
-        "tooltip_bg": hsl_adjust(surface["panel"], h_scale=1.035, s_scale=0.7, l_scale=1.15),
+        "tooltip_bg": hsl_adjust(surface["plot"], s_scale=1, l_scale=1),
         "tooltip_border": surface["border"],
         "tooltip_border_size": "1px",
         "tooltip_text_hi": surface["text_hi"],
