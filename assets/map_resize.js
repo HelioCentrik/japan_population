@@ -5,14 +5,10 @@
     const REF_ZOOM     = 3.75;
     const ZOOM_MIN     = 2.5;
     const ZOOM_MAX     = 5.5;
-    const DEFAULT_ZOOM = 2.5;   // zoom baked into cached figures; Patch raises this on load
+    const DEFAULT_ZOOM = 2.5;   // zoom baked into initial figure; Patch raises this on load
 
     function getPlotlyDiv() {
         return document.querySelector('#map-graph .js-plotly-plot');
-    }
-
-    function getMbMap(plotDiv) {
-        return plotDiv?._fullLayout?.mapbox?._subplot?.map;
     }
 
     let revealed = false;
@@ -24,25 +20,25 @@
         if (inner) inner.style.opacity = '1';
     }
 
-function applyResizeZoom(height) {
-    const plotDiv = getPlotlyDiv();
-    const mbMap   = getMbMap(plotDiv);
-    if (!mbMap) return;
-    const target = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
-        REF_ZOOM + Math.log2(height / REF_HEIGHT)));
-    if (Math.abs(mbMap.getZoom() - target) >= 0.05) {
-        mbMap.setZoom(target);
+    // Use Plotly.relayout (not mbMap.setZoom) so _fullLayout.mapbox.zoom stays in sync.
+    // uirevision-based Plotly.react reads _fullLayout to restore the viewport; calling
+    // mbMap.setZoom directly leaves that value stale and causes filters to revert the zoom.
+    function applyResizeZoom(plotDiv, height) {
+        const target = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
+            REF_ZOOM + Math.log2(height / REF_HEIGHT)));
+        const current = plotDiv._fullLayout?.mapbox?.zoom ?? DEFAULT_ZOOM;
+        if (Math.abs(current - target) >= 0.05) {
+            Plotly.relayout(plotDiv, {'mapbox.zoom': target});
+        }
     }
-}
 
     function attach() {
         const panel   = document.querySelector('.map-panel');
         const plotDiv = getPlotlyDiv();
         if (!panel || !plotDiv) return false;
 
-        // Reveal once the server Patch has landed — detected by layout zoom rising
-        // above the figure default. Does NOT attempt its own zoom correction before
-        // that point; the Patch handles initial zoom, uirevision preserves it after.
+        // Reveal once the initial-zoom Patch has landed (layout zoom rises above the
+        // figure default). Does not attempt its own correction before that point.
         plotDiv.on('plotly_afterplot', function () {
             if (revealed) return;
             const layoutZoom = plotDiv._fullLayout?.mapbox?.zoom ?? DEFAULT_ZOOM;
@@ -51,10 +47,11 @@ function applyResizeZoom(height) {
             }
         });
 
-        // Fallback: if Patch never lands (e.g. clientside callback failure), reveal anyway.
+        // Fallback: reveal anyway if the Patch never lands.
         setTimeout(reveal, 3000);
 
-        // Subsequent window resizes — nudge MB GL zoom after the map is already visible.
+        // On window resize: first tell Plotly about the new container size, then
+        // set the correct zoom through Plotly so _fullLayout stays authoritative.
         let _resizeTimer = null;
         window.addEventListener('resize', function () {
             if (!revealed) return;
@@ -63,9 +60,9 @@ function applyResizeZoom(height) {
                 const pDiv = getPlotlyDiv();
                 if (!pDiv || !panel) return;
                 Plotly.Plots.resize(pDiv).then(function () {
-                    applyResizeZoom(panel.getBoundingClientRect().height);
+                    applyResizeZoom(pDiv, panel.getBoundingClientRect().height);
                 });
-            }, 150);   // 150ms debounce — enough for layout to settle after maximize
+            }, 150);
         });
 
         return true;
