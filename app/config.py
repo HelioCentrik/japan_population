@@ -223,7 +223,13 @@ PANEL_BORDER_THICKNESS = "1px"
 POP_DELTA_SIGMA = 2.0
 MAP_CENTER_LAT           = 35.5
 MAP_CENTER_LON           = 135.5
-MAP_DEFAULT_ZOOM         = 3.65
+
+MAP_DEFAULT_ZOOM         = 2.5
+MAP_ZOOM_MIN             = 1.0    # minimum zoom clamp (matches default baked into figures)
+MAP_ZOOM_MAX             = 5.5    # maximum zoom clamp
+MAP_REF_HEIGHT           = 582    # panel height (px) at which MAP_REF_ZOOM was calibrated
+MAP_REF_ZOOM             = 3.75   # zoom that fits Japan at MAP_REF_HEIGHT
+
 MAP_BORDER_WIDTH         = 0.8
 MAP_HIGHLIGHT_LINE_WIDTH = 2.5
 MAP_TOOLTIP_OFFSET_X     = 28   # px rightward from hovered point

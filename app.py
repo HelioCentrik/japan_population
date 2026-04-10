@@ -12,6 +12,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY,
                         PLAY_INTERVAL_MS,
                         MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
+                        MAP_DEFAULT_ZOOM, MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,)
 from app.index_string import INDEX_STRING
@@ -88,15 +89,22 @@ else:
 
 # ── Layout ────────────────────────────────────────────────────────────────────
 app.layout = html.Div(
-        className="dashboard-outer",
-        style={
-            "backgroundColor": PAGE_BG,
-            "maxWidth": "1400px",
-            "margin": "0 auto",
-        },
+    className="dashboard-outer",
+    style={
+        "backgroundColor": PAGE_BG,
+        "maxWidth": "1400px",
+        "margin": "0 auto",
+    },
     children=[
         dcc.Store(id="selected-prefecture", data=None),
         dcc.Store(id="resume-year", data=None),
+        dcc.Store(id="map-init-zoom", data=None),
+        dcc.Interval(
+            id="zoom-init",
+            interval=200,    # fires once 200ms after page load — enough for flex layout to settle
+            max_intervals=1,
+            n_intervals=0,
+        ),
 
         dcc.Interval(
             id="play-interval",
@@ -118,6 +126,7 @@ app.layout = html.Div(
 
         html.Div(
             id="era-label",
+            children=YEAR_LABELS.get(MAX_YEAR, str(MAX_YEAR)),
             style={
                 "textAlign": "center",
                 "color": COLOR_SECONDARY,
@@ -216,7 +225,7 @@ app.layout = html.Div(
                                             id="map-graph",
                                             clear_on_unhover=True,
                                             figure=build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT),
-                                            config={"displayModeBar": False, "responsive": True},
+                                            config={"displayModeBar": False, "responsive": False},
                                             style={"height": "100%"},
                                         ),
                                     ]
@@ -275,6 +284,24 @@ app.layout = html.Div(
 
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
+app.clientside_callback(
+    f"""
+    function(n) {{
+        const panel = document.querySelector('.map-panel');
+        if (!panel) return window.dash_clientside.no_update;
+        const h = panel.getBoundingClientRect().height;
+        if (h < 10) return window.dash_clientside.no_update;
+        const zoom = Math.min({MAP_ZOOM_MAX}, Math.max({MAP_ZOOM_MIN},
+            {MAP_REF_ZOOM} + Math.log2(h / {MAP_REF_HEIGHT})));
+        return zoom;
+    }}
+    """,
+    Output("map-init-zoom", "data"),
+    Input("zoom-init", "n_intervals"),
+    prevent_initial_call=True,
+)
+
+
 @app.callback(
     Output("play-interval", "disabled"),
     Output("play-btn", "children"),
@@ -316,6 +343,17 @@ def advance_year(n_intervals, current_year, resume_year):
 
     return next_year, False, no_update
 
+@app.callback(
+    Output("map-graph", "figure", allow_duplicate=True),
+    Input("map-init-zoom", "data"),
+    prevent_initial_call=True,
+)
+def apply_initial_map_zoom(zoom):
+    if zoom is None:
+        return no_update
+    patched = Patch()
+    patched["layout"]["mapbox"]["zoom"] = zoom
+    return patched
 
 @app.callback(
     Output("selected-prefecture", "data"),
@@ -439,8 +477,10 @@ def show_map_tooltip(hover_data, metric):
     Input("year-slider", "value"),
     Input("selected-prefecture", "data"),
     Input("metric-selector", "value"),
+    State("map-init-zoom", "data"),
+    prevent_initial_call=True,
 )
-def update_charts(year, area_estat, metric):
+def update_charts(year, area_estat, metric, init_zoom):
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:
@@ -458,7 +498,9 @@ def update_charts(year, area_estat, metric):
         patched["data"][-1]["z"] = [1] if area_estat else []
         map_fig = patched
     else:
-        map_fig = build_japan_map_fig(year=y, metric=metric)
+        fig = build_japan_map_fig(year=y, metric=metric)
+        map_fig = fig.to_dict()   # new dict — cached go.Figure is never mutated
+        map_fig["layout"]["mapbox"]["zoom"] = init_zoom if init_zoom else MAP_DEFAULT_ZOOM
 
     return (
         map_fig,

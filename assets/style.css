@@ -388,6 +388,8 @@ html, body {
     inset            : 0;
     overflow         : hidden;
     border-radius    : var(--border-radius);
+    opacity          : 0;
+    transition       : opacity 0.5s ease;
 }
 
 /* Pyramid panel */
