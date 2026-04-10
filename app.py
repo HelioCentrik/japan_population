@@ -12,7 +12,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY,
                         PLAY_INTERVAL_MS,
                         MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
-                        MAP_DEFAULT_ZOOM, MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
+                        MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,)
 from app.index_string import INDEX_STRING
@@ -477,10 +477,9 @@ def show_map_tooltip(hover_data, metric):
     Input("year-slider", "value"),
     Input("selected-prefecture", "data"),
     Input("metric-selector", "value"),
-    State("map-init-zoom", "data"),
     prevent_initial_call=True,
 )
-def update_charts(year, area_estat, metric, init_zoom):
+def update_charts(year, area_estat, metric):
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:
@@ -491,16 +490,32 @@ def update_charts(year, area_estat, metric, init_zoom):
     axis_max = get_pyramid_axis_max(area_estat)
     kpi_data = build_kpi_data(y)
 
-    # Prefecture click — patch only the highlight trace, leave the map viewport alone
-    if ctx.triggered_id == "selected-prefecture":
+    trigger = ctx.triggered_id
+
+    if trigger == "selected-prefecture":
+        # Patch only the highlight trace (data[2]) — viewport is untouched.
         patched = Patch()
-        patched["data"][-1]["locations"] = [area_estat] if area_estat else []
-        patched["data"][-1]["z"] = [1] if area_estat else []
+        patched["data"][2]["locations"] = [area_estat] if area_estat else []
+        patched["data"][2]["z"] = [1] if area_estat else []
         map_fig = patched
     else:
+        # Year or metric changed — update data traces only, never layout.
+        # Leaving layout.mapbox.zoom out of the payload means Plotly keeps
+        # whatever zoom is currently set (initial-load Patch or ResizeObserver).
         fig = build_japan_map_fig(year=y, metric=metric)
-        map_fig = fig.to_dict()   # new dict — cached go.Figure is never mutated
-        map_fig["layout"]["mapbox"]["zoom"] = init_zoom if init_zoom else MAP_DEFAULT_ZOOM
+        fd  = fig.to_dict()
+        patched = Patch()
+        # Base choropleth (data[0])
+        patched["data"][0]["z"]          = fd["data"][0]["z"]
+        patched["data"][0]["customdata"] = fd["data"][0]["customdata"]
+        patched["data"][0]["colorscale"] = fd["data"][0]["colorscale"]
+        patched["data"][0]["zmin"]       = fd["data"][0]["zmin"]
+        patched["data"][0]["zmax"]       = fd["data"][0]["zmax"]
+        patched["data"][0]["colorbar"]   = fd["data"][0]["colorbar"]
+        # Okinawa overlay (data[1]) — active for 1950/1955, empty otherwise
+        patched["data"][1]["locations"]  = fd["data"][1]["locations"]
+        patched["data"][1]["z"]          = fd["data"][1]["z"]
+        map_fig = patched
 
     return (
         map_fig,
