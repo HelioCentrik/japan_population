@@ -174,27 +174,33 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
 
     traces = [base_trace]
 
-    # ── Okinawa grey-out for 1950 & 1955 ─────────────────────────────────────
-    # Figures rendered beneath the base — but the hovertemplate overrides the
-    # base trace because this trace is layered on top.
+    # ── Okinawa grey-out overlay — always at data[1], empty when inactive ────
+    # Fixed index required: year/metric Patch updates data[1] by position.
+    # Using the full prefectures_js geojson keeps the geojson stable so Patch
+    # only needs to swap locations/z — never the geojson itself.
+    oki_locs: list = []
+    oki_z:    list = []
     if year in _OKINAWA_GREY_YEARS:
         oki = prefectures[prefectures["area_estat"] == OKINAWA_AREA_ESTAT]
         if not oki.empty:
-            traces.append(go.Choroplethmapbox(
-                geojson=json.loads(oki.to_json()),
-                locations=oki["area_estat"],
-                z=[1],
-                featureidkey="properties.area_estat",
-                colorscale=[[0, _OKINAWA_GREY_FILL], [1, _OKINAWA_GREY_FILL]],
-                showscale=False,
-                marker_line_width=1.0,
-                marker_line_color=_OKINAWA_GREY_LINE,
-                hoverinfo="none",   # content handled in show_map_tooltip callback
-            ))
+            oki_locs = list(oki["area_estat"])
+            oki_z    = [1.0]
 
-    # ── Highlight trace — always present as last trace, empty until patched ───────
     traces.append(go.Choroplethmapbox(
-        geojson=json.loads(prefectures.to_json()),  # full geojson so any pref can be highlighted
+        geojson=prefectures_js,
+        locations=oki_locs,
+        z=oki_z,
+        featureidkey="properties.area_estat",
+        colorscale=[[0, _OKINAWA_GREY_FILL], [1, _OKINAWA_GREY_FILL]],
+        showscale=False,
+        marker_line_width=1.0,
+        marker_line_color=_OKINAWA_GREY_LINE,
+        hoverinfo="none",
+    ))
+
+    # ── Highlight trace — always at data[2], empty until prefecture selected ──
+    traces.append(go.Choroplethmapbox(
+        geojson=prefectures_js,
         locations=[],
         z=[],
         featureidkey="properties.area_estat",
