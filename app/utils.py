@@ -79,32 +79,29 @@ def hsl_adjust(hex_color: str, h_scale: float = 1.0, l_scale: float = 1.0, s_sca
 def nice_axis(max_val: int) -> tuple[float, float]:
     """Compute a clean (dtick, half_range) pair for a symmetric Plotly axis.
 
-    half_range is always a clean dtick multiple with one full tick of headroom
-    above max_val — prevents Plotly from snapping the range down and clipping bars.
+    Selects the coarsest dtick that keeps tick count in [3, 4] per side.
+    half_range is always >= max_val — bars are never clipped.
 
     Returns a safe fallback for non-positive inputs.
 
     >>> nice_axis(4_800_000)
-    (2000000, 5500000.0)
+    (2000000, 6500000.0)
     """
     if max_val <= 0:
         return 1_000_000, 4_000_000
 
-    raw_step   = max_val / 3
-    magnitude  = 10 ** math.floor(math.log10(raw_step))
-    normalized = raw_step / magnitude
+    magnitude = 10 ** math.floor(math.log10(max_val))
 
-    if normalized < 1.5:
-        snapped = 1
-    elif normalized < 3.5:
-        snapped = 2
-    else:
-        snapped = 5
+    for mult in (0.1, 0.2, 0.25, 0.5, 1.0, 2.0, 2.5, 5.0):
+        dtick   = mult * magnitude
+        n_ticks = math.ceil(max_val / dtick)
+        if 3 <= n_ticks <= 4:
+            return dtick, dtick * (n_ticks + 0.25)   # +0.25 dtick of breathing room
 
-    dtick      = snapped * magnitude
-    n_ticks    = math.ceil(max_val / dtick)
-    half_range = dtick * (n_ticks + 0.25)
-    return dtick, half_range
+    # Fallback — shouldn't be reached for any realistic demographic value
+    dtick   = magnitude
+    n_ticks = math.ceil(max_val / dtick)
+    return dtick, dtick * (n_ticks + 0.25)
 
 
 def ceil_half_magnitude(val: float) -> float:

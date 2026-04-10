@@ -217,7 +217,6 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
         mapbox=dict(
             style=MAP_TILE_STYLE,
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
-            zoom=MAP_DEFAULT_ZOOM,
         ),
         margin=dict(l=8, r=8, t=8, b=8),
         autosize=True,

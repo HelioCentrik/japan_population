@@ -258,9 +258,10 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         xaxis=dict(
             showline=True,
             linecolor=PANEL_BORDER,
-            linewidth=2,
+            linewidth=2.5,
             mirror=True,
             tickformat="~s",
+            tickangle=0,
             zeroline=True,
             zerolinewidth=1,
             zerolinecolor=PANEL_BORDER,
