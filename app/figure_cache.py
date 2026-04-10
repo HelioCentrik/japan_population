@@ -29,10 +29,14 @@ from app.config import CACHE_DIR, DB_PATH
 _FINGERPRINT_FILE = CACHE_DIR / "_fingerprint.txt"
 _store: dict[str, go.Figure] = {}
 
+# Bump whenever the trace structure or figure layout schema changes so that
+# cached figures built under a previous schema are automatically discarded.
+_SCHEMA_VERSION = "v2"
+
 
 def _current_fingerprint() -> str:
-    """DB file mtime in nanoseconds as a hex string."""
-    return hex(DB_PATH.stat().st_mtime_ns)
+    """Schema version + DB file mtime — changes in either invalidate the cache."""
+    return f"{_SCHEMA_VERSION}:{hex(DB_PATH.stat().st_mtime_ns)}"
 
 
 def is_valid() -> bool:

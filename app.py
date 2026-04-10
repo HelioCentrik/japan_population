@@ -11,7 +11,8 @@ import duckdb as ddb
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY,
                         PLAY_INTERVAL_MS,
-                        MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
+                        MAP_METRICS, MAP_METRIC_DEFAULT, MAP_DEFAULT_ZOOM,
+                        MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,)
 from app.index_string import INDEX_STRING
@@ -84,6 +85,16 @@ else:
         figure_cache.save(figure_cache.make_key("timeseries", _yr, None), fig)
     figure_cache.write_fingerprint()
     print(f"  Cache built and saved — {len(CENSUS_YEARS)} years × 3 builders.")
+
+
+# ── Initial map figure ────────────────────────────────────────────────────────
+# map_resize.js owns zoom after the first ResizeObserver fires.  The figure
+# layout carries no zoom so filter-change Patches never reset it.  We set it
+# once here so Plotly has something reasonable before the JS fires.
+# update_layout mutates the cached figure in-place; that is intentional —
+# the Patch path in update_charts() only reads trace data, not layout.
+_map_init = build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT)
+_map_init.update_layout(mapbox_zoom=MAP_DEFAULT_ZOOM)
 
 
 # ── Layout ────────────────────────────────────────────────────────────────────
@@ -215,7 +226,7 @@ app.layout = html.Div(
                                         dcc.Graph(
                                             id="map-graph",
                                             clear_on_unhover=True,
-                                            figure=build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT),
+                                            figure=_map_init,
                                             config={"displayModeBar": False, "responsive": True},
                                             style={"height": "100%"},
                                         ),
@@ -451,14 +462,36 @@ def update_charts(year, area_estat, metric):
     axis_max = get_pyramid_axis_max(area_estat)
     kpi_data = build_kpi_data(y)
 
-    # Prefecture click — patch only the highlight trace, leave the map viewport alone
-    if ctx.triggered_id == "selected-prefecture":
-        patched = Patch()
-        patched["data"][-1]["locations"] = [area_estat] if area_estat else []
-        patched["data"][-1]["z"] = [1] if area_estat else []
-        map_fig = patched
-    else:
+    trigger = ctx.triggered_id
+
+    if trigger is None:
+        # Initial load — full figure; layout figure already carries the zoom,
+        # uirevision preserves it through this react call.
         map_fig = build_japan_map_fig(year=y, metric=metric)
+
+    elif trigger == "selected-prefecture":
+        # Patch only the highlight trace (always index 2).
+        patched = Patch()
+        patched["data"][2]["locations"] = [area_estat] if area_estat else []
+        patched["data"][2]["z"]         = [1]          if area_estat else []
+        map_fig = patched
+
+    else:
+        # Year or metric change — patch trace data only.
+        # Layout (including mapbox.zoom) is never included in the Patch payload,
+        # so the zoom set by map_resize.js is never disturbed.
+        # Highlight trace (index 2) is also left alone so prefecture selection
+        # persists naturally across year and metric changes.
+        full_fig = build_japan_map_fig(year=y, metric=metric)
+        t0_json  = full_fig.data[0].to_plotly_json()   # base choropleth
+        t1_json  = full_fig.data[1].to_plotly_json()   # okinawa overlay
+        patched  = Patch()
+        for field in ("z", "customdata", "colorscale", "zmin", "zmax", "colorbar"):
+            if field in t0_json:
+                patched["data"][0][field] = t0_json[field]
+        patched["data"][1]["locations"] = t1_json.get("locations", [])
+        patched["data"][1]["z"]         = t1_json.get("z", [])
+        map_fig = patched
 
     return (
         map_fig,

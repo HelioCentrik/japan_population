@@ -11,7 +11,7 @@ from app.utils import ceil_half_magnitude
 from app.config import (
     COLOR_TEXT_MID, MAP_GEO,
     MAP_TILE_STYLE,
-    MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
+    MAP_CENTER_LAT, MAP_CENTER_LON, MAP_BORDER_WIDTH,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
     FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
@@ -174,25 +174,26 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
 
     traces = [base_trace]
 
-    # ── Okinawa grey-out for 1950 & 1955 ─────────────────────────────────────
-    # Figures rendered beneath the base — but the hovertemplate overrides the
-    # base trace because this trace is layered on top.
-    if year in _OKINAWA_GREY_YEARS:
-        oki = prefectures[prefectures["area_estat"] == OKINAWA_AREA_ESTAT]
-        if not oki.empty:
-            traces.append(go.Choroplethmapbox(
-                geojson=json.loads(oki.to_json()),
-                locations=oki["area_estat"],
-                z=[1],
-                featureidkey="properties.area_estat",
-                colorscale=[[0, _OKINAWA_GREY_FILL], [1, _OKINAWA_GREY_FILL]],
-                showscale=False,
-                marker_line_width=1.0,
-                marker_line_color=_OKINAWA_GREY_LINE,
-                hoverinfo="none",   # content handled in show_map_tooltip callback
-            ))
+    # ── Okinawa overlay — always trace[1], empty for non-Okinawa years ────────
+    # Keeping this trace at a fixed index lets app.py patch it by position
+    # without knowing the year.  Empty locations = invisible; hovering over
+    # Okinawa falls through to the base trace, which has normal customdata.
+    oki      = prefectures[prefectures["area_estat"] == OKINAWA_AREA_ESTAT]
+    oki_locs = list(oki["area_estat"]) if (year in _OKINAWA_GREY_YEARS and not oki.empty) else []
+    oki_z    = [1]                     if (year in _OKINAWA_GREY_YEARS and not oki.empty) else []
+    traces.append(go.Choroplethmapbox(
+        geojson=json.loads(oki.to_json()),
+        locations=oki_locs,
+        z=oki_z,
+        featureidkey="properties.area_estat",
+        colorscale=[[0, _OKINAWA_GREY_FILL], [1, _OKINAWA_GREY_FILL]],
+        showscale=False,
+        marker_line_width=1.0,
+        marker_line_color=_OKINAWA_GREY_LINE,
+        hoverinfo="none",   # content handled in show_map_tooltip callback
+    ))
 
-    # ── Highlight trace — always present as last trace, empty until patched ───────
+    # ── Highlight trace — always trace[2], empty until patched ───────────────
     traces.append(go.Choroplethmapbox(
         geojson=json.loads(prefectures.to_json()),  # full geojson so any pref can be highlighted
         locations=[],
@@ -207,11 +208,13 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
 
     fig = go.Figure(data=traces)
     fig.update_layout(
-        uirevision="map-view",  # constant — Plotly never resets viewport on data updates
+        uirevision="map-view",  # constant — preserves center (pan) across figure updates
         mapbox=dict(
             style=MAP_TILE_STYLE,
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
-            zoom=MAP_DEFAULT_ZOOM,
+            # zoom deliberately absent — set once in app.py for initial render,
+            # then owned exclusively by map_resize.js via Plotly.relayout.
+            # Filter-change callbacks use Patch() so this layout is never resent.
         ),
         margin=dict(l=8, r=8, t=8, b=8),
         autosize=True,
