@@ -114,16 +114,18 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
 
     # ── Cohort colour mapping ─────────────────────────────────────────────────
     cohort_bands = {}
+    cohort_band_keys = {}
     if area_estat is None:
         for name, (b_start, b_end, color) in _COHORTS.items():
             band = cohort_band(year, b_start, b_end)
             if band is not None:
                 cohort_bands[band] = color
+                cohort_band_keys[band] = name
 
     male_pops = male_df["population"].tolist()
     female_pops = female_df["population"].tolist()
     bar_customdata = [
-        [age_labels[i], male_pops[i], female_pops[i]]
+        [age_labels[i], male_pops[i], female_pops[i], cohort_band_keys.get(age_starts[i], "")]
         for i in range(len(age_labels))
     ]
 
@@ -185,12 +187,11 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             color=ACCENT_WARTIME_GEN,
             line=dict(width=1, color=ACCENT_WARTIME_GEN),
         ),
-        hoverinfo="skip",
-        hovertemplate=(
-            "<b>%{y}</b><br>"
-            "戦中世代 (1910–1925年生まれ)<br>"
-            "<extra></extra>"
-        ),
+        customdata=[
+            ["戦中世代", "1910–1925年生まれ", ACCENT_WARTIME_GEN, shorten_age_label(l)]
+            for l in war_gen_rows["age_group"]
+        ] if not war_gen_rows.empty else [[None, None, None, None]],
+        hoverinfo="none",
     )
 
     # ── 少子化 — Shoushika cohort marker ─────────────────────────────────────
@@ -210,12 +211,11 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             color=ACCENT_SHOUSHIKA,
             line=dict(width=1, color=ACCENT_SHOUSHIKA),
         ),
-        hoverinfo="skip",
-        hovertemplate=(
-            "<b>%{y}</b><br>"
-            "少子化世代 (1986–1990年生まれ)<br>"
-            "<extra></extra>"
-        ),
+        customdata=[
+            ["少子化世代", "1986–1990年生まれ", ACCENT_SHOUSHIKA, shorten_age_label(l)]
+            for l in shoushika_rows["age_group"]
+        ] if not shoushika_rows.empty else [[None, None, None, None]],
+        hoverinfo="none",
     )
 
     # ── Layout ────────────────────────────────────────────────────────────────

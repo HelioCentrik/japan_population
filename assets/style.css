@@ -611,6 +611,25 @@ html, body {
     margin-top: 8px;
 }
 
+/* Pyramid cohort indicator row (bar card append + scatter card header) */
+.dash-tooltip .pyramid-tt-cohort-row {
+    display    : flex;
+    align-items: center;
+    gap        : 8px;
+    margin-top : 2px;
+}
+/* Colored accent strip — color injected via --cohort-color CSS var on inline style.
+   Explicit !important needed: .dash-tooltip * resets background-color !important,
+   two !important declarations resolve by specificity — this selector wins. */
+.dash-tooltip .pyramid-tt-cohort-strip {
+    flex-shrink      : 0;
+    width            : 3px;
+    height           : 28px;
+    border-radius    : 2px;
+    background-color : var(--cohort-color) !important;
+    align-self       : stretch;
+}
+
 .dash-tooltip .map-tt-card.arrow-right::before {
     right        : auto;
     left         : calc(100% + 1px);
