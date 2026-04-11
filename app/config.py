@@ -215,6 +215,7 @@ FONT_SIZE_TITLE         = 32
 
 PANEL_BORDER_RADIUS    = "6px"
 PANEL_BORDER_THICKNESS = "1px"
+YAXIS_TICK_STANDOFF    = 2
 
 
 # ── 8. Map configuration ──────────────────────────────────────────────────────
@@ -288,17 +289,23 @@ MAP_METRIC_DEFAULT = "population"
 PYRAMID_BARGAP       = 0.15
 COHORT_OUTLINE_WIDTH = 3
 PYRAMID_MAX_BANDS    = 18
-PYRAMID_MARGIN_T     = 20
-PYRAMID_MARGIN_B     = 16
-PYRAMID_MARGIN_L     = 24
+PYRAMID_MARGIN_L     = 72
 PYRAMID_MARGIN_R     = 24
-PYRAMID_GRAPH_TOP_OFFSET = 28
-PYRAMID_TOOLTIP_OFFSET_X = 12
-PYRAMID_TOOLTIP_OFFSET_Y = 20
+PYRAMID_MARGIN_T     = 8
+PYRAMID_MARGIN_B     = 28
+PYRAMID_GRAPH_TOP_OFFSET    = 0
+PYRAMID_TOOLTIP_OFFSET_X    = 12
+PYRAMID_TOOLTIP_OFFSET_Y    = 20
 
 
 # ── 10. Timeseries configuration ──────────────────────────────────────────────
+TIMESERIES_MARGIN_L     = 62
+TIMESERIES_MARGIN_R     = 24
+TIMESERIES_MARGIN_T     = 24
+TIMESERIES_MARGIN_B     = 28
 
+TIMESERIES_TOOLTIP_OFFSET_X    = 12
+TIMESERIES_TOOLTIP_OFFSET_Y    = 20
 
 
 # ── 11a. Play button ──────────────────────────────────────────────────────────

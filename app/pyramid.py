@@ -10,7 +10,7 @@ from app.config import (
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
     PYRAMID_BARGAP, PYRAMID_MAX_BANDS, COHORT_OUTLINE_WIDTH,
-    PYRAMID_MARGIN_T, PYRAMID_MARGIN_B, PYRAMID_MARGIN_L, PYRAMID_MARGIN_R,
+    PYRAMID_MARGIN_T, PYRAMID_MARGIN_B, PYRAMID_MARGIN_L, PYRAMID_MARGIN_R, YAXIS_TICK_STANDOFF,
     FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
     MARKER_SIZE_DIAMOND, MARKER_SIZE_LEGEND_SQ,
     MAX_YEAR,
@@ -273,6 +273,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             zerolinecolor=PANEL_BORDER,
             range=[-half_range, half_range],
             dtick=dtick,
+            automargin=False,
         ),
         yaxis=dict(
             showline=True,
@@ -287,6 +288,8 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             categoryorder="array",
             categoryarray=age_labels,
             range=[-0.5, PYRAMID_MAX_BANDS - 0.5],  # always 18 slots — 1920's 80+ terminal leaves top empty
+            ticklabelstandoff=YAXIS_TICK_STANDOFF,
+            automargin=False,
         ),
     )
 

@@ -10,6 +10,8 @@ from app.config import (
     LINE_WIDTH_THRESHOLD, LINE_WIDTH_YEAR_MARKER,
     MARKER_SIZE_DOT, MARKER_SIZE_1945,
     OPACITY_THRESHOLD_LINE, OPACITY_YEAR_VLINE,
+    YAXIS_TICK_STANDOFF,
+    TIMESERIES_MARGIN_L, TIMESERIES_MARGIN_R, TIMESERIES_MARGIN_T, TIMESERIES_MARGIN_B,
     FONT_SIZE_AXIS_TITLE,
 )
 from app.db import get_con
@@ -177,7 +179,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     )
 
     fig.update_layout(
-        margin=dict(l=24, r=24, t=20, b=20),
+        margin=dict(l=TIMESERIES_MARGIN_L, r=TIMESERIES_MARGIN_R, t=TIMESERIES_MARGIN_T, b=TIMESERIES_MARGIN_B),
         autosize=True,
         # paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor=CHART_PLOT_COLOR,
@@ -192,6 +194,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             linewidth=2,
             mirror=True,
             dtick=10,
+            automargin=False,
         ),
         yaxis=dict(
             showline=True,
@@ -203,6 +206,8 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
                 font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
             ),
             zeroline=False,
+            ticklabelstandoff=YAXIS_TICK_STANDOFF,
+            automargin=False
         ),
     )
 
