@@ -152,22 +152,6 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         customdata=bar_customdata,
     )
 
-    # Invisible traces purely for legend — fixes color mirroring the first bar's cohort color
-    legend_male = go.Scatter(
-        x=[None], y=[None],
-        mode="markers",
-        name="男 Male",
-        marker=dict(symbol="square", size=MARKER_SIZE_LEGEND_SQ, color=PYRAMID_MALE_COLOR),
-        showlegend=True,
-    )
-    legend_female = go.Scatter(
-        x=[None], y=[None],
-        mode="markers",
-        name="女 Female",
-        marker=dict(symbol="square", size=MARKER_SIZE_LEGEND_SQ, color=PYRAMID_FEMALE_COLOR),
-        showlegend=True,
-    )
-
     # ── 戦中世代 — Wartime cohort marker ──────────────────────────────────────
     # Men born 1910–1925 were prime conscription age during the war.
     valid_bands  = set(male_df["age_start"].tolist())
@@ -249,18 +233,11 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
     dtick, half_range = nice_axis(axis_max)
 
     fig.update_layout(
-        # paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor=CHART_PLOT_COLOR,
         barmode="overlay",
         bargap=PYRAMID_BARGAP,
         autosize=True,
-        # height=fig_height,
         margin=dict(l=PYRAMID_MARGIN_L, r=PYRAMID_MARGIN_R, t=PYRAMID_MARGIN_T, b=PYRAMID_MARGIN_B),
-        legend=dict(
-            orientation="h",
-            x=0.5, xanchor="center",
-            y=1.02, yanchor="bottom",
-        ),
         xaxis=dict(
             showline=True,
             linecolor=PANEL_BORDER,

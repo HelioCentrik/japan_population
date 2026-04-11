@@ -437,8 +437,8 @@ html, body {
 }
 .pyramid-legend {
     position        : absolute;
-    top             : 10px;
-    left            : 50%;
+    top             : 14px;
+    left            : 56%;
     transform       : translateX(-50%);
     z-index         : 20;
     font-size       : var(--font-size-kpi-sub);
