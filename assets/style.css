@@ -353,6 +353,7 @@ html, body {
     display        : flex;
     flex-direction : column;
     gap            : var(--layout-gap);
+    overflow       : visible;
 }
 
 /* Map + pyramid row */
@@ -361,6 +362,7 @@ html, body {
     min-height: 0;
     display   : flex;
     gap       : var(--layout-gap);
+    overflow  : visible;
 }
 
 /* Map panel */
@@ -397,8 +399,8 @@ html, body {
     flex             : var(--pyramid-flex);
     min-height       : 0;
     border-radius    : var(--border-radius);
-    box-shadow       : var(--shadow-drop);     /* drop shadow only */
-    overflow         : hidden;
+    box-shadow       : var(--shadow-drop);
+    overflow         : visible;          /* ← was: hidden */
     background-color : var(--panel-bg);
     position         : relative;
     z-index          : 0;
@@ -489,7 +491,7 @@ html, body {
    background: transparent !important on * is enough to suppress div backgrounds. */
 
 .dcc-tooltip-bounding-box {
-    z-index: 20 !important;
+    z-index: 30 !important;
 }
 
 .dash-tooltip {
@@ -533,7 +535,7 @@ html, body {
     box-shadow:     0 6px 16px rgba(0, 0, 0, 0.4) !important;
     color:          var(--tooltip-text-mid);
     pointer-events: none;
-    min-width:      200px;
+    min-width:      150px;
     max-width:      270px;
 }
 
@@ -607,6 +609,19 @@ html, body {
 .dash-tooltip .map-tt-hint {
     font-size:  10px;
     margin-top: 8px;
+}
+
+.dash-tooltip .map-tt-card.arrow-right::before {
+    right        : auto;
+    left         : calc(100% + 1px);
+    border-right : none;
+    border-left  : calc(var(--tt-arrow-l) + 1px) solid var(--tooltip-border);
+}
+.dash-tooltip .map-tt-card.arrow-right::after {
+    right        : auto;
+    left         : 100%;
+    border-right : none;
+    border-left  : var(--tt-arrow-l) solid var(--tooltip-bg);
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */

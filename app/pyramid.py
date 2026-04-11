@@ -120,30 +120,34 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             if band is not None:
                 cohort_bands[band] = color
 
-    male_colors   = [cohort_bands.get(a, PYRAMID_MALE_COLOR)   for a in age_starts]
-    female_colors = [cohort_bands.get(a, PYRAMID_FEMALE_COLOR) for a in age_starts]
+    male_pops = male_df["population"].tolist()
+    female_pops = female_df["population"].tolist()
+    bar_customdata = [
+        [age_labels[i], male_pops[i], female_pops[i]]
+        for i in range(len(age_labels))
+    ]
 
     # ── Traces ────────────────────────────────────────────────────────────────
     male_trace = go.Bar(
         name="男 Male",
         y=age_labels,
-        x=[-v for v in male_df["population"]],
+        x=[-v for v in male_pops],
         orientation="h",
         showlegend=False,
         marker=dict(color=PYRAMID_MALE_COLOR, line=dict(width=0)),
-        hovertemplate="<b>Age (Years): %{y}</b><br>Male: %{customdata:,.0f}<extra></extra>",
-        customdata=male_df["population"],
+        hoverinfo="none",
+        customdata=bar_customdata,
     )
 
     female_trace = go.Bar(
         name="女 Female",
         y=age_labels,
-        x=female_df["population"],
+        x=female_pops,
         orientation="h",
         showlegend=False,
         marker=dict(color=PYRAMID_FEMALE_COLOR, line=dict(width=0)),
-        hovertemplate="<b>Age (Years): %{y}</b><br>Female: %{customdata:,.0f}<extra></extra>",
-        customdata=female_df["population"],
+        hoverinfo="none",
+        customdata=bar_customdata,
     )
 
     # Invisible traces purely for legend — fixes color mirroring the first bar's cohort color
@@ -181,6 +185,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             color=ACCENT_WARTIME_GEN,
             line=dict(width=1, color=ACCENT_WARTIME_GEN),
         ),
+        hoverinfo="skip",
         hovertemplate=(
             "<b>%{y}</b><br>"
             "戦中世代 (1910–1925年生まれ)<br>"
@@ -205,6 +210,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             color=ACCENT_SHOUSHIKA,
             line=dict(width=1, color=ACCENT_SHOUSHIKA),
         ),
+        hoverinfo="skip",
         hovertemplate=(
             "<b>%{y}</b><br>"
             "少子化世代 (1986–1990年生まれ)<br>"

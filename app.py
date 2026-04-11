@@ -14,7 +14,8 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
                         MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
-                        MAX_YEAR, OKINAWA_AREA_ESTAT,)
+                        PYRAMID_TOOLTIP_OFFSET_X, PYRAMID_TOOLTIP_OFFSET_Y, PYRAMID_GRAPH_TOP_OFFSET,
+                        MAX_YEAR, OKINAWA_AREA_ESTAT, )
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -94,6 +95,7 @@ app.layout = html.Div(
         "backgroundColor": PAGE_BG,
         "maxWidth": "1400px",
         "margin": "0 auto",
+        "overflow-y": "visible",
     },
     children=[
         dcc.Store(id="selected-prefecture", data=None),
@@ -241,24 +243,38 @@ app.layout = html.Div(
                         html.Div(
                             className="pyramid-panel",
                             children=[
-                                html.Div(className="pyramid-legend", children=[
-                                    html.Span("■", style={"color": PYRAMID_MALE_COLOR}),
-                                    html.Span("男 Male", style={"marginRight": "10px"}),
-                                    html.Span("■", style={"color": PYRAMID_FEMALE_COLOR}),
-                                    html.Span("女 Female"),
-                                ]),
                                 html.Div(
-                                    className="pyramid-graph-container",
+                                    className="pyramid-legend",
                                     children=[
-                                        dcc.Graph(
-                                            id="pyramid-chart",
-                                            className="pyramid-graph",
-                                            figure=build_pyramid_fig(year=MAX_YEAR, area_estat=None,
-                                                                     axis_max=_prewarm_axis_max),
-                                            config={"displayModeBar": False, "responsive": True},
-                                            style={"height": "100%"},
+                                        html.Span("■", style={"color": PYRAMID_MALE_COLOR}),
+                                        html.Span("男 Male", style={"marginRight": "10px"}),
+                                        html.Span("■", style={"color": PYRAMID_FEMALE_COLOR}),
+                                        html.Span("女 Female"),
+                                    ]
+                                ),
+                                html.Div(
+                                    className="pyramid-inner",
+                                    children=[
+                                        html.Div(
+                                            className="pyramid-graph-container",
+                                            children=[
+                                                dcc.Graph(
+                                                    id="pyramid-chart",
+                                                    className="pyramid-graph",
+                                                    clear_on_unhover=True,
+                                                    figure=build_pyramid_fig(year=MAX_YEAR,
+                                                                             area_estat=None,
+                                                                             axis_max=_prewarm_axis_max),
+                                                    config={"displayModeBar": False, "responsive": True},
+                                                    style={"height": "100%"},
+                                                ),
+                                            ]
                                         ),
                                     ]
+                                ),
+                                dcc.Tooltip(  # ← outside pyramid-inner, direct child of pyramid-panel
+                                    id="pyramid-tooltip",
+                                    direction="right",
                                 ),
                             ]
                         ),
@@ -467,6 +483,58 @@ def show_map_tooltip(hover_data, metric):
     ], className="map-tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
 
     return True, bbox, children
+
+@app.callback(
+    Output("pyramid-tooltip", "show"),
+    Output("pyramid-tooltip", "bbox"),
+    Output("pyramid-tooltip", "children"),
+    Output("pyramid-tooltip", "direction"),   # ← new output
+    Input("pyramid-chart", "hoverData"),
+    prevent_initial_call=True,
+)
+def show_pyramid_tooltip(hover_data):
+    if hover_data is None or not hover_data.get("points"):
+        return False, no_update, no_update, no_update
+
+    pt = hover_data["points"][0]
+    cd = pt.get("customdata")
+    if cd is None:
+        return False, no_update, no_update, no_update
+
+    # Male bars have negative x — tooltip goes left, arrow points right
+    # Female bars have positive x — tooltip goes right, arrow points left
+    x_val     = pt.get("x", 0)
+    direction = "left" if x_val < 0 else "right"
+    arrow_cls = "map-tt-card arrow-right" if direction == "left" else "map-tt-card"
+    x_offset = PYRAMID_TOOLTIP_OFFSET_X if direction == "right" else -PYRAMID_TOOLTIP_OFFSET_X
+
+    raw  = pt.get("bbox", {})
+    bbox = {
+        "x0": raw.get("x0", 0) + x_offset,
+        "x1": raw.get("x1", 0) + x_offset,
+        "y0": raw.get("y0", 0) + PYRAMID_GRAPH_TOP_OFFSET - PYRAMID_TOOLTIP_OFFSET_Y,
+        "y1": raw.get("y1", 0) + PYRAMID_GRAPH_TOP_OFFSET - PYRAMID_TOOLTIP_OFFSET_Y,
+    }
+
+    age_label  = cd[0]
+    male_pop   = cd[1]
+    female_pop = cd[2]
+
+    children = html.Div([
+        html.Div(
+            html.Span(f"Age (Years): {age_label}", className="map-tt-title"),
+        ),
+        html.Div([
+            html.Span("男 Male  ", className="map-tt-label"),
+            html.Span(f"{int(male_pop):,}", className="map-tt-value"),
+        ]),
+        html.Div([
+            html.Span("女 Female  ", className="map-tt-label"),
+            html.Span(f"{int(female_pop):,}", className="map-tt-value"),
+        ]),
+    ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
+
+    return True, bbox, children, direction
 
 @app.callback(
     Output("map-graph", "figure"),

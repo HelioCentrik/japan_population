@@ -292,16 +292,23 @@ PYRAMID_MARGIN_T     = 20
 PYRAMID_MARGIN_B     = 16
 PYRAMID_MARGIN_L     = 24
 PYRAMID_MARGIN_R     = 24
+PYRAMID_GRAPH_TOP_OFFSET = 28
+PYRAMID_TOOLTIP_OFFSET_X = 12
+PYRAMID_TOOLTIP_OFFSET_Y = 20
 
 
-# ── 10. Play button ───────────────────────────────────────────────────────────
+# ── 10. Timeseries configuration ──────────────────────────────────────────────
+
+
+
+# ── 11a. Play button ──────────────────────────────────────────────────────────
 
 PLAY_BTN_SIZE_PX   = 52
 PLAY_BTN_SIZE      = f"{PLAY_BTN_SIZE_PX}px"
 PLAY_BTN_FONT_SIZE = f"{round(PLAY_BTN_SIZE_PX * 0.538)}px"
 
 
-# ── 11. Playback ──────────────────────────────────────────────────────────────
+# ── 11b. Playback ─────────────────────────────────────────────────────────────
 
 PLAY_INTERVAL_MS = 1000
 
