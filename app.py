@@ -9,14 +9,15 @@ from dash import Dash, html, dcc, Input, Output, State, ctx, no_update, Patch
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
-                        FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY,
+                        FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT_MID,
                         PLAY_INTERVAL_MS,
                         MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
                         MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
                         PYRAMID_TOOLTIP_OFFSET_X, PYRAMID_TOOLTIP_OFFSET_Y, PYRAMID_GRAPH_TOP_OFFSET,
+                        TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT,
                         ACCENT_DANKAI, ACCENT_DANKAI_JR,
-                        MAX_YEAR, OKINAWA_AREA_ESTAT, )
+                        MAX_YEAR, OKINAWA_AREA_ESTAT,)
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -275,7 +276,7 @@ app.layout = html.Div(
                                         ),
                                     ]
                                 ),
-                                dcc.Tooltip(  # ← outside pyramid-inner, direct child of pyramid-panel
+                                dcc.Tooltip(
                                     id="pyramid-tooltip",
                                     direction="right",
                                 ),
@@ -288,6 +289,18 @@ app.layout = html.Div(
                 html.Div(
                     className="timeseries-panel",
                     children=[
+                        html.Div(
+                            className="metric-selector-strip ts-selector-strip",
+                            children=[
+                                dcc.Dropdown(
+                                    id="ts-view-selector",
+                                    options=[{"label": v, "value": k} for k, v in TS_VIEWS.items()],
+                                    value=TS_VIEW_DEFAULT,
+                                    clearable=False,
+                                    searchable=False,
+                                ),
+                            ],
+                        ),
                         dcc.Graph(
                             id="timeseries-chart",
                             figure=build_timeseries_fig(selected_year=MAX_YEAR, area_estat=None),
@@ -596,9 +609,10 @@ def show_pyramid_tooltip(hover_data):
     Input("year-slider", "value"),
     Input("selected-prefecture", "data"),
     Input("metric-selector", "value"),
+    Input("ts-view-selector", "value"),
     prevent_initial_call=True,
 )
-def update_charts(year, area_estat, metric):
+def update_charts(year, area_estat, metric, ts_view):
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:
@@ -636,12 +650,18 @@ def update_charts(year, area_estat, metric):
         patched["data"][1]["z"]          = fd["data"][1]["z"]
         map_fig = patched
 
+    ts_fig = (
+        build_timeseries_fig(selected_year=y, area_estat=area_estat)
+        if ts_view == "population"
+        else build_aging_index_fig(selected_year=y, area_estat=area_estat)
+    )
+
     return (
         map_fig,
         build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
         label,
         render_kpi_cards(kpi_data),
-        build_timeseries_fig(selected_year=y, area_estat=area_estat),
+        ts_fig,
     )
 
 

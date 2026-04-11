@@ -138,7 +138,7 @@ html, body {
     aspect-ratio     : 1 / 1;
     background-color : var(--panel-border);
     color            : var(--color-text-mid);
-    border           : 0px solid rgba(255, 255, 255, 0.07);
+    border           : var(--panel-border-thickness) solid var(--panel-border);
     border-radius    : var(--border-radius);
     font-size        : var(--play-btn-font-size);
     cursor           : pointer;
@@ -182,7 +182,7 @@ html, body {
     border           : 1px solid var(--panel-border);
     border-radius    : calc(var(--border-radius) * 0.67);
     font-size        : var(--font-size-kpi-sub);
-    box-shadow       : var(--shadow-full);
+    box-shadow       : var(--shadow-bezel);
     width            : 200px;
     height           : 32px;
     cursor           : pointer;
@@ -478,6 +478,11 @@ html, body {
     inset            : 0;
     overflow         : hidden;
     border-radius    : var(--border-radius);
+}
+
+.ts-selector-strip {
+    top : 32px;
+    left: 70px;
 }
 
 /* ── Map tooltip ─────────────────────────────────────────────────────────── */

@@ -143,7 +143,7 @@ SHADOW_MAP_INSET = _rgba(_SHADOW_COLOR, min(1.0, SHADOW_DARKNESS * 1.6))
 PANEL_SHADOW_Y    = 3     # px — drop shadow Y offset (bottom)
 PANEL_SHADOW_X    = 2     # px — drop shadow X offset (right)
 PANEL_SHADOW_BLUR = 8     # px — drop shadow blur radius
-PANEL_BEZEL_SIZE  = 2     # px — inset highlight/shadow thickness
+PANEL_BEZEL_SIZE  = 1.5   # px — inset highlight/shadow thickness
 BEZEL_BLUR        = 3     # px — bezel edge softness (0 = hard, keep low)
 BEZEL_HI_ALPHA    = _t["bezel_hi_alpha"]
 BEZEL_LO_ALPHA    = _t["bezel_lo_alpha"]
@@ -221,7 +221,7 @@ YAXIS_TICK_STANDOFF    = 2
 # ── 8. Map configuration ──────────────────────────────────────────────────────
 # Structural values — these don't vary by theme.
 
-POP_DELTA_SIGMA = 2.0
+POP_DELTA_SIGMA          = 2.0
 MAP_CENTER_LAT           = 35.5
 MAP_CENTER_LON           = 135.5
 
@@ -306,6 +306,14 @@ TIMESERIES_MARGIN_B     = 28
 
 TIMESERIES_TOOLTIP_OFFSET_X    = 12
 TIMESERIES_TOOLTIP_OFFSET_Y    = 20
+
+TIMESERIES_SELECTOR_OFFSET_L = TIMESERIES_MARGIN_L + 8
+
+TS_VIEWS = {
+    "population": "人口 Population",
+    "aging_index": "高齢化指数 Aging Index",
+}
+TS_VIEW_DEFAULT = "population"
 
 
 # ── 11a. Play button ──────────────────────────────────────────────────────────

@@ -185,8 +185,8 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         plot_bgcolor=CHART_PLOT_COLOR,
         legend=dict(
             orientation="h",
-            x=0.01, xanchor="left",
-            y=0.99, yanchor="top",
+            x=0.17, xanchor="left",
+            y=0.98, yanchor="top",
         ),
         xaxis=dict(
             showline=True,
@@ -341,8 +341,8 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
         plot_bgcolor=CHART_PLOT_COLOR,
         legend=dict(
             orientation="h",
-            x=0.01, xanchor="left",
-            y=0.99, yanchor="top",
+            x=0.17, xanchor="left",
+            y=0.98, yanchor="top",
         ),
         xaxis=dict(
             showline=True,
