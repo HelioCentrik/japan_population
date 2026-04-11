@@ -241,7 +241,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         xaxis=dict(
             showline=True,
             linecolor=PANEL_BORDER,
-            linewidth=2.5,
+            linewidth=2,
             mirror=True,
             tickformat="~s",
             tickangle=0,
@@ -255,7 +255,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
         yaxis=dict(
             showline=True,
             linecolor=PANEL_BORDER,
-            linewidth=1,
+            linewidth=0.8,
             mirror=True,
             title=dict(
                 text="Age (Years)",

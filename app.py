@@ -22,7 +22,7 @@ import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
-from app.timeseries import build_aging_index_fig
+from app.timeseries import build_aging_index_fig, build_timeseries_fig
 from app.plotly_template import register_plotly_template
 from app import figure_cache
 
@@ -85,6 +85,8 @@ else:
         figure_cache.save(figure_cache.make_key("pyramid", _yr, None, _prewarm_axis_max), fig)
         fig = build_aging_index_fig(selected_year=_yr, area_estat=None)
         figure_cache.save(figure_cache.make_key("timeseries", _yr, None), fig)
+        fig = build_timeseries_fig(selected_year=_yr, area_estat=None)
+        figure_cache.save(figure_cache.make_key("population", _yr, None), fig)
     figure_cache.write_fingerprint()
     print(f"  Cache built and saved — {len(CENSUS_YEARS)} years × 3 builders.")
 
@@ -288,7 +290,7 @@ app.layout = html.Div(
                     children=[
                         dcc.Graph(
                             id="timeseries-chart",
-                            figure=build_aging_index_fig(selected_year=MAX_YEAR, area_estat=None),
+                            figure=build_timeseries_fig(selected_year=MAX_YEAR, area_estat=None),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
                         ),
@@ -639,7 +641,7 @@ def update_charts(year, area_estat, metric):
         build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
         label,
         render_kpi_cards(kpi_data),
-        build_aging_index_fig(selected_year=y, area_estat=area_estat),
+        build_timeseries_fig(selected_year=y, area_estat=area_estat),
     )
 
 

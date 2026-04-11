@@ -4,7 +4,7 @@ from functools import lru_cache
 import plotly.graph_objects as go
 
 from app.config import (
-    COLOR_TEXT_MID, COLOR_PRIMARY, CHART_PLOT_COLOR,
+    FONT_SIZE_AXIS_TITLE, COLOR_TEXT_MID, COLOR_PRIMARY, CHART_PLOT_COLOR,
     PANEL_BORDER, ACCENT_THRESHOLD, TIMESERIES_PREF_COLOR,
     LINE_WIDTH_MAIN, LINE_WIDTH_PREF, LINE_WIDTH_1945,
     LINE_WIDTH_THRESHOLD, LINE_WIDTH_YEAR_MARKER,
@@ -12,7 +12,7 @@ from app.config import (
     OPACITY_THRESHOLD_LINE, OPACITY_YEAR_VLINE,
     YAXIS_TICK_STANDOFF,
     TIMESERIES_MARGIN_L, TIMESERIES_MARGIN_R, TIMESERIES_MARGIN_T, TIMESERIES_MARGIN_B,
-    FONT_SIZE_AXIS_TITLE,
+    PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
 )
 from app.db import get_con
 from app import figure_cache
@@ -208,6 +208,162 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             zeroline=False,
             ticklabelstandoff=YAXIS_TICK_STANDOFF,
             automargin=False
+        ),
+    )
+
+    figure_cache.put(_key, fig)
+    return fig
+
+
+_POPULATION_DIVISOR = 1_000_000  # display in millions; y-axis label says 百万人
+
+@lru_cache(maxsize=8)
+def _get_population_data(area_estat: str | None) -> tuple:
+    """
+    Returns (national_df, pref_df_or_None, pref_label_or_None).
+
+    national_df / pref_df columns: year, total, male, female — population in raw headcount.
+    Divide by _POPULATION_DIVISOR in the figure builder for axis display.
+    Cached on area_estat only — the full time series is fetched once per selection.
+    """
+    con = get_con()
+
+    national_df = con.execute("""
+        SELECT year, sex, SUM(population) AS population
+        FROM v_census
+        WHERE age_group  = 'Total'
+          AND sex        IN ('total', 'male', 'female')
+          AND area_level  = 2
+        GROUP BY year, sex
+        ORDER BY year, sex
+    """).df()
+
+    national_df = (
+        national_df
+        .pivot(index="year", columns="sex", values="population")
+        .reset_index()
+    )
+    national_df.columns.name = None  # drop the 'sex' axis label left by pivot
+
+    pref_df    = None
+    pref_label = None
+
+    if area_estat is not None:
+        name_row = con.execute(
+            "SELECT prefecture_name_ja, prefecture_name FROM d_prefectures WHERE area_estat = ?",
+            [area_estat],
+        ).fetchone()
+        pref_label = f"{name_row[0]}  {name_row[1]}" if name_row else area_estat
+
+        pref_df = con.execute("""
+            SELECT year, sex, SUM(population) AS population
+            FROM v_census
+            WHERE age_group  = 'Total'
+              AND sex        IN ('total', 'male', 'female')
+              AND area_estat  = ?
+            GROUP BY year, sex
+            ORDER BY year, sex
+        """, [area_estat]).df()
+
+        pref_df = (
+            pref_df
+            .pivot(index="year", columns="sex", values="population")
+            .reset_index()
+        )
+        pref_df.columns.name = None
+
+    return national_df, pref_df, pref_label
+
+
+def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> go.Figure:
+    _key = figure_cache.make_key("population", selected_year, area_estat)
+    if (fig := figure_cache.get(_key)) is not None:
+        return fig
+
+    national_df, pref_df, pref_label = _get_population_data(area_estat)
+
+    M = _POPULATION_DIVISOR  # shorthand for inline division
+
+    traces = []
+
+    # ── National lines ────────────────────────────────────────────────────────
+    if area_estat is None:
+        national_series = [
+            ("total",  "全国 Total",  COLOR_TEXT_MID,       LINE_WIDTH_MAIN),
+            ("male",   "全国 Male",   PYRAMID_MALE_COLOR,   LINE_WIDTH_MAIN),
+            ("female", "全国 Female", PYRAMID_FEMALE_COLOR, LINE_WIDTH_MAIN),
+        ]
+
+        for col, label, color, width in national_series:
+            traces.append(go.Scatter(
+                x=national_df["year"],
+                y=national_df[col] / M,
+                mode="lines+markers",
+                name=label,
+                line=dict(color=color, width=width),
+                marker=dict(color=color, size=MARKER_SIZE_DOT),
+                hovertemplate=f"<b>%{{x}}</b><br>人口: <b>%{{y:.0f}}M</b><extra>{label}</extra>",
+            ))
+
+    # ── Prefecture overlays ───────────────────────────────────────────────────
+    if pref_df is not None and not pref_df.empty:
+        pref_series = [
+            ("total",  f"{pref_label} Total",  COLOR_TEXT_MID),
+            ("male",   f"{pref_label} Male",   PYRAMID_MALE_COLOR),
+            ("female", f"{pref_label} Female", PYRAMID_FEMALE_COLOR),
+        ]
+
+        for col, label, color in pref_series:
+            traces.append(go.Scatter(
+                x=pref_df["year"],
+                y=pref_df[col] / M,
+                mode="lines+markers",
+                name=label,
+                line=dict(color=color, width=LINE_WIDTH_PREF, dash="dot"),
+                marker=dict(color=color, size=4),
+                hovertemplate=f"<b>%{{x}}</b><br>人口: <b>%{{y:.0f}}M</b><extra>{label}</extra>",
+            ))
+
+    fig = go.Figure(data=traces)
+
+    # ── Selected year indicator ───────────────────────────────────────────────
+    fig.add_vline(
+        x=selected_year,
+        line_color=COLOR_TEXT_MID,
+        line_width=LINE_WIDTH_YEAR_MARKER,
+        line_dash="dot",
+        opacity=OPACITY_YEAR_VLINE,
+    )
+
+    fig.update_layout(
+        margin=dict(l=TIMESERIES_MARGIN_L, r=TIMESERIES_MARGIN_R, t=TIMESERIES_MARGIN_T, b=TIMESERIES_MARGIN_B),
+        autosize=True,
+        plot_bgcolor=CHART_PLOT_COLOR,
+        legend=dict(
+            orientation="h",
+            x=0.01, xanchor="left",
+            y=0.99, yanchor="top",
+        ),
+        xaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=2,
+            mirror=True,
+            dtick=10,
+            automargin=False,
+        ),
+        yaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=0.8,
+            mirror=True,
+            title=dict(
+                text="百万人 / Millions",
+                font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
+            ),
+            zeroline=False,
+            ticklabelstandoff=YAXIS_TICK_STANDOFF,
+            automargin=False,
         ),
     )
 
