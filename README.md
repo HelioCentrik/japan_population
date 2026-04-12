@@ -78,7 +78,7 @@ A single-page application with four linked panels driven by a shared year contro
 
 ## Data Notes
 
-**Coverage:** 20 census years, 1920–2015. The source CSV (`000031523105`) tops out at 2015; 2020 data exists in the e-Stat database but requires API extraction and is not yet included.
+**Coverage:** 21 census years, 1920–2020. 1920–2015 sourced from CSV (`000031523105`); 2020 sourced via the e-Stat API (`0003410381`).
 
 **1945 Provisional Census (臨時国勢調査):** The 1945 data point is real official census data, not a gap or estimate. It was conducted November 1, 1945 — 78 days after surrender — and excludes Okinawa, which was under US administration. Age was recorded as kazoedoshi (数え年), a traditional counting system that produces bands offset by one year from completed age. These are converted to standard 5-year bands in the data pipeline. The 1945 marker is visually distinguished on the year slider and time series.
 
