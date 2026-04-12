@@ -28,8 +28,6 @@ from app.config import (
     FONT_SIZE_TITLE,
     # Borders
     PANEL_BORDER_RADIUS, PANEL_BORDER_THICKNESS,
-    # Play button
-    PLAY_BTN_SIZE, PLAY_BTN_FONT_SIZE,
     # Layout
     LAYOUT_GAP, LAYOUT_OUTER_PAD, LAYOUT_MIN_HEIGHT,
     CHARTS_ROW_FLEX, CHARTS_TS_FLEX,
@@ -38,6 +36,10 @@ from app.config import (
     TOOLTIP_BG, TOOLTIP_BORDER, TOOLTIP_BORDER_SIZE,
     TOOLTIP_TEXT_HI, TOOLTIP_TEXT_MID,
     TOOLTIP_HINT, TOOLTIP_DIVIDER,
+    # KPIs
+    KPI_LABEL_H, KPI_VALUE_H, KPI_SUB_H,
+    # Play button
+    PLAY_BTN_SIZE, PLAY_BTN_FONT_SIZE,
     # Timeseries
     TS_SELECTOR_OFFSET_L
 )
@@ -107,10 +109,6 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --border-radius            : {PANEL_BORDER_RADIUS};
                 --panel-border-thickness   : {PANEL_BORDER_THICKNESS};
 
-                /* Play button */
-                --play-btn-size      : {PLAY_BTN_SIZE};
-                --play-btn-font-size : {PLAY_BTN_FONT_SIZE};
-
                 /* Layout */
                 --layout-gap       : {LAYOUT_GAP};
                 --outer-pad        : {LAYOUT_OUTER_PAD};
@@ -129,6 +127,15 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --tooltip-text-mid    : {TOOLTIP_TEXT_MID};
                 --tooltip-hint        : {TOOLTIP_HINT};
                 --tooltip-divider     : {TOOLTIP_DIVIDER};
+                
+                /* KPIs */
+                --kpi-label-h : {KPI_LABEL_H}px;
+                --kpi-value-h : {KPI_VALUE_H}px;
+                --kpi-sub-h   : {KPI_SUB_H}px;
+
+                /* Play button */
+                --play-btn-size      : {PLAY_BTN_SIZE};
+                --play-btn-font-size : {PLAY_BTN_FONT_SIZE};
                 
                 /* Timeseries */
                 --ts-selector-offset-l: {TS_SELECTOR_OFFSET_L};

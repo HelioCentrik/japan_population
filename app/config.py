@@ -85,6 +85,7 @@ COLOR_TEXT_HINT = _t["text_hint"]
 # UI interaction
 COLOR_UI_HOVER     = _t["ui_hover"]
 SLIDER_TRACK_COLOR = _t["slider_track"]
+COLOR_WARNING      = _t["warning"]
 
 # Chart
 CHART_GRID_COLOR      = _t["chart_grid"]
@@ -205,9 +206,9 @@ FONT_SIZE_LEGEND        = 14
 FONT_SIZE_CHART_TITLE   = 13
 FONT_SIZE_COLORBAR      = 12
 FONT_SIZE_COLORBAR_TICK = 14
-FONT_SIZE_KPI_LABEL     = 11
+FONT_SIZE_KPI_LABEL     = 12
 FONT_SIZE_KPI_VALUE     = 22
-FONT_SIZE_KPI_SUB       = 12
+FONT_SIZE_KPI_SUB       = 11
 FONT_SIZE_TITLE         = 32
 
 
@@ -218,7 +219,13 @@ PANEL_BORDER_THICKNESS = "1px"
 YAXIS_TICK_STANDOFF    = 2
 
 
-# ── 8. Map configuration ──────────────────────────────────────────────────────
+# ── 8. KPI card grid row heights ─────────────────────────────────────────────────
+KPI_LABEL_H = 36   # px — label row (accommodates 2-line wrap)
+KPI_VALUE_H = 36   # px — value row (anchor)
+KPI_SUB_H   = 14   # px — sub row
+
+
+# ── 9a. Map configuration ──────────────────────────────────────────────────────
 # Structural values — these don't vary by theme.
 
 POP_DELTA_SIGMA          = 2.0
@@ -236,7 +243,7 @@ MAP_HIGHLIGHT_LINE_WIDTH = 2.5
 MAP_TOOLTIP_OFFSET_X     = 28   # px rightward from hovered point
 MAP_TOOLTIP_OFFSET_Y     = 40   # px upward from hovered point
 
-# ── 8b. Metric selector ───────────────────────────────────────────────────────
+# ── 9b. Metric selector ───────────────────────────────────────────────────────
 
 OKINAWA_AREA_ESTAT = "47000"
 
@@ -284,7 +291,7 @@ MAP_METRICS = {
 MAP_METRIC_DEFAULT = "population"
 
 
-# ── 9. Pyramid configuration ─────────────────────────────────────────────────
+# ── 10. Pyramid configuration ─────────────────────────────────────────────────
 
 PYRAMID_BARGAP       = 0.15
 COHORT_OUTLINE_WIDTH = 3
@@ -298,7 +305,7 @@ PYRAMID_TOOLTIP_OFFSET_X    = 12
 PYRAMID_TOOLTIP_OFFSET_Y    = 20
 
 
-# ── 10. Timeseries configuration ──────────────────────────────────────────────
+# ── 11. Timeseries configuration ──────────────────────────────────────────────
 TIMESERIES_MARGIN_L  = 62
 TIMESERIES_MARGIN_R  = 24
 TIMESERIES_MARGIN_T  = 24
@@ -315,19 +322,19 @@ TS_VIEWS = {
 TS_VIEW_DEFAULT = "population"
 
 
-# ── 11a. Play button ──────────────────────────────────────────────────────────
+# ── 12a. Play button ──────────────────────────────────────────────────────────
 
 PLAY_BTN_SIZE_PX   = 52
 PLAY_BTN_SIZE      = f"{PLAY_BTN_SIZE_PX}px"
 PLAY_BTN_FONT_SIZE = f"{round(PLAY_BTN_SIZE_PX * 0.538)}px"
 
 
-# ── 11b. Playback ─────────────────────────────────────────────────────────────
+# ── 12b. Playback ─────────────────────────────────────────────────────────────
 
 PLAY_INTERVAL_MS = 1000
 
 
-# ── 12. Markers & lines ───────────────────────────────────────────────────────
+# ── 13. Markers & lines ───────────────────────────────────────────────────────
 
 MARKER_SIZE_DOT         = 5
 MARKER_SIZE_1945        = 11
@@ -344,7 +351,7 @@ OPACITY_THRESHOLD_LINE  = 0.55
 OPACITY_YEAR_VLINE      = 0.35
 
 
-# ── 13. THEME dict ────────────────────────────────────────────────────────────
+# ── 14. THEME dict ────────────────────────────────────────────────────────────
 
 THEME = {
     "active_theme": ACTIVE_THEME_NAME,
@@ -454,16 +461,10 @@ THEME = {
 }
 
 
-# ── 14. Legacy constants ──────────────────────────────────────────────────────
+# ── 15. Legacy constants ──────────────────────────────────────────────────────
 # Aliases for renamed constants — kept for backward compat with older imports.
 # Remove once all consumers have been updated.
 
-# FONT_COLOR_JPRED   = COLOR_PRIMARY
-# FONT_COLOR_JPWHT   = COLOR_SECONDARY
 FONT_MAIN_COLOR    = COLOR_TEXT_MID
 FONT_MAIN          = FONT_STACK_SANS
 FONT_HEADER        = FONT_STACK_SERIF
-#
-# PANEL_H            = 720
-# LEGEND_H           = int(PANEL_H * 1.03)
-# TIME_H             = 180
