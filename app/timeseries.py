@@ -90,6 +90,31 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     df_non_1945 = national_df[national_df["year"] != 1945]
     df_1945     = national_df[national_df["year"] == 1945]
 
+    # ── Shared customdata — all traces carry full year snapshot ───────────────
+    # Shape per point: [year, national_ai, pref_ai_or_None, pref_label, flag]
+    if pref_df is not None and not pref_df.empty:
+        merged = national_df.merge(
+            pref_df[["year", "aging_index"]].rename(columns={"aging_index": "pref_ai"}),
+            on="year",
+            how="left",
+        )
+    else:
+        merged = national_df.copy()
+        merged["pref_ai"] = float("nan")
+
+    pl = pref_label or ""
+
+    cd_by_year = {
+        int(row.year): [
+            int(row.year),
+            float(row.aging_index),
+            None if row.pref_ai != row.pref_ai else float(row.pref_ai),  # NaN → None
+            pl,
+            "1945" if row.year == 1945 else "",
+        ]
+        for row in merged.itertuples()
+    }
+
     traces = []
 
     # ── National line (connects all years including 1945) ─────────────────────
@@ -100,15 +125,10 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         name="全国 National",
         line=dict(color=COLOR_TEXT_MID, width=LINE_WIDTH_MAIN),
         hoverinfo="none",
-        customdata=list(zip(
-            national_df["year"],
-            national_df["aging_index"],
-            ["全国"] * len(national_df),
-            [""] * len(national_df),
-        )),
+        customdata=[cd_by_year[yr] for yr in national_df["year"]],
     ))
 
-    # Regular census year dots (non-1945 only)
+    # Regular census year dots (non-1945 only) — visual overlay, no hover
     traces.append(go.Scatter(
         x=df_non_1945["year"],
         y=df_non_1945["aging_index"],
@@ -132,12 +152,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
                 line=dict(width=LINE_WIDTH_1945, color=COLOR_PRIMARY),
             ),
             hoverinfo="none",
-            customdata=[[
-                int(df_1945["year"].iloc[0]),
-                float(df_1945["aging_index"].iloc[0]),
-                "全国",
-                "1945",
-            ]],
+            customdata=[cd_by_year[1945]],
         ))
 
     # ── Prefecture overlay ────────────────────────────────────────────────────
@@ -150,12 +165,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             line=dict(color=TIMESERIES_PREF_COLOR, width=LINE_WIDTH_PREF, dash="dot"),
             marker=dict(size=4, color=TIMESERIES_PREF_COLOR),
             hoverinfo="none",
-            customdata=list(zip(
-                pref_df["year"],
-                pref_df["aging_index"],
-                [pref_label] * len(pref_df),
-                [""] * len(pref_df),
-            )),
+            customdata=[cd_by_year[yr] for yr in pref_df["year"]],
         ))
 
     fig = go.Figure(data=traces)
@@ -294,15 +304,26 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
 
     national_df, pref_df, pref_label = _get_population_data(area_estat)
 
-    M = _POPULATION_DIVISOR  # shorthand for inline division
+    M = _POPULATION_DIVISOR
+
+    # ── Shared customdata — all traces carry full year snapshot ───────────────
+    # Shape per point: [year, total_M, male_M, female_M, series_prefix]
+    df_source     = national_df if area_estat is None else pref_df
+    series_prefix = "全国" if area_estat is None else pref_label
+
+    cd_rows = [
+        [int(row.year), row.total / M, row.male / M, row.female / M, series_prefix]
+        for row in df_source.itertuples()
+    ]
+    cd_by_year = {int(row[0]): row for row in cd_rows}
 
     traces = []
 
     # ── National lines ────────────────────────────────────────────────────────
     if area_estat is None:
         national_series = [
-            ("total", "全国 Total", COLOR_TEXT_MID, LINE_WIDTH_MAIN),
-            ("male", "全国 Male", PYRAMID_MALE_COLOR, LINE_WIDTH_MAIN),
+            ("total",  "全国 Total",  COLOR_TEXT_MID,       LINE_WIDTH_MAIN),
+            ("male",   "全国 Male",   PYRAMID_MALE_COLOR,   LINE_WIDTH_MAIN),
             ("female", "全国 Female", PYRAMID_FEMALE_COLOR, LINE_WIDTH_MAIN),
         ]
 
@@ -315,19 +336,14 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
                 line=dict(color=color, width=width),
                 marker=dict(color=color, size=MARKER_SIZE_DOT),
                 hoverinfo="none",
-                customdata=list(zip(
-                    national_df["year"],
-                    national_df[col] / M,
-                    [label] * len(national_df),
-                    [col] * len(national_df),
-                )),
+                customdata=[cd_by_year[yr] for yr in national_df["year"]],
             ))
 
     # ── Prefecture overlays ───────────────────────────────────────────────────
     if pref_df is not None and not pref_df.empty:
         pref_series = [
-            ("total", f"{pref_label} Total", COLOR_TEXT_MID),
-            ("male", f"{pref_label} Male", PYRAMID_MALE_COLOR),
+            ("total",  f"{pref_label} Total",  COLOR_TEXT_MID),
+            ("male",   f"{pref_label} Male",   PYRAMID_MALE_COLOR),
             ("female", f"{pref_label} Female", PYRAMID_FEMALE_COLOR),
         ]
 
@@ -340,12 +356,7 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
                 line=dict(color=color, width=LINE_WIDTH_PREF, dash="dot"),
                 marker=dict(color=color, size=4),
                 hoverinfo="none",
-                customdata=list(zip(
-                    pref_df["year"],
-                    pref_df[col] / M,
-                    [label] * len(pref_df),
-                    [col] * len(pref_df),
-                )),
+                customdata=[cd_by_year[yr] for yr in pref_df["year"]],
             ))
 
     fig = go.Figure(data=traces)

@@ -623,46 +623,74 @@ def show_timeseries_tooltip(hover_data, ts_view):
     if cd is None:
         return False, no_update, no_update, no_update
 
-    year         = cd[0]
-    value        = cd[1]
-    series_label = cd[2]
-    flag         = cd[3]  # "" or "1945" (aging view); sex col name (population view)
-
-    raw       = pt.get("bbox", {})
-    direction = "top"
-    arrow_cls = "tt-card arrow-bottom"
-    x_offset  = TS_TOOLTIP_OFFSET_X if direction == "right" else -TS_TOOLTIP_OFFSET_X
-
-    bbox = {
+    raw   = pt.get("bbox", {})
+    bbox  = {
         "x0": raw.get("x0", 0),
         "x1": raw.get("x1", 0),
         "y0": raw.get("y0", 0) - TS_TOOLTIP_OFFSET_Y,
         "y1": raw.get("y1", 0) - TS_TOOLTIP_OFFSET_Y,
     }
 
+    year = cd[0]
+
     if ts_view == "population":
-        metric_label = "人口 / Population"
-        metric_value = f"{value:.1f}M"
-    else:
-        metric_label = "高齢化指数 / Aging Index"
-        metric_value = f"{value:.1f}"
+        total_M       = cd[1]
+        male_M        = cd[2]
+        female_M      = cd[3]
+        series_prefix = cd[4]
 
-    note = None
-    if flag == "1945":
-        note = html.Div(
-            "臨時国勢調査  /  Provisional Wartime Census",
-            className="tt-hint",
-        )
+        children = html.Div([
+            html.Div(str(int(year)),          className="tt-title"),
+            html.Div("人口 / Population",      className="tt-metric-label"),
+            html.Hr(                           className="tt-divider"),
+            html.Div([
+                html.Span("総数  ", className="tt-label"),
+                html.Span(f"{total_M:.1f}M",  className="tt-value"),
+            ]),
+            html.Div([
+                html.Span("男  ",  className="tt-label"),
+                html.Span(f"{male_M:.1f}M",   className="tt-value"),
+            ]),
+            html.Div([
+                html.Span("女  ",  className="tt-label"),
+                html.Span(f"{female_M:.1f}M", className="tt-value"),
+            ]),
+            html.Div(series_prefix,            className="tt-hint"),
+        ], className="tt-card arrow-bottom", style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
 
-    children = html.Div([
-        html.Div(str(int(year)), className="tt-title"),
-        html.Div(metric_label,  className="tt-metric-label"),
-        html.Div(metric_value,  className="tt-metric-value"),
-        html.Div(series_label,  className="tt-hint"),
-        note,
-    ], className=arrow_cls, style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
+    else:  # aging index
+        national_ai = cd[1]
+        pref_ai     = cd[2]   # None if no prefecture selected
+        pref_lbl    = cd[3]   # "" if no prefecture selected
+        flag        = cd[4]   # "1945" or ""
 
-    return True, bbox, children, direction
+        pref_row = None
+        if pref_ai is not None:
+            pref_row = html.Div([
+                html.Span(f"{pref_lbl}  ", className="tt-label"),
+                html.Span(f"{pref_ai:.1f}", className="tt-value"),
+            ])
+
+        note = None
+        if flag == "1945":
+            note = html.Div(
+                "臨時国勢調査  /  Provisional Wartime Census",
+                className="tt-hint",
+            )
+
+        children = html.Div([
+            html.Div(str(int(year)),              className="tt-title"),
+            html.Div("高齢化指数 / Aging Index",   className="tt-metric-label"),
+            html.Hr(                               className="tt-divider"),
+            html.Div([
+                html.Span("全国  ",   className="tt-label"),
+                html.Span(f"{national_ai:.1f}", className="tt-value"),
+            ]),
+            pref_row,
+            note,
+        ], className="tt-card arrow-bottom", style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
+
+    return True, bbox, children, "top"
 
 @app.callback(
     Output("map-graph", "figure"),
