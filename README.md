@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 ### Data pipeline
 
-The `data/` directory is not tracked in version control. Source files (`source/jp_census_historical_1920_2020.csv` and `source/japan_prefectures.geojson`) are included in the repository. To build the database:
+Source files (`source/jp_census_historical_1920_2015.csv` and `source/japan_prefectures.geojson`) are included in the repository. To build the database:
 
 ```bash
 python scripts/build_db.py
@@ -47,7 +47,8 @@ A single-page application with four linked panels driven by a shared year contro
 | Play button | Autoplays through census years at a fixed interval. |
 | Prefecture click (map) | Filters the pyramid and overlays a prefecture line on the time series. |
 | Re-click / Reset | Clears prefecture selection and returns all panels to the national view. |
-| Metric selector | Switches the choropleth between total population, aging index, old-age dependency ratio, and working-age share. |
+| Map metric selector | Switches the choropleth between total population, aging index, population change, and working-age share. |
+| Time series selector | Switches the time series between population (default) and aging index views. |
 
 ### Panels
 
@@ -55,9 +56,9 @@ A single-page application with four linked panels driven by a shared year contro
 
 **Population pyramid** — Age/sex butterfly chart for the selected year and geography. Cohort annotations mark the 団塊世代 (dankai), 団塊ジュニア, 戦中世代 (wartime generation), and 少子化世代 birth cohorts. Hover tooltips show cohort context and population figures. The wartime generation's male deficit is visible walking up the pyramid across years.
 
-**Aging index time series** — National aging index 1920–2020 with a reference line at 100 — the crossover point where the elderly population exceeds the child population. Prefecture overlay shown on map selection. The 1945 data point is rendered as a distinct marker with a tooltip noting its provisional wartime provenance.
+**Time series** — Switchable between two views via a dropdown selector. The default population view shows national total, male, and female population trends in millions. The aging index view shows national 高齢化指数 (1920–2020) with a reference line at 100 — the crossover point where the elderly population exceeds the child population. Prefecture overlay shown on map selection. The 1945 data point is rendered as a distinct open-circle marker in red, matching the year slider. See Data Notes for 1945 provenance.
 
-**KPI cards** — National population, aging index, old-age dependency ratio, working-age share, and the most- and least-aged prefectures for the selected year.
+**KPI cards** — National population, period-over-period population change, aging index, children 0–14 share, and the most- and least-aged prefectures for the selected year.
 
 ---
 
@@ -75,14 +76,13 @@ A single-page application with four linked panels driven by a shared year contro
 
 ---
 
-## Data Sources
+## Data Notes
 
-**Census data**
-Statistics Bureau of Japan — Population Census (国勢調査), 1920–2020.
-Retrieved via [e-Stat](https://www.e-stat.go.jp/). Provided under the [e-Stat Terms of Use](https://www.e-stat.go.jp/terms-of-use). Redistribution of the derived CSV is permitted for non-commercial use with attribution.
+**Coverage:** 20 census years, 1920–2015. The source CSV (`000031523105`) tops out at 2015; 2020 data exists in the e-Stat database but requires API extraction and is not yet included.
 
-**Prefecture boundary geometry**
-GeoJSON sourced from [dataofjapan/land](https://github.com/dataofjapan/land), converted from Shapefiles published by the [Geospatial Information Authority of Japan](https://www.gsi.go.jp/) (国土地理院). Simplified at `tolerance=0.001` via Shapely for web rendering.
+**1945 Provisional Census (臨時国勢調査):** The 1945 data point is real official census data, not a gap or estimate. It was conducted November 1, 1945 — 78 days after surrender — and excludes Okinawa, which was under US administration. Age was recorded as kazoedoshi (数え年), a traditional counting system that produces bands offset by one year from completed age. These are converted to standard 5-year bands in the data pipeline. The 1945 marker is visually distinguished on the year slider and time series.
+
+**Okinawa 1950 & 1955:** Greyed out on the choropleth. During this period Okinawa remained under US administration and its census used an open-ended 70+ age band, causing the aging index to be overstated relative to other prefectures. Population figures are included; derived metrics are suppressed.
 
 ---
 
@@ -96,3 +96,14 @@ Okinawa was under U.S. administration from 1945 until 1972 and was not surveyed 
 
 **Geography**
 Boundary geometry reflects modern prefecture definitions. Minor historical boundary changes prior to 1960 are not accounted for.
+
+---
+
+## Data Sources
+
+**Census data**
+Statistics Bureau of Japan — Population Census (国勢調査), 1920–2020.
+Retrieved via [e-Stat](https://www.e-stat.go.jp/). Provided under the [e-Stat Terms of Use](https://www.e-stat.go.jp/terms-of-use). Redistribution of the derived CSV is permitted for non-commercial use with attribution.
+
+**Prefecture boundary geometry**
+GeoJSON sourced from [dataofjapan/land](https://github.com/dataofjapan/land), converted from Shapefiles published by the [Geospatial Information Authority of Japan](https://www.gsi.go.jp/) (国土地理院). Simplified at `tolerance=0.001` via Shapely for web rendering.
