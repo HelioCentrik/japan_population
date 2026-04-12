@@ -15,7 +15,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
                         PYRAMID_TOOLTIP_OFFSET_X, PYRAMID_TOOLTIP_OFFSET_Y, PYRAMID_GRAPH_TOP_OFFSET,
-                        TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT,
+                        TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT, TS_TOOLTIP_OFFSET_X, TS_TOOLTIP_OFFSET_Y,
                         ACCENT_DANKAI, ACCENT_DANKAI_JR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,)
 from app.index_string import INDEX_STRING
@@ -303,9 +303,14 @@ app.layout = html.Div(
                         ),
                         dcc.Graph(
                             id="timeseries-chart",
+                            clear_on_unhover=True,
                             figure=build_timeseries_fig(selected_year=MAX_YEAR, area_estat=None),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
+                        ),
+                        dcc.Tooltip(
+                            id="timeseries-tooltip",
+                            direction="top",
                         ),
                     ]
                 ),
@@ -442,17 +447,17 @@ def show_map_tooltip(hover_data, metric):
     if cd is None:
         if pt.get("location") == OKINAWA_AREA_ESTAT:
             children = html.Div([
-                html.Div("沖縄県  Okinawa", className="map-tt-title"),
-                html.Div("⚠ データ品質に注意", className="map-tt-warning"),
+                html.Div("沖縄県  Okinawa", className="tt-title"),
+                html.Div("⚠ データ品質に注意", className="tt-warning"),
                 html.Div(
                     "米国統治期の集計方法の違いにより他年度と比較できません。",
-                    className="map-tt-body",
+                    className="tt-body",
                 ),
                 html.Div(
                     "Age band inflation under US administration — not comparable to other census years.",
-                    className="map-tt-hint",
+                    className="tt-hint",
                 ),
-            ], className="map-tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
+            ], className="tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
             return True, bbox, children
         return False, no_update, no_update
 
@@ -473,30 +478,30 @@ def show_map_tooltip(hover_data, metric):
     if show_pop:
         secondary.append(
             html.Div([
-                html.Span("人口  ", className="map-tt-label"),
-                html.Span(f"{int(population):,}", className="map-tt-value"),
+                html.Span("人口  ", className="tt-label"),
+                html.Span(f"{int(population):,}", className="tt-value"),
             ])
         )
     if show_aging:
         secondary.append(
             html.Div([
-                html.Span("高齢化指数  ", className="map-tt-label"),
-                html.Span(f"{aging_index:.1f}", className="map-tt-value"),
+                html.Span("高齢化指数  ", className="tt-label"),
+                html.Span(f"{aging_index:.1f}", className="tt-value"),
             ])
         )
 
     children = html.Div([
         html.Div([
-            html.Span(name_ja, className="map-tt-name-ja"),
-            html.Span(f"  {name_en}", className="map-tt-name-en"),
-        ], className="map-tt-title"),
-        html.Div(meta["label"], className="map-tt-metric-label"),
-        html.Div(metric_str,    className="map-tt-metric-value"),
-        html.Div(delta_str,     className="map-tt-delta"),
-        html.Hr(className="map-tt-divider") if secondary else None,
+            html.Span(name_ja, className="tt-name-ja"),
+            html.Span(f"  {name_en}", className="tt-name-en"),
+        ], className="tt-title"),
+        html.Div(meta["label"], className="tt-metric-label"),
+        html.Div(metric_str,    className="tt-metric-value"),
+        html.Div(delta_str,     className="tt-delta"),
+        html.Hr(className="tt-divider") if secondary else None,
         *secondary,
-        html.Div("再選択でクリア  /  Reselect to clear", className="map-tt-hint"),
-    ], className="map-tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
+        html.Div("再選択でクリア  /  Reselect to clear", className="tt-hint"),
+    ], className="tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
 
     return True, bbox, children
 
@@ -523,7 +528,7 @@ def show_pyramid_tooltip(hover_data):
     # zero or positive x     → tooltip right, arrow points left
     x_val     = pt.get("x", 0)
     direction = "left" if x_val < 0 else "right"
-    arrow_cls = "map-tt-card arrow-right" if direction == "left" else "map-tt-card"
+    arrow_cls = "tt-card arrow-right" if direction == "left" else "tt-card"
     x_offset  = PYRAMID_TOOLTIP_OFFSET_X if direction == "right" else -PYRAMID_TOOLTIP_OFFSET_X
 
     raw  = pt.get("bbox", {})
@@ -549,27 +554,27 @@ def show_pyramid_tooltip(hover_data):
             }
             cohort_name, birth_range, cohort_color = _COHORT_META[cohort_key]
             cohort_strip = html.Div([
-                html.Hr(className="map-tt-divider"),
+                html.Hr(className="tt-divider"),
                 html.Div([
                     html.Div(className="pyramid-tt-cohort-strip",
                              style={"--cohort-color": cohort_color}),
                     html.Div([
-                        html.Span(cohort_name, className="map-tt-label",
+                        html.Span(cohort_name, className="tt-label",
                                   style={"color": cohort_color}),
-                        html.Span(f"  {birth_range}", className="map-tt-hint"),
+                        html.Span(f"  {birth_range}", className="tt-hint"),
                     ]),
                 ], className="pyramid-tt-cohort-row"),
             ])
 
         children = html.Div([
-            html.Div(f"年齢: {age_label}", className="map-tt-title"),
+            html.Div(f"年齢: {age_label}", className="tt-title"),
             html.Div([
-                html.Span("男 Male  ", className="map-tt-label"),
-                html.Span(f"{int(male_pop):,}", className="map-tt-value"),
+                html.Span("男 Male  ", className="tt-label"),
+                html.Span(f"{int(male_pop):,}", className="tt-value"),
             ]),
             html.Div([
-                html.Span("女 Female  ", className="map-tt-label"),
-                html.Span(f"{int(female_pop):,}", className="map-tt-value"),
+                html.Span("女 Female  ", className="tt-label"),
+                html.Span(f"{int(female_pop):,}", className="tt-value"),
             ]),
             cohort_strip,
         ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
@@ -587,16 +592,75 @@ def show_pyramid_tooltip(hover_data):
         html.Div([
             html.Div(className="pyramid-tt-cohort-strip",
                      style={"--cohort-color": cohort_color}),
-            html.Div(cohort_name, className="map-tt-title",
+            html.Div(cohort_name, className="tt-title",
                      style={"color": cohort_color}),
         ], className="pyramid-tt-cohort-row"),
-        html.Div(birth_range, className="map-tt-hint"),
-        html.Hr(className="map-tt-divider"),
+        html.Div(birth_range, className="tt-hint"),
+        html.Hr(className="tt-divider"),
         html.Div([
-            html.Span("年齢  ", className="map-tt-label"),
-            html.Span(age_label, className="map-tt-value"),
+            html.Span("年齢  ", className="tt-label"),
+            html.Span(age_label, className="tt-value"),
         ]),
     ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
+
+    return True, bbox, children, direction
+
+@app.callback(
+    Output("timeseries-tooltip", "show"),
+    Output("timeseries-tooltip", "bbox"),
+    Output("timeseries-tooltip", "children"),
+    Output("timeseries-tooltip", "direction"),
+    Input("timeseries-chart", "hoverData"),
+    State("ts-view-selector", "value"),
+    prevent_initial_call=True,
+)
+def show_timeseries_tooltip(hover_data, ts_view):
+    if hover_data is None or not hover_data.get("points"):
+        return False, no_update, no_update, no_update
+
+    pt = hover_data["points"][0]
+    cd = pt.get("customdata")
+    if cd is None:
+        return False, no_update, no_update, no_update
+
+    year         = cd[0]
+    value        = cd[1]
+    series_label = cd[2]
+    flag         = cd[3]  # "" or "1945" (aging view); sex col name (population view)
+
+    raw       = pt.get("bbox", {})
+    direction = "top"
+    arrow_cls = "tt-card arrow-bottom"
+    x_offset  = TS_TOOLTIP_OFFSET_X if direction == "right" else -TS_TOOLTIP_OFFSET_X
+
+    bbox = {
+        "x0": raw.get("x0", 0),
+        "x1": raw.get("x1", 0),
+        "y0": raw.get("y0", 0) - TS_TOOLTIP_OFFSET_Y,
+        "y1": raw.get("y1", 0) - TS_TOOLTIP_OFFSET_Y,
+    }
+
+    if ts_view == "population":
+        metric_label = "人口 / Population"
+        metric_value = f"{value:.1f}M"
+    else:
+        metric_label = "高齢化指数 / Aging Index"
+        metric_value = f"{value:.1f}"
+
+    note = None
+    if flag == "1945":
+        note = html.Div(
+            "臨時国勢調査  /  Provisional Wartime Census",
+            className="tt-hint",
+        )
+
+    children = html.Div([
+        html.Div(str(int(year)), className="tt-title"),
+        html.Div(metric_label,  className="tt-metric-label"),
+        html.Div(metric_value,  className="tt-metric-value"),
+        html.Div(series_label,  className="tt-hint"),
+        note,
+    ], className=arrow_cls, style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
 
     return True, bbox, children, direction
 

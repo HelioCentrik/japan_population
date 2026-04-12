@@ -400,7 +400,7 @@ html, body {
     min-height       : 0;
     border-radius    : var(--border-radius);
     box-shadow       : var(--shadow-drop);
-    overflow         : visible;          /* ← was: hidden */
+    overflow         : visible;
     background-color : var(--panel-bg);
     position         : relative;
     z-index          : 0;
@@ -458,7 +458,7 @@ html, body {
     min-height       : 0;
     border-radius    : var(--border-radius);
     box-shadow       : var(--shadow-drop);     /* drop shadow only */
-    overflow         : hidden;
+    overflow         : visible;
     background-color : var(--panel-bg);
     position         : relative;
     z-index          : 0;
@@ -527,7 +527,7 @@ html, body {
     display: none !important;
 }
 
-.dash-tooltip .map-tt-card {
+.dash-tooltip .tt-card {
     /* Arrow dimensions — tweak these two values to resize */
     --tt-arrow-h : 4px;   /* half-height: total triangle height = 2× this */
     --tt-arrow-l : 24px;  /* length: how far it reaches toward the selection */
@@ -545,7 +545,7 @@ html, body {
 }
 
 /* Arrow border layer */
-.map-tt-card::before {
+.tt-card::before {
     content       : '';
     position      : absolute;
     right         : calc(100% + 1px);
@@ -560,7 +560,7 @@ html, body {
 }
 
 /* Arrow fill layer */
-.map-tt-card::after {
+.tt-card::after {
     content       : '';
     position      : absolute;
     right         : 100%;
@@ -575,17 +575,17 @@ html, body {
     pointer-events: none;
 }
 
-.dash-tooltip .map-tt-name-ja      { color: var(--tooltip-text-hi)  !important; }
-.dash-tooltip .map-tt-name-en      { color: var(--tooltip-text-mid) !important; }
-.dash-tooltip .map-tt-metric-value { color: var(--tooltip-text-hi)  !important; }
-.dash-tooltip .map-tt-delta        { color: var(--tooltip-text-mid) !important; }
-.dash-tooltip .map-tt-label        { color: var(--tooltip-text-mid) !important; }
-.dash-tooltip .map-tt-value        { color: var(--tooltip-text-hi)  !important; }
-.dash-tooltip .map-tt-warning      { color: var(--tooltip-warning)  !important; }
-.dash-tooltip .map-tt-body         { color: var(--tooltip-text-hi)  !important; }
-.dash-tooltip .map-tt-hint         { color: var(--tooltip-hint)     !important; }
+.dash-tooltip .tt-name-ja      { color: var(--tooltip-text-hi)  !important; }
+.dash-tooltip .tt-name-en      { color: var(--tooltip-text-mid) !important; }
+.dash-tooltip .tt-metric-value { color: var(--tooltip-text-hi)  !important; }
+.dash-tooltip .tt-delta        { color: var(--tooltip-text-mid) !important; }
+.dash-tooltip .tt-label        { color: var(--tooltip-text-mid) !important; }
+.dash-tooltip .tt-value        { color: var(--tooltip-text-hi)  !important; }
+.dash-tooltip .tt-warning      { color: var(--tooltip-warning)  !important; }
+.dash-tooltip .tt-body         { color: var(--tooltip-text-hi)  !important; }
+.dash-tooltip .tt-hint         { color: var(--tooltip-hint)     !important; }
 
-.dash-tooltip .map-tt-title {
+.dash-tooltip .tt-title {
     font-size:     15px;
     font-weight:   600;
     color:         var(--tooltip-text-hi) !important;
@@ -593,25 +593,25 @@ html, body {
     line-height:   1.3;
 }
 
-.dash-tooltip .map-tt-metric-label {
+.dash-tooltip .tt-metric-label {
     font-size:  11px;
     color:      var(--tooltip-text-mid) !important;
     margin-top: 2px;
 }
 
-.dash-tooltip .map-tt-metric-value {
+.dash-tooltip .tt-metric-value {
     font-size:   22px;
     font-weight: 700;
     line-height: 1.2;
     margin:      2px 0 4px;
 }
 
-.dash-tooltip .map-tt-divider {
+.dash-tooltip .tt-divider {
     border-top: var(--tooltip-border-size) solid var(--tooltip-divider) !important;
     margin:     8px 0;
 }
 
-.dash-tooltip .map-tt-hint {
+.dash-tooltip .tt-hint {
     font-size:  10px;
     margin-top: 8px;
 }
@@ -635,17 +635,49 @@ html, body {
     align-self       : stretch;
 }
 
-.dash-tooltip .map-tt-card.arrow-right::before {
+.dash-tooltip .tt-card.arrow-right::before {
     right        : auto;
     left         : calc(100% + 1px);
     border-right : none;
     border-left  : calc(var(--tt-arrow-l) + 1px) solid var(--tooltip-border);
 }
-.dash-tooltip .map-tt-card.arrow-right::after {
+.dash-tooltip .tt-card.arrow-right::after {
     right        : auto;
     left         : 100%;
     border-right : none;
     border-left  : var(--tt-arrow-l) solid var(--tooltip-bg);
+}
+
+.dash-tooltip .tt-card.arrow-bottom::before {
+    content       : '';
+    position      : absolute;
+    top           : 100%;
+    left          : 50%;
+    right         : auto;
+    transform     : translateX(-50%);
+    width         : 0;
+    height        : 0;
+    border-left   : calc(var(--tt-arrow-h) + 2px) solid transparent;
+    border-right  : calc(var(--tt-arrow-h) + 2px) solid transparent;
+    border-top    : calc(var(--tt-arrow-l) + 1px) solid var(--tooltip-border);
+    border-bottom : none;
+    pointer-events: none;
+}
+.dash-tooltip .tt-card.arrow-bottom::after {
+    content       : '';
+    position      : absolute;
+    top           : 100%;
+    left          : 50%;
+    right         : auto;
+    transform     : translateX(-50%);
+    z-index       : 1;
+    width         : 0;
+    height        : 0;
+    border-left   : var(--tt-arrow-h) solid transparent;
+    border-right  : var(--tt-arrow-h) solid transparent;
+    border-top    : var(--tt-arrow-l) solid var(--tooltip-bg);
+    border-bottom : none;
+    pointer-events: none;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */

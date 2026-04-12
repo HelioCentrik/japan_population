@@ -39,7 +39,7 @@ from app.config import (
     TOOLTIP_TEXT_HI, TOOLTIP_TEXT_MID,
     TOOLTIP_HINT, TOOLTIP_DIVIDER,
     # Timeseries
-    TIMESERIES_SELECTOR_OFFSET_L
+    TS_SELECTOR_OFFSET_L
 )
 
 INDEX_STRING = f'''<!DOCTYPE html>
@@ -131,7 +131,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --tooltip-divider     : {TOOLTIP_DIVIDER};
                 
                 /* Timeseries */
-                --ts-selector-offset-l: {TIMESERIES_SELECTOR_OFFSET_L};
+                --ts-selector-offset-l: {TS_SELECTOR_OFFSET_L};
             }}
         </style>
     </head>

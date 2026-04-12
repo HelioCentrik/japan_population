@@ -99,7 +99,13 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         mode="lines",
         name="全国 National",
         line=dict(color=COLOR_TEXT_MID, width=LINE_WIDTH_MAIN),
-        hovertemplate="<b>%{x}</b><br>高齢化指数: <b>%{y:.1f}</b><extra>全国</extra>",
+        hoverinfo="none",
+        customdata=list(zip(
+            national_df["year"],
+            national_df["aging_index"],
+            ["全国"] * len(national_df),
+            [""] * len(national_df),
+        )),
     ))
 
     # Regular census year dots (non-1945 only)
@@ -125,13 +131,13 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
                 color=COLOR_PRIMARY,
                 line=dict(width=LINE_WIDTH_1945, color=COLOR_PRIMARY),
             ),
-            hovertemplate=(
-                "<b>1945</b><br>"
-                "高齢化指数: <b>%{y:.1f}</b><br>"
-                "臨時国勢調査<br>"
-                "<span style='font-size:11px;color:#aaa'>Provisional Wartime Census</span>"
-                "<extra></extra>"
-            ),
+            hoverinfo="none",
+            customdata=[[
+                int(df_1945["year"].iloc[0]),
+                float(df_1945["aging_index"].iloc[0]),
+                "全国",
+                "1945",
+            ]],
         ))
 
     # ── Prefecture overlay ────────────────────────────────────────────────────
@@ -142,8 +148,14 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             mode="lines+markers",
             name=pref_label,
             line=dict(color=TIMESERIES_PREF_COLOR, width=LINE_WIDTH_PREF, dash="dot"),
-            marker=dict(size=4, color=TIMESERIES_PREF_COLOR),  # 4px — intentionally smaller than national dots
-            hovertemplate=f"<b>%{{x}}</b><br>高齢化指数: <b>%{{y:.1f}}</b><extra>{pref_label}</extra>",
+            marker=dict(size=4, color=TIMESERIES_PREF_COLOR),
+            hoverinfo="none",
+            customdata=list(zip(
+                pref_df["year"],
+                pref_df["aging_index"],
+                [pref_label] * len(pref_df),
+                [""] * len(pref_df),
+            )),
         ))
 
     fig = go.Figure(data=traces)
@@ -289,8 +301,8 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
     # ── National lines ────────────────────────────────────────────────────────
     if area_estat is None:
         national_series = [
-            ("total",  "全国 Total",  COLOR_TEXT_MID,       LINE_WIDTH_MAIN),
-            ("male",   "全国 Male",   PYRAMID_MALE_COLOR,   LINE_WIDTH_MAIN),
+            ("total", "全国 Total", COLOR_TEXT_MID, LINE_WIDTH_MAIN),
+            ("male", "全国 Male", PYRAMID_MALE_COLOR, LINE_WIDTH_MAIN),
             ("female", "全国 Female", PYRAMID_FEMALE_COLOR, LINE_WIDTH_MAIN),
         ]
 
@@ -302,14 +314,20 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
                 name=label,
                 line=dict(color=color, width=width),
                 marker=dict(color=color, size=MARKER_SIZE_DOT),
-                hovertemplate=f"<b>%{{x}}</b><br>人口: <b>%{{y:.0f}}M</b><extra>{label}</extra>",
+                hoverinfo="none",
+                customdata=list(zip(
+                    national_df["year"],
+                    national_df[col] / M,
+                    [label] * len(national_df),
+                    [col] * len(national_df),
+                )),
             ))
 
     # ── Prefecture overlays ───────────────────────────────────────────────────
     if pref_df is not None and not pref_df.empty:
         pref_series = [
-            ("total",  f"{pref_label} Total",  COLOR_TEXT_MID),
-            ("male",   f"{pref_label} Male",   PYRAMID_MALE_COLOR),
+            ("total", f"{pref_label} Total", COLOR_TEXT_MID),
+            ("male", f"{pref_label} Male", PYRAMID_MALE_COLOR),
             ("female", f"{pref_label} Female", PYRAMID_FEMALE_COLOR),
         ]
 
@@ -321,7 +339,13 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
                 name=label,
                 line=dict(color=color, width=LINE_WIDTH_PREF, dash="dot"),
                 marker=dict(color=color, size=4),
-                hovertemplate=f"<b>%{{x}}</b><br>人口: <b>%{{y:.0f}}M</b><extra>{label}</extra>",
+                hoverinfo="none",
+                customdata=list(zip(
+                    pref_df["year"],
+                    pref_df[col] / M,
+                    [label] * len(pref_df),
+                    [col] * len(pref_df),
+                )),
             ))
 
     fig = go.Figure(data=traces)
