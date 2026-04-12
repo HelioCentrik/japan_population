@@ -652,7 +652,7 @@ html, body {
     content       : '';
     position      : absolute;
     top           : 100%;
-    left          : 50%;
+    left          : calc(50% + var(--arrow-x-offset, 0px));
     right         : auto;
     transform     : translateX(-50%);
     width         : 0;
@@ -667,7 +667,7 @@ html, body {
     content       : '';
     position      : absolute;
     top           : 100%;
-    left          : 50%;
+    left          : calc(50% + var(--arrow-x-offset, 0px));
     right         : auto;
     transform     : translateX(-50%);
     z-index       : 1;

@@ -569,13 +569,21 @@ def show_pyramid_tooltip(hover_data):
         children = html.Div([
             html.Div(f"年齢: {age_label}", className="tt-title"),
             html.Div([
-                html.Span("男 Male  ", className="tt-label"),
-                html.Span(f"{int(male_pop):,}", className="tt-value"),
-            ]),
+                html.Div(className="pyramid-tt-cohort-strip",
+                         style={"--cohort-color": PYRAMID_MALE_COLOR}),
+                html.Div([
+                    html.Span("男 Male  ", className="tt-label"),
+                    html.Span(f"{int(male_pop):,}", className="tt-value"),
+                ]),
+            ], className="pyramid-tt-cohort-row"),
             html.Div([
-                html.Span("女 Female  ", className="tt-label"),
-                html.Span(f"{int(female_pop):,}", className="tt-value"),
-            ]),
+                html.Div(className="pyramid-tt-cohort-strip",
+                         style={"--cohort-color": PYRAMID_FEMALE_COLOR}),
+                html.Div([
+                    html.Span("女 Female  ", className="tt-label"),
+                    html.Span(f"{int(female_pop):,}", className="tt-value"),
+                ]),
+            ], className="pyramid-tt-cohort-row"),
             cohort_strip,
         ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
 
@@ -624,15 +632,16 @@ def show_timeseries_tooltip(hover_data, ts_view):
         return False, no_update, no_update, no_update
 
     raw   = pt.get("bbox", {})
-    bbox  = {
-        "x0": raw.get("x0", 0),
-        "x1": raw.get("x1", 0),
+    bbox = {
+        "x0": raw.get("x0", 0) - TS_TOOLTIP_OFFSET_X,
+        "x1": raw.get("x1", 0) - TS_TOOLTIP_OFFSET_X,
         "y0": raw.get("y0", 0) - TS_TOOLTIP_OFFSET_Y,
         "y1": raw.get("y1", 0) - TS_TOOLTIP_OFFSET_Y,
     }
 
     year = cd[0]
 
+    # population metric
     if ts_view == "population":
         total_M       = cd[1]
         male_M        = cd[2]
@@ -657,7 +666,10 @@ def show_timeseries_tooltip(hover_data, ts_view):
             pop_row("男",   f"{male_M:.1f}M",   PYRAMID_MALE_COLOR),
             pop_row("女",   f"{female_M:.1f}M", PYRAMID_FEMALE_COLOR),
             html.Div(series_prefix, className="tt-hint"),
-        ], className="tt-card arrow-bottom", style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
+        ], className="tt-card arrow-bottom", style={
+            "--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px",
+            "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
+        })
 
     else:  # aging index
         national_ai = cd[1]
@@ -693,7 +705,10 @@ def show_timeseries_tooltip(hover_data, ts_view):
             ai_row("全国", f"{national_ai:.1f}", COLOR_TEXT_MID),
             pref_row,
             note,
-        ], className="tt-card arrow-bottom", style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
+        ], className="tt-card arrow-bottom", style={
+            "--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px",
+            "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
+        })
 
     return True, bbox, children, "top"
 
