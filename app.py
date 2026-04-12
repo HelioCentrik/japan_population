@@ -639,37 +639,45 @@ def show_timeseries_tooltip(hover_data, ts_view):
         female_M      = cd[3]
         series_prefix = cd[4]
 
+        def pop_row(label, value_str, color):
+            return html.Div([
+                html.Div(className="pyramid-tt-cohort-strip",
+                         style={"--cohort-color": color}),
+                html.Div([
+                    html.Span(f"{label}  ", className="tt-label"),
+                    html.Span(value_str,    className="tt-value"),
+                ]),
+            ], className="pyramid-tt-cohort-row")
+
         children = html.Div([
-            html.Div(str(int(year)),          className="tt-title"),
-            html.Div("人口 / Population",      className="tt-metric-label"),
-            html.Hr(                           className="tt-divider"),
-            html.Div([
-                html.Span("総数  ", className="tt-label"),
-                html.Span(f"{total_M:.1f}M",  className="tt-value"),
-            ]),
-            html.Div([
-                html.Span("男  ",  className="tt-label"),
-                html.Span(f"{male_M:.1f}M",   className="tt-value"),
-            ]),
-            html.Div([
-                html.Span("女  ",  className="tt-label"),
-                html.Span(f"{female_M:.1f}M", className="tt-value"),
-            ]),
-            html.Div(series_prefix,            className="tt-hint"),
+            html.Div(str(int(year)), className="tt-title"),
+            html.Div("人口 / Population", className="tt-metric-label"),
+            html.Hr(className="tt-divider"),
+            pop_row("総数", f"{total_M:.1f}M",  COLOR_TEXT_MID),
+            pop_row("男",   f"{male_M:.1f}M",   PYRAMID_MALE_COLOR),
+            pop_row("女",   f"{female_M:.1f}M", PYRAMID_FEMALE_COLOR),
+            html.Div(series_prefix, className="tt-hint"),
         ], className="tt-card arrow-bottom", style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
 
     else:  # aging index
         national_ai = cd[1]
-        pref_ai     = cd[2]   # None if no prefecture selected
-        pref_lbl    = cd[3]   # "" if no prefecture selected
-        flag        = cd[4]   # "1945" or ""
+        pref_ai     = cd[2]
+        pref_lbl    = cd[3]
+        flag        = cd[4]
+
+        def ai_row(label, value_str, color):
+            return html.Div([
+                html.Div(className="pyramid-tt-cohort-strip",
+                         style={"--cohort-color": color}),
+                html.Div([
+                    html.Span(f"{label}  ", className="tt-label"),
+                    html.Span(value_str,    className="tt-value"),
+                ]),
+            ], className="pyramid-tt-cohort-row")
 
         pref_row = None
         if pref_ai is not None:
-            pref_row = html.Div([
-                html.Span(f"{pref_lbl}  ", className="tt-label"),
-                html.Span(f"{pref_ai:.1f}", className="tt-value"),
-            ])
+            pref_row = ai_row(pref_lbl, f"{pref_ai:.1f}", TIMESERIES_PREF_COLOR)
 
         note = None
         if flag == "1945":
@@ -679,13 +687,10 @@ def show_timeseries_tooltip(hover_data, ts_view):
             )
 
         children = html.Div([
-            html.Div(str(int(year)),              className="tt-title"),
-            html.Div("高齢化指数 / Aging Index",   className="tt-metric-label"),
-            html.Hr(                               className="tt-divider"),
-            html.Div([
-                html.Span("全国  ",   className="tt-label"),
-                html.Span(f"{national_ai:.1f}", className="tt-value"),
-            ]),
+            html.Div(str(int(year)),            className="tt-title"),
+            html.Div("高齢化指数 / Aging Index", className="tt-metric-label"),
+            html.Hr(className="tt-divider"),
+            ai_row("全国", f"{national_ai:.1f}", COLOR_TEXT_MID),
             pref_row,
             note,
         ], className="tt-card arrow-bottom", style={"--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px"})
