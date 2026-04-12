@@ -614,6 +614,15 @@ html, body {
     margin-top: 8px;
 }
 
+.dash-tooltip .tt-provisional-banner {
+    color          : var(--color-primary) !important;
+    font-size      : 10px;
+    font-weight    : 600;
+    letter-spacing : 0.05em;
+    text-transform : uppercase;
+    margin-bottom  : 2px;
+}
+
 /* Pyramid cohort indicator row (bar card append + scatter card header) */
 .dash-tooltip .pyramid-tt-cohort-row {
     display    : flex;

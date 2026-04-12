@@ -658,10 +658,16 @@ def show_timeseries_tooltip(hover_data, ts_view):
                 ]),
             ], className="pyramid-tt-cohort-row")
 
+        provisional_banner = (
+            html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
+            if int(year) == 1945 else None
+        )
+
         children = html.Div([
+            provisional_banner,
             html.Div(str(int(year)), className="tt-title"),
             html.Div("人口 / Population", className="tt-metric-label"),
-            html.Hr(className="tt-divider"),
+            html.Hr(className="tt-divider") if provisional_banner else None,
             pop_row("総数", f"{total_M:.1f}M",  COLOR_TEXT_MID),
             pop_row("男",   f"{male_M:.1f}M",   PYRAMID_MALE_COLOR),
             pop_row("女",   f"{female_M:.1f}M", PYRAMID_FEMALE_COLOR),
@@ -698,13 +704,18 @@ def show_timeseries_tooltip(hover_data, ts_view):
                 className="tt-hint",
             )
 
+        provisional_banner = (
+            html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
+            if flag == "1945" else None
+        )
+
         children = html.Div([
+            provisional_banner,
             html.Div(str(int(year)),            className="tt-title"),
             html.Div("高齢化指数 / Aging Index", className="tt-metric-label"),
-            html.Hr(className="tt-divider"),
+            html.Hr(className="tt-divider") if provisional_banner else None,
             ai_row("全国", f"{national_ai:.1f}", COLOR_TEXT_MID),
             pref_row,
-            note,
         ], className="tt-card arrow-bottom", style={
             "--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px",
             "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
