@@ -285,10 +285,6 @@ html, body {
     box-shadow      : 0 0 5px rgba(170, 170, 221, 0.5) !important;
 }
 
-.dash-slider-mark {
-    color: var(--color-text-hi) !important;
-}
-
 
 /* ── Layout ────────────────────────────────────────────────────────────────── */
 
