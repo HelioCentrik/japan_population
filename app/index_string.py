@@ -57,7 +57,6 @@ INDEX_STRING = f'''<!DOCTYPE html>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&family=BIZ+UDGothic&family=JetBrains+Mono&family=Noto+Sans+Mono&display=swap" rel="stylesheet">
 
-        {{%css%}}
         <style>
             :root {{
 
@@ -100,9 +99,9 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --font-size-chart-title   : {FONT_SIZE_CHART_TITLE}px;
                 --font-size-colorbar      : {FONT_SIZE_COLORBAR}px;
                 --font-size-colorbar-tick : {FONT_SIZE_COLORBAR_TICK}px;
-                --font-size-kpi-label     : {FONT_SIZE_KPI_LABEL}px;
-                --font-size-kpi-value     : {FONT_SIZE_KPI_VALUE}px;
-                --font-size-kpi-sub       : {FONT_SIZE_KPI_SUB}px;
+                --font-size-kpi-label     : clamp(8px, 0.6vw, {FONT_SIZE_KPI_LABEL}px);
+                --font-size-kpi-value     : clamp(16px, 1.25vw, {FONT_SIZE_KPI_VALUE}px);
+                --font-size-kpi-sub       : clamp(8px, 0.6vw, {FONT_SIZE_KPI_SUB}px);
                 --font-size-title         : {FONT_SIZE_TITLE}px;
 
                 /* Borders */
@@ -129,9 +128,9 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --tooltip-divider     : {TOOLTIP_DIVIDER};
                 
                 /* KPIs */
-                --kpi-label-h : {KPI_LABEL_H}px;
-                --kpi-value-h : {KPI_VALUE_H}px;
-                --kpi-sub-h   : {KPI_SUB_H}px;
+                --kpi-label-h : clamp(10px, 1.5vw, {KPI_LABEL_H}px);
+                --kpi-value-h : clamp(10px, 1.5vw, {KPI_VALUE_H}px);
+                --kpi-sub-h   : clamp(6px, 0.5vw, {KPI_SUB_H}px);
 
                 /* Play button */
                 --play-btn-size      : {PLAY_BTN_SIZE};
@@ -141,6 +140,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --ts-selector-offset-l: {TS_SELECTOR_OFFSET_L};
             }}
         </style>
+        {{%css%}}
     </head>
     <body>
         {{%app_entry%}}

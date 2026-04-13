@@ -690,34 +690,24 @@ html, body {
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 1100px) {
-    #kpi-row {
-        flex-wrap: wrap;
-    }
-    #kpi-row .card {
-        flex: 1 1 30%;
-    }
+    #kpi-row { flex-wrap: wrap; }
+    #kpi-row .card { flex: 1 1 30%; }
 }
 
 @media (max-width: 768px) {
-    #kpi-row {
-        flex-wrap: wrap;
-    }
-    #kpi-row .card {
-        flex: 1 1 45%;
-    }
+    #kpi-row { flex-wrap: wrap; }
+    #kpi-row .card { flex: 1 1 45%; }
 
     .map-pyramid-row {
         flex-direction: column;
         flex          : none;
         height        : auto;
     }
-
     .map-panel,
     .pyramid-panel {
         flex  : none;
         height: 50vh;
     }
-
     .timeseries-panel {
         flex  : none;
         height: 30vh;
