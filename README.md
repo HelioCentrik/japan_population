@@ -52,13 +52,13 @@ A single-page application with four linked panels driven by a shared year contro
 
 ### Panels
 
+**KPI cards** — National population, period-over-period population change, aging index, children 0–14 share, and the most- and least-aged prefectures for the selected year.
+
 **Choropleth map** — Prefecture-level choropleth with per-metric colour scales. Hover for prefecture name, population, aging index, and period-over-period delta. Aging index is defined as `population 65+ / population 0–14 × 100` (高齢化指数); values above 100 indicate the elderly population exceeds the child population. Okinawa is greyed out for 1950 and 1955 (see Limitations).
 
 **Population pyramid** — Age/sex butterfly chart for the selected year and geography. Cohort annotations mark the 団塊世代 (dankai), 団塊ジュニア, 戦中世代 (wartime generation), and 少子化世代 birth cohorts. Hover tooltips show cohort context and population figures. The wartime generation's male deficit is visible walking up the pyramid across years.
 
 **Time series** — Switchable between two views via a dropdown selector. The default population view shows national total, male, and female population trends in millions. The aging index view shows national 高齢化指数 (1920–2020) with a reference line at 100 — the crossover point where the elderly population exceeds the child population. Prefecture overlay shown on map selection. The 1945 data point is rendered as a distinct open-circle marker in red, matching the year slider. See Data Notes for 1945 provenance.
-
-**KPI cards** — National population, period-over-period population change, aging index, children 0–14 share, and the most- and least-aged prefectures for the selected year.
 
 ---
 
