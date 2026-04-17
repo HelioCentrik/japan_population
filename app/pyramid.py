@@ -14,6 +14,7 @@ from app.config import (
     FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
     MARKER_SIZE_DIAMOND, MARKER_SIZE_LEGEND_SQ,
     MAX_YEAR,
+    get_scaled_fonts,
 )
 from app.db import get_con
 from app import figure_cache
@@ -66,8 +67,8 @@ _COHORTS = {
 # ]
 
 
-def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 5_000_000) -> go.Figure:
-    _key = figure_cache.make_key("pyramid", year, area_estat, axis_max)
+def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int | None = None, tier: str = "lg") -> go.Figure:
+    _key = figure_cache.make_key("pyramid", year, area_estat, axis_max, tier)
     if (fig := figure_cache.get(_key)) is not None:
         return fig
 
@@ -244,6 +245,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             linewidth=2,
             mirror=True,
             tickformat="~s",
+            tickfont=dict(size=get_scaled_fonts(tier)["axis_tick"]),
             tickangle=0,
             zeroline=True,
             zerolinewidth=1,
@@ -259,8 +261,9 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int = 
             mirror=True,
             title=dict(
                 text="Age (Years)",
-                font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
+                font=dict(color=COLOR_TEXT_MID, size=get_scaled_fonts(tier)["axis_title"]),
             ),
+            tickfont=dict(size=get_scaled_fonts(tier)["axis_tick"]),
             showgrid=False,
             categoryorder="array",
             categoryarray=age_labels,

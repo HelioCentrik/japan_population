@@ -439,7 +439,7 @@ html, body {
     left            : 56%;
     transform       : translateX(-50%);
     z-index         : 20;
-    font-size       : var(--font-size-kpi-sub);
+    font-size       : var(--font-size-legend);
     color           : var(--color-text-mid);
     flex-shrink     : 0;
     display         : flex;

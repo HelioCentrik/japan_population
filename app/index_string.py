@@ -95,7 +95,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 /* Font sizes */
                 --font-size-axis-tick     : {FONT_SIZE_AXIS_TICK}px;
                 --font-size-axis-title    : {FONT_SIZE_AXIS_TITLE}px;
-                --font-size-legend        : {FONT_SIZE_LEGEND}px;
+                --font-size-legend        : clamp(11px, 1.0vw, {FONT_SIZE_LEGEND}px);
                 --font-size-chart-title   : {FONT_SIZE_CHART_TITLE}px;
                 --font-size-colorbar      : {FONT_SIZE_COLORBAR}px;
                 --font-size-colorbar-tick : {FONT_SIZE_COLORBAR_TICK}px;
@@ -128,9 +128,9 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --tooltip-divider     : {TOOLTIP_DIVIDER};
                 
                 /* KPIs */
-                --kpi-label-h : clamp(10px, 1.5vw, {KPI_LABEL_H}px);
-                --kpi-value-h : clamp(10px, 1.5vw, {KPI_VALUE_H}px);
-                --kpi-sub-h   : clamp(6px, 0.5vw, {KPI_SUB_H}px);
+                --kpi-label-h : clamp(12px, 1.5vw, {KPI_LABEL_H}px);
+                --kpi-value-h : clamp(12px, 1.5vw, {KPI_VALUE_H}px);
+                --kpi-sub-h   : clamp(7px, 0.5vw, {KPI_SUB_H}px);
 
                 /* Play button */
                 --play-btn-size      : {PLAY_BTN_SIZE};

@@ -200,16 +200,36 @@ FONT_STACK_MONO = _stack(
 
 # ── 6. Font sizes ─────────────────────────────────────────────────────────────
 
-FONT_SIZE_AXIS_TICK     = 11
-FONT_SIZE_AXIS_TITLE    = 11
+FONT_SIZE_AXIS_TICK     = 12.5
+FONT_SIZE_AXIS_TITLE    = 12.5
 FONT_SIZE_LEGEND        = 14
 FONT_SIZE_CHART_TITLE   = 13
 FONT_SIZE_COLORBAR      = 12
 FONT_SIZE_COLORBAR_TICK = 14
 FONT_SIZE_KPI_LABEL     = 12
 FONT_SIZE_KPI_VALUE     = 22
-FONT_SIZE_KPI_SUB       = 11
+FONT_SIZE_KPI_SUB       = 12
 FONT_SIZE_TITLE         = 32
+
+# ── 6b. Font tier scaling ─────────────────────────────────────────────────────
+# Breakpoints mirror the @media thresholds in style.css exactly.
+# Scale is a plain multiplier applied to base font sizes above.
+# Floors prevent any value from dropping below 8px.
+
+FONT_TIER_BREAKPOINTS = {"lg": 1100, "sm": 768}  # px — upper edge of each tier
+FONT_SCALE            = {"lg": 1.0, "md": 0.9, "sm": 0.8}
+
+
+def get_scaled_fonts(tier: str) -> dict:
+    s = FONT_SCALE[tier]
+    return {
+        "axis_tick":     max(8, round(FONT_SIZE_AXIS_TICK     * s)),
+        "axis_title":    max(8, round(FONT_SIZE_AXIS_TITLE    * s)),
+        "legend":        max(8, round(FONT_SIZE_LEGEND        * s)),
+        "chart_title":   max(8, round(FONT_SIZE_CHART_TITLE   * s)),
+        "colorbar":      max(8, round(FONT_SIZE_COLORBAR      * s)),
+        "colorbar_tick": max(8, round(FONT_SIZE_COLORBAR_TICK * s)),
+    }
 
 
 # ── 7. Spacing & borders ──────────────────────────────────────────────────────

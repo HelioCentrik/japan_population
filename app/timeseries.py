@@ -13,6 +13,7 @@ from app.config import (
     YAXIS_TICK_STANDOFF,
     TIMESERIES_MARGIN_L, TIMESERIES_MARGIN_R, TIMESERIES_MARGIN_T, TIMESERIES_MARGIN_B,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
+    get_scaled_fonts,
 )
 from app.db import get_con
 from app import figure_cache
@@ -80,8 +81,8 @@ def _get_aging_index_data(area_estat: str | None) -> tuple:
     return national_df, pref_df, pref_label
 
 
-def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> go.Figure:
-    _key = figure_cache.make_key("timeseries", selected_year, area_estat)
+def build_aging_index_fig(selected_year: int, area_estat: str | None = None, tier: str = "lg") -> go.Figure:
+    _key = figure_cache.make_key("timeseries", selected_year, area_estat, tier)
     if (fig := figure_cache.get(_key)) is not None:
         return fig
 
@@ -187,7 +188,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         showarrow=False,
         xanchor="left",
         yanchor="bottom",
-        font=dict(size=11, color=ACCENT_THRESHOLD),
+        font=dict(color=COLOR_TEXT_MID, size=get_scaled_fonts(tier)["axis_title"]),
         bgcolor="rgba(0,0,0,0)",
     )
 
@@ -297,8 +298,8 @@ def _get_population_data(area_estat: str | None) -> tuple:
     return national_df, pref_df, pref_label
 
 
-def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> go.Figure:
-    _key = figure_cache.make_key("population", selected_year, area_estat)
+def build_timeseries_fig(selected_year: int, area_estat: str | None = None, tier: str = "lg") -> go.Figure:
+    _key = figure_cache.make_key("population", selected_year, area_estat, tier)
     if (fig := figure_cache.get(_key)) is not None:
         return fig
 
@@ -394,7 +395,7 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
             mirror=True,
             title=dict(
                 text="百万人 / Millions",
-                font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
+                font=dict(color=COLOR_TEXT_MID, size=get_scaled_fonts(tier)["axis_title"]),
             ),
             zeroline=False,
             ticklabelstandoff=YAXIS_TICK_STANDOFF,

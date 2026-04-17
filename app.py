@@ -17,7 +17,8 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         PYRAMID_TOOLTIP_OFFSET_X, PYRAMID_TOOLTIP_OFFSET_Y, PYRAMID_GRAPH_TOP_OFFSET,
                         TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT, TS_TOOLTIP_OFFSET_X, TS_TOOLTIP_OFFSET_Y,
                         ACCENT_DANKAI, ACCENT_DANKAI_JR,
-                        MAX_YEAR, OKINAWA_AREA_ESTAT,)
+                        MAX_YEAR, OKINAWA_AREA_ESTAT,
+                        get_scaled_fonts, )
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -105,6 +106,8 @@ app.layout = html.Div(
         dcc.Store(id="selected-prefecture", data=None),
         dcc.Store(id="resume-year", data=None),
         dcc.Store(id="map-init-zoom", data=None),
+        dcc.Store(id="font-tier", data="lg"),
+        dcc.Interval(id="resize-poll", interval=200, n_intervals=0),
         dcc.Interval(
             id="zoom-init",
             interval=200,    # fires once 200ms after page load — enough for flex layout to settle
@@ -336,6 +339,20 @@ app.clientside_callback(
     Output("map-init-zoom", "data"),
     Input("zoom-init", "n_intervals"),
     prevent_initial_call=True,
+)
+
+app.clientside_callback(
+    """
+    function(n, current_tier) {
+        const w = window.innerWidth;
+        const tier = w <= 768 ? 'sm' : w <= 1100 ? 'md' : 'lg';
+        if (tier === current_tier) return window.dash_clientside.no_update;
+        return tier;
+    }
+    """,
+    Output("font-tier", "data"),
+    Input("resize-poll", "n_intervals"),
+    State("font-tier", "data"),
 )
 
 
@@ -735,9 +752,11 @@ def show_timeseries_tooltip(hover_data, ts_view):
     Input("selected-prefecture", "data"),
     Input("metric-selector", "value"),
     Input("ts-view-selector", "value"),
+    State("font-tier", "data"),
     prevent_initial_call=True,
 )
-def update_charts(year, area_estat, metric, ts_view):
+def update_charts(year, area_estat, metric, ts_view, tier):
+    tier = tier or "lg"
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:
@@ -760,7 +779,7 @@ def update_charts(year, area_estat, metric, ts_view):
         # Year or metric changed — update data traces only, never layout.
         # Leaving layout.mapbox.zoom out of the payload means Plotly keeps
         # whatever zoom is currently set (initial-load Patch or ResizeObserver).
-        fig = build_japan_map_fig(year=y, metric=metric)
+        fig = build_japan_map_fig(year=y, metric=metric, tier=tier)
         fd  = fig.to_dict()
         patched = Patch()
         # Base choropleth (data[0])
@@ -776,18 +795,59 @@ def update_charts(year, area_estat, metric, ts_view):
         map_fig = patched
 
     ts_fig = (
-        build_timeseries_fig(selected_year=y, area_estat=area_estat)
+        build_timeseries_fig(selected_year=y, area_estat=area_estat, tier=tier)
         if ts_view == "population"
-        else build_aging_index_fig(selected_year=y, area_estat=area_estat)
+        else build_aging_index_fig(selected_year=y, area_estat=area_estat, tier=tier)
     )
 
     return (
         map_fig,
-        build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
+        build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max, tier=tier),
         label,
         render_kpi_cards(kpi_data),
         ts_fig,
     )
+
+@app.callback(
+    Output("map-graph", "figure", allow_duplicate=True),
+    Input("font-tier", "data"),
+    prevent_initial_call=True,
+)
+def patch_map_fonts(tier):
+    fonts = get_scaled_fonts(tier)
+    p = Patch()
+    p["data"][0]["colorbar"]["tickfont"]["size"]    = fonts["colorbar_tick"]
+    p["data"][0]["colorbar"]["title"]["font"]["size"] = fonts["colorbar"]
+    return p
+
+
+@app.callback(
+    Output("pyramid-chart", "figure", allow_duplicate=True),
+    Input("font-tier", "data"),
+    prevent_initial_call=True,
+)
+def patch_pyramid_fonts(tier):
+    fonts = get_scaled_fonts(tier)
+    p = Patch()
+    p["layout"]["xaxis"]["tickfont"]["size"]        = fonts["axis_tick"]
+    p["layout"]["yaxis"]["tickfont"]["size"]        = fonts["axis_tick"]
+    p["layout"]["yaxis"]["title"]["font"]["size"]   = fonts["axis_title"]
+    return p
+
+
+@app.callback(
+    Output("timeseries-chart", "figure", allow_duplicate=True),
+    Input("font-tier", "data"),
+    prevent_initial_call=True,
+)
+def patch_timeseries_fonts(tier):
+    fonts = get_scaled_fonts(tier)
+    p = Patch()
+    p["layout"]["xaxis"]["tickfont"]["size"]        = fonts["axis_tick"]
+    p["layout"]["yaxis"]["tickfont"]["size"]        = fonts["axis_tick"]
+    p["layout"]["yaxis"]["title"]["font"]["size"]   = fonts["axis_title"]
+    p["layout"]["legend"]["font"]["size"]           = fonts["legend"]
+    return p
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────
