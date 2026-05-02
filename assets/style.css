@@ -321,7 +321,7 @@ html, body {
     gap              : var(--layout-gap);
     padding-left     : var(--outer-pad);
     padding-right    : var(--outer-pad);
-    padding-top      : var(--outer-pad);
+    padding-top      : calc(var(--outer-pad) - 6px);
     padding-bottom   : var(--outer-pad);
     box-sizing       : border-box;
 }
@@ -330,7 +330,7 @@ html, body {
 .dashboard-title {
     text-align    : center;
     font-family   : var(--font-serif);
-    font-size     : clamp(24px, 3vw, var(--font-size-title));
+    font-size     : clamp(24px, 1.8vw, var(--font-size-title));
     letter-spacing: 0.02em;
     margin        : 0;
 }
