@@ -23,36 +23,36 @@ from app.utils import hsl_adjust
 def _build_dark_theme() -> dict:
     # ── Surfaces, borders, UI states, text scale ───────────────────────
     surface = {
-        "page":      "#06091a",  # → page_bg
-        "panel":     "#142148",  # → panel_bg
-        "border":    "#324a8f",  # → panel_border
-        "hover":     "#162a64",  # → ui_hover
-        "grid":      "#272f53",  # → chart_grid
-        "plot":      "#0f142e",  # → chart_plot_color
-        "track":     "#1a2a44",  # → slider_track
-        "text_hint": "#6a6a9e",  # → text_hint  (de-emphasised, still legible)
-        "text_lo":   "#8c8cca",  # → text_lo    (subordinate text)
-        "text_mid":  "#b6b6f6",  # → text_mid   (body / axis text)
-        "text_hi":   "#cfdbff",  # → text_hi    (headings / primary values)
+        "page":      "#100E0C",  # sumi — warm ink black
+        "panel":     "#1C1916",  # warm charcoal — visible lift from page
+        "border":    "#2E2822",  # subtle warm border (used by bezel ::after)
+        "hover":     "#26201A",  # interactive hover — just above panel
+        "grid":      "#2A2420",  # chart grid lines — barely perceptible
+        "plot":      "#181410",  # chart plot area — slightly below panel
+        "track":     "#252018",  # slider track
+        "text_hint": "#5C514A",  # de-emphasised — barely legible
+        "text_lo":   "#8A7F74",  # faded ink — subordinate text
+        "text_mid":  "#c4bab0",  # warm mid-tone — body / axis text
+        "text_hi":   "#E8DDD0",  # washi — warm off-white / headings
     }
 
     # ── Brand and annotation colors ────────────────────────────────────
     accent = {
-        "primary": "#bc002d",  # Japan red
-        "white":   "#ffffff",
-        "warning": "#f0a830",  # warning red
-        "teal":    "#00ccaa",  # threshold reference line
-        "amber":   "#f08d0b",  # 団塊の世代
-        "lime":    "#64b909",  # 団塊ジュニア
-        "sky":     "#9ee0ff",  # 少子化世代
-        "ink":     "#2d1f0e",  # sumi dark brown
+        "primary":  "#C45C3A",  # beni-iro — lacquer red / vermillion
+        "kincha":   "#a17b41",  # kincha — aged gold (year label)
+        "warning":  "#D4873A",  # warm amber warning
+        "teal":     "#3DA898",  # desaturated teal — threshold reference line
+        "amber":    "#D4873A",  # 団塊の世代
+        "lime":     "#7AB830",  # 団塊ジュニア
+        "sky":      "#9ECFDE",  # 少子化世代 — slightly warmed sky
+        "ink":      "#100E0C",  # sumi — used for shadow_color
     }
 
     # ── Data encoding colors ───────────────────────────────────────────
     data = {
-        "male":   "#477eeb",
-        "female": "#e4536b",
-        "pref":   "#ffffff",  # timeseries prefecture overlay
+        "male":   "#477eeb",   # keep — discrimination matters
+        "female": "#e4536b",   # keep — discrimination matters
+        "pref":   "#E8DDD0",   # timeseries prefecture overlay — warm white
     }
 
     return {
@@ -62,7 +62,7 @@ def _build_dark_theme() -> dict:
         "panel_border": surface["border"],
         # Brand
         "primary":   accent["primary"],
-        "secondary": accent["white"],
+        "secondary": accent["kincha"],
         # Text scale
         "text_hi":   surface["text_hi"],
         "text_mid":  surface["text_mid"],
@@ -85,28 +85,28 @@ def _build_dark_theme() -> dict:
         "pyramid_male":   data["male"],
         "pyramid_female": data["female"],
         # Tooltip
-        "tooltip_bg": hsl_adjust(surface["plot"], s_scale=1, l_scale=1),
-        "tooltip_border": surface["border"],
-        "tooltip_border_size": "2.5px",
-        "tooltip_text_hi": surface["text_hi"],
-        "tooltip_text_mid": surface["text_mid"],
-        "tooltip_hint": surface["text_hint"],
-        "tooltip_divider": "rgba(255, 255, 255, 0.20)",
+        "tooltip_bg":          "#1E1B17",
+        "tooltip_border":      surface["border"],
+        "tooltip_border_size": "1.5px",
+        "tooltip_text_hi":     surface["text_hi"],
+        "tooltip_text_mid":    surface["text_mid"],
+        "tooltip_hint":        surface["text_hint"],
+        "tooltip_divider":     "rgba(232, 221, 208, 0.12)",
         # Map (passthroughs)
         "map_geo": {
             "bg_color":   surface["page"],
-            "land_color": "#1c1f30",
-            "line_color": "#6089A0",
+            "land_color": "#1C1916",
+            "line_color": "#5C4A3A",
         },
-        "map_highlight_line_color": accent["white"],
-        "map_highlight_fill":       "rgba(255, 255, 255, 0.08)",
+        "map_highlight_line_color": surface["text_hi"],
+        "map_highlight_fill":       "rgba(196, 92, 58, 0.12)",
         "map_colorscale": "plasma_r",
         "map_tile_style": "carto-darkmatter",
-        # Shadows
-        "bezel_hi_alpha":  0.25,
-        "bezel_lo_alpha":  0.85,
-        "shadow_color":    accent["white"],
-        "shadow_darkness": 0.2,
+        # Shadows — ink-on-ink; drop shadow minimal, bezel does the work
+        "bezel_hi_alpha":  0.10,
+        "bezel_lo_alpha":  0.55,
+        "shadow_color":    accent["ink"],
+        "shadow_darkness": 0.6,
         # Miscellaneous
         "warning": accent["warning"],
     }
