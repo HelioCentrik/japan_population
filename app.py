@@ -98,7 +98,7 @@ app.layout = html.Div(
     className="dashboard-outer",
     style={
         "backgroundColor": PAGE_BG,
-        "maxWidth": "clamp(800px,68vw, 1800px)",
+        "maxWidth": "clamp(800px,66.67vw, 1800px)",
         "margin": "0 auto",
         "overflow-y": "visible",
     },

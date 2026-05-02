@@ -83,7 +83,6 @@ html, body {
 .card {
     background        : var(--panel-bg);
     border-radius     : var(--border-radius);
-    /* box-shadow        : var(--shadow-drop); */
     padding           : 12px 16px;
     overflow          : hidden;
     display           : grid;
@@ -102,7 +101,6 @@ html, body {
     inset         : 0;
     border-radius : var(--border-radius);
     border        : var(--panel-border-thickness) solid var(--panel-border);
-    box-shadow    : var(--shadow-bezel);
     pointer-events: none;
     z-index       : 10;
 }
@@ -144,19 +142,15 @@ html, body {
     border-radius    : var(--border-radius);
     font-size        : var(--play-btn-font-size);
     cursor           : pointer;
-    box-shadow       : var(--shadow-bezel);
-    transition       : background-color 0.15s ease, box-shadow 0.1s ease, color 0.15s ease;
 }
 
 .play-btn:hover {
     background-color: var(--color-ui-hover);
     color           : var(--color-text-hi);
-    box-shadow       : var(--shadow-bezel);
 }
 
 .play-btn:active {
     background-color: var(--panel-bg);
-    box-shadow       : var(--shadow-bezel);
 }
 
 /* Metric selector strip — overlays top-left of .map-panel */
@@ -184,7 +178,6 @@ html, body {
     border           : 1px solid var(--panel-border);
     border-radius    : calc(var(--border-radius) * 0.67);
     font-size        : var(--font-size-kpi-sub);
-    box-shadow       : var(--shadow-bezel);
     width            : 200px;
     height           : 32px;
     cursor           : pointer;
@@ -327,7 +320,6 @@ html, body {
 .playback-panel {
     flex             : 1;
     border-radius    : var(--border-radius);
-    /* box-shadow       : var(--shadow-drop); */
     background-color : var(--panel-border);
     position         : relative;
     padding          : 0.75rem 1rem 0.5rem 1rem;
@@ -339,7 +331,6 @@ html, body {
     inset         : 0;
     border-radius : var(--border-radius);
     border        : var(--panel-border-thickness) solid var(--panel-border);
-    box-shadow    : var(--shadow-bezel);
     pointer-events: none;
     z-index       : 10;
 }
@@ -368,7 +359,6 @@ html, body {
     flex             : var(--map-flex);
     min-height       : var(--map-min-height);
     border-radius    : var(--border-radius);
-    /* box-shadow       : var(--shadow-drop); */
     background-color : var(--panel-bg);
     position         : relative;
     z-index          : 0;
@@ -379,7 +369,6 @@ html, body {
     inset         : 0;
     border-radius : var(--border-radius);
     border        : var(--panel-border-thickness) solid var(--panel-border);
-    box-shadow    : var(--shadow-bezel);
     pointer-events: none;
     z-index       : 10;
 }
@@ -397,7 +386,6 @@ html, body {
     flex             : var(--pyramid-flex);
     min-height       : 0;
     border-radius    : var(--border-radius);
-    /* box-shadow       : var(--shadow-drop); */
     overflow         : visible;
     background-color : var(--panel-bg);
     position         : relative;
@@ -409,7 +397,6 @@ html, body {
     inset         : 0;
     border-radius : var(--border-radius);
     border        : var(--panel-border-thickness) solid var(--panel-border);
-    box-shadow    : var(--shadow-bezel);
     pointer-events: none;
     z-index       : 10;
 }
@@ -455,7 +442,6 @@ html, body {
     flex             : var(--charts-ts-flex);
     min-height       : 0;
     border-radius    : var(--border-radius);
-    /* box-shadow       : var(--shadow-drop); */
     overflow         : visible;
     background-color : var(--panel-bg);
     position         : relative;
@@ -467,7 +453,6 @@ html, body {
     inset         : 0;
     border-radius : var(--border-radius);
     border        : var(--panel-border-thickness) solid var(--panel-border);
-    box-shadow    : var(--shadow-bezel);
     pointer-events: none;
     z-index       : 10;
 }
