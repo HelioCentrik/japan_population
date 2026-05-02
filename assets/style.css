@@ -156,7 +156,7 @@ html, body {
 .map-resize-btn {
     position         : absolute;
     top              : 16px;
-    right            : 12px;
+    right            : 16px;
     z-index          : 20;
     background-color : var(--panel-bg);
     color            : var(--color-text-mid);
