@@ -107,7 +107,7 @@ app.layout = html.Div(
         dcc.Store(id="resume-year", data=None),
         dcc.Store(id="map-init-zoom", data=None),
         dcc.Store(id="font-tier", data="lg"),
-        dcc.Interval(id="resize-poll", interval=200, n_intervals=0),
+        # dcc.Interval(id="resize-poll", interval=200, n_intervals=0),
         dcc.Interval(
             id="zoom-init",
             interval=200,    # fires once 200ms after page load — enough for flex layout to settle
@@ -226,6 +226,13 @@ app.layout = html.Div(
                                             id="reset-prefecture-btn",
                                         ),
                                     ]
+                                ),
+                                html.Button(
+                                    "⛶",
+                                    id="map-resize-btn",
+                                    className="map-resize-btn",
+                                    title="Refit map",
+                                    n_clicks=0,
                                 ),
                                 html.Div(
                                     className="map-inner",
@@ -351,8 +358,7 @@ app.clientside_callback(
     }
     """,
     Output("font-tier", "data"),
-    Input("resize-poll", "n_intervals"),
-    State("font-tier", "data"),
+    Input("map-resize-btn", "n_clicks"),
 )
 
 
@@ -752,11 +758,9 @@ def show_timeseries_tooltip(hover_data, ts_view):
     Input("selected-prefecture", "data"),
     Input("metric-selector", "value"),
     Input("ts-view-selector", "value"),
-    State("font-tier", "data"),
     prevent_initial_call=True,
 )
-def update_charts(year, area_estat, metric, ts_view, tier):
-    tier = tier or "lg"
+def update_charts(year, area_estat, metric, ts_view):
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:
@@ -779,7 +783,7 @@ def update_charts(year, area_estat, metric, ts_view, tier):
         # Year or metric changed — update data traces only, never layout.
         # Leaving layout.mapbox.zoom out of the payload means Plotly keeps
         # whatever zoom is currently set (initial-load Patch or ResizeObserver).
-        fig = build_japan_map_fig(year=y, metric=metric, tier=tier)
+        fig = build_japan_map_fig(year=y, metric=metric)
         fd  = fig.to_dict()
         patched = Patch()
         # Base choropleth (data[0])
@@ -795,14 +799,14 @@ def update_charts(year, area_estat, metric, ts_view, tier):
         map_fig = patched
 
     ts_fig = (
-        build_timeseries_fig(selected_year=y, area_estat=area_estat, tier=tier)
+        build_timeseries_fig(selected_year=y, area_estat=area_estat)
         if ts_view == "population"
-        else build_aging_index_fig(selected_year=y, area_estat=area_estat, tier=tier)
+        else build_aging_index_fig(selected_year=y, area_estat=area_estat)
     )
 
     return (
         map_fig,
-        build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max, tier=tier),
+        build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
         label,
         render_kpi_cards(kpi_data),
         ts_fig,

@@ -10,13 +10,12 @@ from plotly import graph_objects as go
 from app.utils import ceil_half_magnitude
 from app.config import (
     COLOR_TEXT_MID, MAP_GEO,
-    MAP_TILE_STYLE,
+    MAP_MARGINS, MAP_TILE_STYLE,
     MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
     FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
     MAX_YEAR, POP_DELTA_SIGMA,
-    get_scaled_fonts,
 )
 from app import figure_cache
 
@@ -68,8 +67,8 @@ def _get_global_metric_bounds() -> dict:
     }
 
 
-def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT, tier: str = "lg") -> go.Figure:
-    _key = figure_cache.make_key("map", year, metric, tier)
+def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figure:
+    _key = figure_cache.make_key("map", year, metric)
     if (fig := figure_cache.get(_key)) is not None:
         return fig
 
@@ -164,11 +163,11 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT, tier: str =
             title=dict(
                 text=colorbar_label,
                 side="bottom",
-                font=dict(size=get_scaled_fonts(tier)["colorbar"], color=COLOR_TEXT_MID),
+                font=dict(size=FONT_SIZE_COLORBAR, color=COLOR_TEXT_MID),
             ),
             x=0.02, xanchor="left",
             thickness=16, len=0.6,
-            tickfont=dict(size=get_scaled_fonts(tier)["colorbar_tick"], color=COLOR_TEXT_MID),
+            tickfont=dict(size=FONT_SIZE_COLORBAR_TICK, color=COLOR_TEXT_MID),
             **colorbar_extra,
         ),
     )
@@ -219,7 +218,7 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT, tier: str =
             style=MAP_TILE_STYLE,
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
         ),
-        margin=dict(l=8, r=8, t=8, b=8),
+        margin=dict(l=MAP_MARGINS, r=MAP_MARGINS, t=MAP_MARGINS, b=MAP_MARGINS),
         autosize=True,
     )
 

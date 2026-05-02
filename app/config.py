@@ -248,6 +248,9 @@ KPI_SUB_H   = 14   # px — sub row
 # ── 9a. Map configuration ──────────────────────────────────────────────────────
 # Structural values — these don't vary by theme.
 
+MAP_MARGINS              = 4
+MAP_BORDER_WIDTH         = 0.8
+
 POP_DELTA_SIGMA          = 2.0
 MAP_CENTER_LAT           = 35.5
 MAP_CENTER_LON           = 135.5
@@ -258,7 +261,6 @@ MAP_ZOOM_MAX             = 5.5    # maximum zoom clamp
 MAP_REF_HEIGHT           = 582    # panel height (px) at which MAP_REF_ZOOM was calibrated
 MAP_REF_ZOOM             = 3.75   # zoom that fits Japan at MAP_REF_HEIGHT
 
-MAP_BORDER_WIDTH         = 0.8
 MAP_HIGHLIGHT_LINE_WIDTH = 2.5
 MAP_TOOLTIP_OFFSET_X     = 28   # px rightward from hovered point
 MAP_TOOLTIP_OFFSET_Y     = 40   # px upward from hovered point
