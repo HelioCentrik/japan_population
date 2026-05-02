@@ -51,7 +51,7 @@ MAX_YEAR: int = _get_max_year()
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
 
 LAYOUT_GAP        = "clamp(0.2rem, 0.25vw, 0.5rem)"
-LAYOUT_OUTER_PAD  = "clamp(0.5rem, 1.0vw, 1.2rem)"
+LAYOUT_OUTER_PAD  = "clamp(0.35rem, 0.6vw, 0.75rem)"
 LAYOUT_MIN_HEIGHT = "700px"
 
 CHARTS_ANCHOR     = 10
@@ -202,7 +202,7 @@ FONT_STACK_MONO = _stack(
 
 FONT_SIZE_AXIS_TICK     = 12.5
 FONT_SIZE_AXIS_TITLE    = 12.5
-FONT_SIZE_LEGEND        = 14
+FONT_SIZE_LEGEND        = 13
 FONT_SIZE_CHART_TITLE   = 13
 FONT_SIZE_COLORBAR      = 12
 FONT_SIZE_COLORBAR_TICK = 14
@@ -236,7 +236,7 @@ def get_scaled_fonts(tier: str) -> dict:
 
 PANEL_BORDER_RADIUS    = "3px"
 PANEL_BORDER_THICKNESS = "0px"
-YAXIS_TICK_STANDOFF    = 2
+YAXIS_TICK_STANDOFF    = 0
 
 
 # ── 8. KPI card grid row heights ─────────────────────────────────────────────────
@@ -319,8 +319,8 @@ PYRAMID_BARGAP       = 0.15
 COHORT_OUTLINE_WIDTH = 3
 PYRAMID_MAX_BANDS    = 18
 PYRAMID_MARGIN_L     = 72
-PYRAMID_MARGIN_R     = 24
-PYRAMID_MARGIN_T     = 16
+PYRAMID_MARGIN_R     = 12
+PYRAMID_MARGIN_T     = 6
 PYRAMID_MARGIN_B     = 28
 PYRAMID_GRAPH_TOP_OFFSET    = 28
 PYRAMID_TOOLTIP_OFFSET_X    = 12
@@ -328,9 +328,9 @@ PYRAMID_TOOLTIP_OFFSET_Y    = 20
 
 
 # ── 11. Timeseries configuration ──────────────────────────────────────────────
-TIMESERIES_MARGIN_L  = 62
-TIMESERIES_MARGIN_R  = 24
-TIMESERIES_MARGIN_T  = 24
+TIMESERIES_MARGIN_L  = 52
+TIMESERIES_MARGIN_R  = 12
+TIMESERIES_MARGIN_T  = 12
 TIMESERIES_MARGIN_B  = 28
 
 TS_SELECTOR_OFFSET_L = TIMESERIES_MARGIN_L + 8

@@ -165,8 +165,8 @@ html, body {
     font-size        : 20px;
     font-family      : var(--font-sans);
     letter-spacing   : 0.05em;
-    width            : 32px;
-    height           : 32px;
+    width            : 28px;
+    height           : 28px;
     cursor           : pointer;
     display          : flex;
     align-items      : center;
@@ -209,7 +209,7 @@ html, body {
     border-radius    : calc(var(--border-radius) * 0.67);
     font-size        : var(--font-size-kpi-sub);
     width            : 200px;
-    height           : 32px;
+    height           : 28px;
     cursor           : pointer;
     display          : flex;
     align-items      : center;
@@ -452,8 +452,8 @@ html, body {
 }
 .pyramid-legend {
     position        : absolute;
-    top             : 14px;
-    left            : 56%;
+    top             : 6px;
+    left            : 57%;
     transform       : translateX(-50%);
     z-index         : 20;
     font-size       : var(--font-size-legend);
@@ -494,7 +494,7 @@ html, body {
 }
 
 .ts-selector-strip {
-    top : 32px;
+    top : 20px;
     left: 70px;
 }
 

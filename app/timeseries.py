@@ -204,11 +204,10 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
     fig.update_layout(
         margin=dict(l=TIMESERIES_MARGIN_L, r=TIMESERIES_MARGIN_R, t=TIMESERIES_MARGIN_T, b=TIMESERIES_MARGIN_B),
         autosize=True,
-        # paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor=CHART_PLOT_COLOR,
         legend=dict(
             orientation="h",
-            x=0.17, xanchor="left",
+            x=0.195, xanchor="left",
             y=0.98, yanchor="top",
         ),
         xaxis=dict(
@@ -377,7 +376,7 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
         plot_bgcolor=CHART_PLOT_COLOR,
         legend=dict(
             orientation="h",
-            x=0.17, xanchor="left",
+            x=0.195, xanchor="left",
             y=0.98, yanchor="top",
         ),
         xaxis=dict(
