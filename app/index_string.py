@@ -99,9 +99,9 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --font-size-chart-title   : {FONT_SIZE_CHART_TITLE}px;
                 --font-size-colorbar      : {FONT_SIZE_COLORBAR}px;
                 --font-size-colorbar-tick : {FONT_SIZE_COLORBAR_TICK}px;
-                --font-size-kpi-label     : clamp(8px, 0.6vw, {FONT_SIZE_KPI_LABEL}px);
-                --font-size-kpi-value     : clamp(16px, 1.25vw, {FONT_SIZE_KPI_VALUE}px);
-                --font-size-kpi-sub       : clamp(8px, 0.6vw, {FONT_SIZE_KPI_SUB}px);
+                --font-size-kpi-label     : clamp(11.5px, 0.7vw, {FONT_SIZE_KPI_LABEL}px);
+                --font-size-kpi-value     : clamp(17px, 1.25vw, {FONT_SIZE_KPI_VALUE}px);
+                --font-size-kpi-sub       : clamp(11.5px, 0.7vw, {FONT_SIZE_KPI_SUB}px);
                 --font-size-title         : {FONT_SIZE_TITLE}px;
 
                 /* Borders */
@@ -129,8 +129,8 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 
                 /* KPIs */
                 --kpi-label-h : clamp(12px, 1.5vw, {KPI_LABEL_H}px);
-                --kpi-value-h : clamp(12px, 1.5vw, {KPI_VALUE_H}px);
-                --kpi-sub-h   : clamp(7px, 0.5vw, {KPI_SUB_H}px);
+                --kpi-value-h : clamp(18px, 1.5vw, {KPI_VALUE_H}px);
+                --kpi-sub-h   : clamp(12px, 0.7vw, {KPI_SUB_H}px);
 
                 /* Play button */
                 --play-btn-size      : {PLAY_BTN_SIZE};

@@ -50,7 +50,7 @@ MAX_YEAR: int = _get_max_year()
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
 
-LAYOUT_GAP        = "clamp(0.2rem, 0.25vw, 0.5rem)"
+LAYOUT_GAP        = "clamp(0.3rem, 0.35vw, 0.5rem)"
 LAYOUT_OUTER_PAD  = "clamp(0.35rem, 0.6vw, 0.75rem)"
 LAYOUT_MIN_HEIGHT = "700px"
 

@@ -228,7 +228,7 @@ app.layout = html.Div(
                                     ]
                                 ),
                                 html.Button(
-                                    "⛶",
+                                    "⤢",
                                     id="map-resize-btn",
                                     className="map-resize-btn",
                                     title="Refit map",
