@@ -18,7 +18,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT, TS_TOOLTIP_OFFSET_X, TS_TOOLTIP_OFFSET_Y,
                         ACCENT_DANKAI, ACCENT_DANKAI_JR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,
-                        get_scaled_fonts, LAYOUT_GAP, )
+                        get_scaled_fonts, LAYOUT_GAP, FONT_SIZE_AXIS_TITLE, )
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -129,7 +129,7 @@ app.layout = html.Div(
             className="dashboard-title",
             style={
                 "color": COLOR_PRIMARY,
-                "marginBottom": "16px",
+                "marginBottom": "0px",
             }
         ),
 
@@ -139,7 +139,7 @@ app.layout = html.Div(
             style={
                 "textAlign": "center",
                 "color": COLOR_SECONDARY,
-                "fontSize": "28px",
+                "fontSize": "26px",
                 "letterSpacing": "0.05em",
             }
         ),
@@ -181,7 +181,7 @@ app.layout = html.Div(
                                     "label": str(yr),
                                     "style": {
                                         "color": COLOR_PRIMARY if yr == 1945 else FONT_MAIN_COLOR,
-                                        "fontSize": "13px",
+                                        "fontSize": f"{FONT_SIZE_AXIS_TITLE}px",
                                         "fontWeight": "bold" if yr == 1945 else "normal",
                                     }
                                 }

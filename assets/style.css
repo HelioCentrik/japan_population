@@ -352,7 +352,7 @@ html, body {
     border-radius    : var(--border-radius);
     background-color : var(--panel-border);
     position         : relative;
-    padding          : 0.75rem 1rem 0.5rem 1rem;
+    padding          : 0.35rem 1rem 0.25rem 1rem;
     z-index          : 0;
 }
 .playback-panel::after {
