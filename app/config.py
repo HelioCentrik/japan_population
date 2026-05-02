@@ -50,8 +50,8 @@ MAX_YEAR: int = _get_max_year()
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
 
-LAYOUT_GAP        = "clamp(0.5rem, 0.7vw, 0.8rem)"
-LAYOUT_OUTER_PAD  = "clamp(0.75rem, 1.2vw, 1.5rem)"
+LAYOUT_GAP        = "clamp(0.3rem, 0.4vw, 0.6rem)"
+LAYOUT_OUTER_PAD  = "clamp(0.5rem, 1.0vw, 1.2rem)"
 LAYOUT_MIN_HEIGHT = "700px"
 
 CHARTS_ANCHOR     = 10
@@ -234,8 +234,8 @@ def get_scaled_fonts(tier: str) -> dict:
 
 # ── 7. Spacing & borders ──────────────────────────────────────────────────────
 
-PANEL_BORDER_RADIUS    = "6px"
-PANEL_BORDER_THICKNESS = "1px"
+PANEL_BORDER_RADIUS    = "3px"
+PANEL_BORDER_THICKNESS = "0px"
 YAXIS_TICK_STANDOFF    = 2
 
 
@@ -486,5 +486,3 @@ THEME = {
 # Remove once all consumers have been updated.
 
 FONT_MAIN_COLOR    = COLOR_TEXT_MID
-FONT_MAIN          = FONT_STACK_SANS
-FONT_HEADER        = FONT_STACK_SERIF

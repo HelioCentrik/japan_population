@@ -9,7 +9,7 @@ from dash import Dash, html, dcc, Input, Output, State, ctx, no_update, Patch
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
-                        FONT_MAIN, FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT_MID,
+                        FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT_MID,
                         PLAY_INTERVAL_MS,
                         MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
                         MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
