@@ -704,7 +704,7 @@ html, body {
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
-@media (max-width: 1400px) {
+@media (max-width: 1590px) {
     #kpi-row { flex-wrap: wrap; }
     #kpi-row .card { flex: 1 1 30%; }
 }
