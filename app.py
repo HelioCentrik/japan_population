@@ -18,7 +18,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT, TS_TOOLTIP_OFFSET_X, TS_TOOLTIP_OFFSET_Y,
                         ACCENT_DANKAI, ACCENT_DANKAI_JR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,
-                        get_scaled_fonts, )
+                        get_scaled_fonts, LAYOUT_GAP, )
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -155,7 +155,7 @@ app.layout = html.Div(
             style={
                 "display": "flex",
                 "alignItems": "stretch",
-                "gap": "0.4rem",
+                "gap": f"{LAYOUT_GAP}",
             },
             children=[
 

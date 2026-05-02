@@ -50,7 +50,7 @@ MAX_YEAR: int = _get_max_year()
 
 # ── 2. Layout ─────────────────────────────────────────────────────────────────
 
-LAYOUT_GAP        = "clamp(0.3rem, 0.4vw, 0.6rem)"
+LAYOUT_GAP        = "clamp(0.2rem, 0.25vw, 0.5rem)"
 LAYOUT_OUTER_PAD  = "clamp(0.5rem, 1.0vw, 1.2rem)"
 LAYOUT_MIN_HEIGHT = "700px"
 
@@ -58,7 +58,7 @@ CHARTS_ANCHOR     = 10
 CHARTS_ROW_FLEX   = 7
 CHARTS_TS_FLEX    = CHARTS_ANCHOR - CHARTS_ROW_FLEX  # = 3
 
-MAP_MIN_HEIGHT    = "64px"
+MAP_MIN_HEIGHT    = "48px"
 MAP_FLEX          = 7
 PYRAMID_FLEX      = 3
 
