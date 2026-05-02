@@ -83,7 +83,7 @@ html, body {
 .card {
     background        : var(--panel-bg);
     border-radius     : var(--border-radius);
-    padding           : 12px 16px;
+    padding           : 8px clamp(6px, 1vw, 16px);
     overflow          : hidden;
     display           : grid;
     grid-template-rows: var(--kpi-label-h) var(--kpi-value-h) var(--kpi-sub-h);
@@ -342,7 +342,7 @@ html, body {
 }
 
 #kpi-row .card {
-    min-width: 140px;
+    min-width: 120px;
     flex     : 1 1 14%;
 }
 
@@ -704,7 +704,7 @@ html, body {
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
-@media (max-width: 1590px) {
+@media (max-width: 1572px) {
     #kpi-row { flex-wrap: wrap; }
     #kpi-row .card { flex: 1 1 30%; }
 }
