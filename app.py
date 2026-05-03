@@ -351,15 +351,15 @@ app.clientside_callback(
 
 app.clientside_callback(
     """
-    function(n, current_tier) {
-        const w = window.innerWidth;
-        const tier = w <= 768 ? 'sm' : w <= 1100 ? 'md' : 'lg';
-        if (tier === current_tier) return window.dash_clientside.no_update;
-        return tier;
+    function(n_clicks) {
+        if (!n_clicks) return window.dash_clientside.no_update;
+        if (window.refitMap) window.refitMap();
+        return window.dash_clientside.no_update;
     }
     """,
-    Output("font-tier", "data"),
+    Output("map-init-zoom", "data", allow_duplicate=True),
     Input("map-resize-btn", "n_clicks"),
+    prevent_initial_call=True,
 )
 
 

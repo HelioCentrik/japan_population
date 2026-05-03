@@ -1,11 +1,13 @@
 // assets/map_resize.js
 (function () {
     // Keep in sync with config.py MAP_REF_* / MAP_ZOOM_* constants.
-    const REF_HEIGHT   = 582;
-    const REF_ZOOM     = 3.75;
-    const ZOOM_MIN     = 2.5;
-    const ZOOM_MAX     = 5.5;
-    const DEFAULT_ZOOM = 2.5;   // zoom baked into initial figure; Patch raises this on load
+    const REF_HEIGHT   = window.MAP_CONFIG.refHeight;
+    const REF_ZOOM     = window.MAP_CONFIG.refZoom;
+    const ZOOM_MIN     = window.MAP_CONFIG.zoomMin;
+    const ZOOM_MAX     = window.MAP_CONFIG.zoomMax;
+    const DEFAULT_ZOOM = window.MAP_CONFIG.defaultZoom;
+    const CENTER_LAT   = window.MAP_CONFIG.centerLat;
+    const CENTER_LON   = window.MAP_CONFIG.centerLon;
 
     function getPlotlyDiv() {
         return document.querySelector('#map-graph .js-plotly-plot');
@@ -71,4 +73,21 @@
     const interval = setInterval(() => {
         if (attach()) clearInterval(interval);
     }, 200);
+
+    // Exposed for the ⤢ button clientside callback.
+    // Recomputes zoom from current panel height and applies via Plotly.relayout.
+    window.refitMap = function () {
+        const panel   = document.querySelector('.map-panel');
+        const plotDiv = getPlotlyDiv();
+        if (!panel || !plotDiv) return window.dash_clientside.no_update;
+        const height = panel.getBoundingClientRect().height;
+        const zoom   = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
+            REF_ZOOM + Math.log2(height / REF_HEIGHT)));
+        Plotly.relayout(plotDiv, {
+            'mapbox.zoom':       zoom,
+            'mapbox.center.lat': CENTER_LAT,
+            'mapbox.center.lon': CENTER_LON,
+        });
+        return window.dash_clientside.no_update;
+    };
 })();

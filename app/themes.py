@@ -29,7 +29,7 @@ def _build_dark_theme() -> dict:
         "hover":     "#183662",  # hover — just above panel
         "grid":      "#1b2843",  # chart grid
         "plot":      "#0e1a30",  # plot area — below panel
-        "track":     "#152035",  # slider track
+        "track":     "#1b2e4b",  # slider track
         "text_hint": "#6d5d46",  # dark sepia — barely legible
         "text_lo":   "#907b56",  # faded parchment — subordinate
         "text_mid":  "#e7cea6",  # parchment mid — body / axis text

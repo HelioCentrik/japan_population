@@ -43,6 +43,10 @@ from app.config import (
     KPI_MARGIN, KPI_LABEL_H, KPI_VALUE_H, KPI_SUB_H,
     # Play button
     PLAY_BTN_SIZE, PLAY_BTN_FONT_SIZE,
+    # Map
+    MAP_CENTER_LON, MAP_CENTER_LAT,
+    MAP_DEFAULT_ZOOM, MAP_ZOOM_MIN, MAP_ZOOM_MAX,
+    MAP_REF_HEIGHT, MAP_REF_ZOOM,
     # Timeseries
     TS_SELECTOR_OFFSET_L,
 )
@@ -153,6 +157,17 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --ts-selector-offset-l: {TS_SELECTOR_OFFSET_L};
             }}
         </style>
+        <script>
+            window.MAP_CONFIG = {{
+                refHeight:  {MAP_REF_HEIGHT},
+                refZoom:    {MAP_REF_ZOOM},
+                zoomMin:    {MAP_ZOOM_MIN},
+                zoomMax:    {MAP_ZOOM_MAX},
+                defaultZoom:{MAP_DEFAULT_ZOOM},
+                centerLat:  {MAP_CENTER_LAT},
+                centerLon:  {MAP_CENTER_LON},
+            }};
+        </script>
         {{%css%}}
     </head>
     <body>
