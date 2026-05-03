@@ -7,14 +7,15 @@ env/
 api.py
 
 # Project Folders
-source/*
-!source/jp_census_historical_1920_2015.csv
+assets/OkinawaWomanBabay.jpg
 data/*
 !data/japan_prefectures_simplified.parquet
 scripts/*
 !scripts/build_db.py
-backup
-test
+source/*
+!source/jp_census_historical_1920_2015.csv
+backup/
+test/
 
 # Data files (regenerable via scripts/)
 data/*.geojson
