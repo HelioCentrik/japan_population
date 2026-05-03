@@ -91,9 +91,6 @@ A single-page application with four linked panels driven by a shared year contro
 **1945 census (臨時国勢調査)**
 The 1945 census was a provisional wartime survey. Age was recorded using the kazoedoshi (数え年) counting convention, producing age bands offset by one year from the standard scheme and no age-0 band. The data is remapped to standard age bands for display. The 1945 data point appears in all panels with a tooltip noting its wartime provenance; it is excluded from choropleth metrics where the remapping introduces unacceptable error.
 
-**Okinawa 1950 & 1955**
-Okinawa was under U.S. administration from 1945 until 1972 and was not surveyed under Japanese census methodology for this period. The 1950 and 1955 figures use an open-ended 70+ age band without granular breakdown, which inflates the aging index relative to all other prefectures and years. Okinawa is greyed out on the choropleth for these two years with an explanatory tooltip.
-
 **Geography**
 Boundary geometry reflects modern prefecture definitions. Minor historical boundary changes prior to 1960 are not accounted for.
 
@@ -105,5 +102,10 @@ Boundary geometry reflects modern prefecture definitions. Minor historical bound
 Statistics Bureau of Japan — Population Census (国勢調査), 1920–2020.
 Retrieved via [e-Stat](https://www.e-stat.go.jp/). Provided under the [e-Stat Terms of Use](https://www.e-stat.go.jp/terms-of-use). Redistribution of the derived CSV is permitted for non-commercial use with attribution.
 
-**Prefecture boundary geometry**
+**Prefecture boundary geometry**  
 GeoJSON sourced from [dataofjapan/land](https://github.com/dataofjapan/land), converted from Shapefiles published by the [Geospatial Information Authority of Japan](https://www.gsi.go.jp/) (国土地理院). Simplified at `tolerance=0.001` via Shapely for web rendering.
+
+**Header Photo**  
+Okinawa, c. 1950–1954.  
+Original photo by Bert Mosher / The American Photo Service.  
+Archived by [Remembering Okinawa](https://www.rememberingokinawa.com/page/american_photo_2).
