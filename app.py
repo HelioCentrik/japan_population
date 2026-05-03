@@ -135,18 +135,13 @@ app.layout = html.Div(
                         html.Div(HEADER_TITLE_EN, className="header-title-en"),
                     ],
                 ),
+                html.Div(
+                    id="era-label",
+                    children=YEAR_LABELS.get(MAX_YEAR, str(MAX_YEAR)),
+                    className="header-era-label",
+                    # remove the inline style dict — CSS class handles it now
+                ),
             ],
-        ),
-
-        html.Div(
-            id="era-label",
-            children=YEAR_LABELS.get(MAX_YEAR, str(MAX_YEAR)),
-            style={
-                "textAlign"    : "center",
-                "color"        : COLOR_SECONDARY,
-                "fontSize"     : "26px",
-                "letterSpacing": "0.05em",
-            },
         ),
 
         # KPI Cards
