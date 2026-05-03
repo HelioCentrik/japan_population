@@ -345,7 +345,7 @@ body.slider-thinner
     gap              : var(--layout-gap);
     padding-left     : var(--outer-pad);
     padding-right    : var(--outer-pad);
-    padding-top      : calc(var(--outer-pad) - 6px);
+    padding-top      : var(--outer-pad);
     padding-bottom   : var(--outer-pad);
     box-sizing       : border-box;
 }

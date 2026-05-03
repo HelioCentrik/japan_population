@@ -124,7 +124,7 @@ app.layout = html.Div(
         ),
 
 
-        # ── Header ───────────────────────────────────────────────────────────
+        # ── Header ────────────────────────
         html.Div(
             className="dashboard-header",
             children=[

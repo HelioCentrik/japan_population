@@ -230,12 +230,12 @@ YAXIS_TICK_STANDOFF    = 0
 # HEADER_TEXT_SHADOW: hard drop + soft glow for legibility over the photo.
 
 HEADER_IMAGE       = "OkinawaWomanBaby_hdr.png"
-HEADER_HEIGHT      = "clamp(120px, 12vw, 175px)"
+HEADER_HEIGHT      = "132px"
 HEADER_BG_SIZE     = "100% auto"
-HEADER_BG_POS      = "center 30%"
-HEADER_TEXT_SHADOW = "2px 2px 0 rgba(0,0,0,0.85), 0 0 10px rgba(0,0,0,0.65)"
-HEADER_FONT_JA     = 30    # px — 少子高齢化 title
-HEADER_FONT_EN     = 13    # px — English subtitle
+HEADER_BG_POS      = "center 50%"
+HEADER_TEXT_SHADOW = "2px 3px 0 rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.85)"
+HEADER_FONT_JA     = 36    # px — 少子高齢化 title
+HEADER_FONT_EN     = 14    # px — English subtitle
 HEADER_TITLE_JA    = "少子高齢化"
 HEADER_TITLE_EN    = "A Century of Japan's Population · 1920–2020"
 
