@@ -19,7 +19,7 @@ from pathlib import Path
 import pandas as pd
 import duckdb as ddb
 
-from app.config import DB_PATH
+from app.utils import DB_PATH
 from app.sql import V_CENSUS, V_MAP_METRICS
 
 

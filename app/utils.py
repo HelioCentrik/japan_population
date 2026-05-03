@@ -12,17 +12,21 @@ Rules for this file:
   - Safe to lift into any project as-is
 
 Sections:
-    1. Color      — hex parsing, CSS rgba/hsl builders
-    2. Chart math — axis tick/range helpers, colorscale bound rounding
-    3. String     — label normalization
-    4. Demography — 5-year age band arithmetic
+    Color      — hex parsing, CSS rgba/hsl builders
+    Chart math — axis tick/range helpers, colorscale bound rounding
+    String     — label normalization
+    Demography — 5-year age band arithmetic
 """
 
+from pathlib import Path
 import colorsys
 import math
 
+import duckdb as ddb
 
-# ── 1. Color ──────────────────────────────────────────────────────────────────
+
+
+# ── Color ──────────────────────────────────────────────────────────────────
 
 TRANSPARENT = "rgba(0,0,0,0)"
 
@@ -74,7 +78,17 @@ def hsl_adjust(hex_color: str, h_scale: float = 1.0, l_scale: float = 1.0, s_sca
     return f"#{round(r2 * 255):02x}{round(g2 * 255):02x}{round(b2 * 255):02x}"
 
 
-# ── 2. Chart math ─────────────────────────────────────────────────────────────
+# ── Chart math ─────────────────────────────────────────────────────────────
+
+DB_PATH   = Path(__file__).resolve().parent.parent / "data" / "japan_population.duckdb"
+CACHE_DIR = Path(__file__).resolve().parent.parent / "data" / ".figure_cache"
+
+def _get_max_year() -> int:
+    con = ddb.connect(str(DB_PATH), read_only=True)
+    result = con.execute("SELECT MAX(year) FROM d_years").fetchone()[0]
+    con.close()
+    return result
+
 
 def nice_axis(max_val: int) -> tuple[float, float]:
     """Compute a clean (dtick, half_range) pair for a symmetric Plotly axis.
@@ -119,7 +133,7 @@ def ceil_half_magnitude(val: float) -> float:
     return math.ceil(val / step) * step
 
 
-# ── 3. String ─────────────────────────────────────────────────────────────────
+# ── String ─────────────────────────────────────────────────────────────────
 
 def shorten_age_label(label: str) -> str:
     """Strip verbose age suffixes used in Japanese census band labels.
@@ -137,7 +151,7 @@ def shorten_age_label(label: str) -> str:
             .replace(" years old", ""))
 
 
-# ── 4. Demography ─────────────────────────────────────────────────────────────
+# ── Demography ─────────────────────────────────────────────────────────────
 
 def cohort_band(year: int, birth_start: int, birth_end: int) -> int | None:
     """Return the age_start of the scheme_a band containing the cohort in year.

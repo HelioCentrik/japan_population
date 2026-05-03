@@ -8,47 +8,31 @@ Everything else (layout, fonts, sizes, structural map config, etc.) is defined h
 To swap themes: change ACTIVE_THEME_NAME in app/themes.py and restart the app.
 
 Sections:
-  1.  Private helpers     (hex parsing, rgba builder, HSL adjustment utility)
-  2.  Layout
-  3.  Colors              (unpacked from active theme — do not hardcode here)
-  4.  Shadows             (derived from theme's shadow_color × shadow_darkness)
-  5.  Fonts
-  6.  Font sizes
-  7.  Spacing & borders
-  8.  Map configuration   (structural — center, zoom, widths are theme-independent)
-  9.  Pyramid configuration
-  10. Play button
-  11. Playback
-  12. Markers & lines
-  13. THEME dict
-  14. Legacy constants
+  Private helpers     (hex parsing, rgba builder, HSL adjustment utility)
+  Layout
+  Colors              (unpacked from active theme — do not hardcode here)
+  Shadows             (derived from theme's shadow_color × shadow_darkness)
+  Fonts
+  Font sizes
+  Spacing & borders
+  Headers
+  Map configuration   (structural — center, zoom, widths are theme-independent)
+  Pyramid configuration
+  Play button
+  Playback
+  Markers & lines
+  THEME dict
+  Legacy constants
 """
 
-from pathlib import Path
-
-import duckdb as ddb
-
-from app.utils import hex_to_rgb as _hex_to_rgb, rgba as _rgba, hsl_adjust as _hsl_adjust
+from app.utils import hex_to_rgb as _hex_to_rgb, rgba as _rgba, hsl_adjust as _hsl_adjust, _get_max_year
 from app.fonts import _stack
 from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 
 
-# ── 1. Private helpers ────────────────────────────────────────────────────────
 
-DB_PATH   = Path(__file__).resolve().parent.parent / "data" / "japan_population.duckdb"
-CACHE_DIR = Path(__file__).resolve().parent.parent / "data" / ".figure_cache"
-
-def _get_max_year() -> int:
-    con = ddb.connect(str(DB_PATH), read_only=True)
-    result = con.execute("SELECT MAX(year) FROM d_years").fetchone()[0]
-    con.close()
-    return result
-
-MAX_YEAR: int = _get_max_year()
-
-
-# ── 2. Layout ─────────────────────────────────────────────────────────────────
+# ── Layout ─────────────────────────────────────────────────────────────────
 
 LAYOUT_GAP        = "clamp(0.3rem, 0.35vw, 0.5rem)"
 LAYOUT_OUTER_PAD  = "clamp(0.35rem, 0.6vw, 0.75rem)"
@@ -63,7 +47,7 @@ MAP_FLEX          = 7
 PYRAMID_FLEX      = 3
 
 
-# ── 3. Colors ─────────────────────────────────────────────────────────────────
+# ── Colors ─────────────────────────────────────────────────────────────────
 # All color constants are unpacked from the active theme.
 # Do not hardcode hex values here — add them to themes.py instead.
 
@@ -130,7 +114,7 @@ TOOLTIP_HINT        = _t["tooltip_hint"]
 TOOLTIP_DIVIDER     = _t["tooltip_divider"]
 
 
-# ── 4. Shadows ────────────────────────────────────────────────────────────────
+# ── Shadows ────────────────────────────────────────────────────────────────
 # Derived from the theme's shadow_color and shadow_darkness knob.
 # Using an explicit shadow_color (rather than PAGE_BG) lets light themes
 # use dark shadows without coupling shadow depth to background hue.
@@ -168,7 +152,7 @@ SHADOW_BEZEL = (
 SHADOW_FULL = f"{SHADOW_DROP}, {SHADOW_BEZEL}"
 
 
-# ── 5. Fonts ──────────────────────────────────────────────────────────────────
+# ── Fonts ──────────────────────────────────────────────────────────────────
 # Font names match the catalogue in app/fonts.py.
 # [GF] families must be linked in app/index_string.py to load on client.
 
@@ -198,7 +182,7 @@ FONT_STACK_MONO = _stack(
 )
 
 
-# ── 6. Font sizes ─────────────────────────────────────────────────────────────
+# ── Font sizes ─────────────────────────────────────────────────────────────
 
 FONT_SIZE_AXIS_TICK     = 12.5
 FONT_SIZE_AXIS_TITLE    = 12.5
@@ -211,7 +195,7 @@ FONT_SIZE_KPI_VALUE     = 22
 FONT_SIZE_KPI_SUB       = 12
 FONT_SIZE_TITLE         = 32
 
-# ── 6b. Font tier scaling ─────────────────────────────────────────────────────
+# ── Font tier scaling ─────────────────────────────────────────────────────
 # Breakpoints mirror the @media thresholds in style.css exactly.
 # Scale is a plain multiplier applied to base font sizes above.
 # Floors prevent any value from dropping below 8px.
@@ -232,20 +216,39 @@ def get_scaled_fonts(tier: str) -> dict:
     }
 
 
-# ── 7. Spacing & borders ──────────────────────────────────────────────────────
+# ── Spacing & borders ──────────────────────────────────────────────────────
 
 PANEL_BORDER_RADIUS    = "3px"
 PANEL_BORDER_THICKNESS = "1px"
 YAXIS_TICK_STANDOFF    = 0
 
 
-# ── 8. KPI card grid row heights ─────────────────────────────────────────────────
+# ── Header ────────────────────────────────────────────────────────────────
+# Photo strip header — all creator-controlled knobs in one place.
+# HEADER_IMAGE: filename only; file must live in assets/.
+# HEADER_BG_POS: CSS background-position — adjust to reframe the photo crop.
+# HEADER_TEXT_SHADOW: hard drop + soft glow for legibility over the photo.
+
+HEADER_IMAGE       = "OkinawaWomanBaby_hdr.png"
+HEADER_HEIGHT      = "clamp(120px, 12vw, 175px)"
+HEADER_BG_POS      = "center 30%"
+HEADER_TEXT_SHADOW = "2px 2px 0 rgba(0,0,0,0.85), 0 0 10px rgba(0,0,0,0.65)"
+HEADER_FONT_JA     = 30    # px — 少子高齢化 title
+HEADER_FONT_EN     = 13    # px — English subtitle
+HEADER_TITLE_JA    = "少子高齢化"
+HEADER_TITLE_EN    = "A Century of Japan's Population · 1920–2020"
+
+
+# ── KPI card grid row heights ─────────────────────────────────────────────────
+
+MAX_YEAR: int = _get_max_year()
+
 KPI_LABEL_H = 36   # px — label row (accommodates 2-line wrap)
 KPI_VALUE_H = 36   # px — value row (anchor)
 KPI_SUB_H   = 14   # px — sub row
 
 
-# ── 9a. Map configuration ──────────────────────────────────────────────────────
+# ── Map configuration ──────────────────────────────────────────────────────
 # Structural values — these don't vary by theme.
 
 MAP_MARGINS              = 4
@@ -265,7 +268,7 @@ MAP_HIGHLIGHT_LINE_WIDTH = 2.5
 MAP_TOOLTIP_OFFSET_X     = 28   # px rightward from hovered point
 MAP_TOOLTIP_OFFSET_Y     = 40   # px upward from hovered point
 
-# ── 9b. Metric selector ───────────────────────────────────────────────────────
+# ── Metric selector ───────────────────────────────────────────────────────
 
 OKINAWA_AREA_ESTAT = "47000"
 
@@ -313,7 +316,7 @@ MAP_METRICS = {
 MAP_METRIC_DEFAULT = "population"
 
 
-# ── 10. Pyramid configuration ─────────────────────────────────────────────────
+# ── Pyramid configuration ─────────────────────────────────────────────────
 
 PYRAMID_BARGAP       = 0.15
 COHORT_OUTLINE_WIDTH = 3
@@ -327,7 +330,7 @@ PYRAMID_TOOLTIP_OFFSET_X    = 12
 PYRAMID_TOOLTIP_OFFSET_Y    = 20
 
 
-# ── 11. Timeseries configuration ──────────────────────────────────────────────
+# ── imeseries configuration ──────────────────────────────────────────────
 TIMESERIES_MARGIN_L  = 52
 TIMESERIES_MARGIN_R  = 12
 TIMESERIES_MARGIN_T  = 12
@@ -344,19 +347,19 @@ TS_VIEWS = {
 TS_VIEW_DEFAULT = "population"
 
 
-# ── 12a. Play button ──────────────────────────────────────────────────────────
+# ── Play button ──────────────────────────────────────────────────────────
 
 PLAY_BTN_SIZE_PX   = 52
 PLAY_BTN_SIZE      = f"{PLAY_BTN_SIZE_PX}px"
 PLAY_BTN_FONT_SIZE = f"{round(PLAY_BTN_SIZE_PX * 0.538)}px"
 
 
-# ── 12b. Playback ─────────────────────────────────────────────────────────────
+# ── Playback ─────────────────────────────────────────────────────────────
 
 PLAY_INTERVAL_MS = 1000
 
 
-# ── 13. Markers & lines ───────────────────────────────────────────────────────
+# ── Markers & lines ───────────────────────────────────────────────────────
 
 MARKER_SIZE_DOT         = 5
 MARKER_SIZE_1945        = 11
@@ -373,7 +376,7 @@ OPACITY_THRESHOLD_LINE  = 0.55
 OPACITY_YEAR_VLINE      = 0.35
 
 
-# ── 14. THEME dict ────────────────────────────────────────────────────────────
+# ── THEME dict ────────────────────────────────────────────────────────────
 
 THEME = {
     "active_theme": ACTIVE_THEME_NAME,
@@ -483,7 +486,7 @@ THEME = {
 }
 
 
-# ── 15. Legacy constants ──────────────────────────────────────────────────────
+# ── Legacy constants ──────────────────────────────────────────────────────
 # Aliases for renamed constants — kept for backward compat with older imports.
 # Remove once all consumers have been updated.
 
