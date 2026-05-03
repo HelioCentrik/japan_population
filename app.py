@@ -31,7 +31,7 @@ from app import figure_cache
 
 
 # ── App instance ──────────────────────────────────────────────────────────────
-app = dash.Dash(__name__, title="Japanese Population Dashboard")
+app = dash.Dash(__name__, title="少子高齢化 A Century of Japan's Population")
 app.index_string = INDEX_STRING
 register_plotly_template()
 server = app.server  # expose for deployment (Gunicorn etc.)
@@ -125,7 +125,7 @@ app.layout = html.Div(
         # Header
         # app.py — header
         html.H2(
-            "日本の人口統計 Japanese Population",
+            "少子高齢化 A Century of Japan's Population · 1920–2020",
             className="dashboard-title",
             style={
                 "color": COLOR_PRIMARY,
