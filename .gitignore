@@ -7,7 +7,7 @@ env/
 api.py
 
 # Project Folders
-assets/OkinawaWomanBabay.jpg
+assets/OkinawaWomanBaby.jpg
 data/*
 !data/japan_prefectures_simplified.parquet
 scripts/*
