@@ -229,23 +229,24 @@ YAXIS_TICK_STANDOFF    = 0
 # HEADER_BG_POS: CSS background-position — adjust to reframe the photo crop.
 # HEADER_TEXT_SHADOW: hard drop + soft glow for legibility over the photo.
 
+MAX_YEAR: int = _get_max_year()
+
 HEADER_IMAGE       = "OkinawaWomanBaby_hdr_dk.png"
 HEADER_HEIGHT      = "132px"
 HEADER_BG_SIZE     = "100% auto"
-HEADER_BG_POS      = "center 50%"
+HEADER_BG_POS      = "center 22.5%"
 HEADER_TEXT_SHADOW = "2px 2px 0 rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.85)"
 HEADER_FONT_JA     = 52    # px — 少子高齢化 title
 HEADER_FONT_EN     = 14    # px — English subtitle
 HEADER_TITLE_JA    = "少子高齢化"
-HEADER_TITLE_EN    = "A Century of Japan's Population · 1920–2020"
+HEADER_TITLE_EN    = f"A Century of Japan's Population · 1920–{MAX_YEAR}"
 
 
 # ── KPI card grid row heights ─────────────────────────────────────────────────
 
-MAX_YEAR: int = _get_max_year()
-
-KPI_LABEL_H = 36   # px — label row (accommodates 2-line wrap)
-KPI_VALUE_H = 36   # px — value row (anchor)
+KPI_MARGIN  = 8
+KPI_LABEL_H = 30   # px — label row (accommodates 2-line wrap)
+KPI_VALUE_H = 30   # px — value row (anchor)
 KPI_SUB_H   = 14   # px — sub row
 
 

@@ -83,7 +83,7 @@ html, body {
 .card {
     background        : var(--panel-bg);
     border-radius     : var(--border-radius);
-    padding           : 8px clamp(6px, 1vw, 16px);
+    padding           : var(--kpi-margin);
     overflow          : hidden;
     display           : grid;
     grid-template-rows: var(--kpi-label-h) var(--kpi-value-h) var(--kpi-sub-h);
@@ -110,7 +110,7 @@ html, body {
     font-size      : var(--font-size-kpi-label);
     letter-spacing : 0.06em;
     text-transform : uppercase;
-    align-self     : center;
+    align-self     : start;
     padding-bottom : 0px;
 }
 
@@ -126,7 +126,7 @@ html, body {
 .kpi-sub {
     color          : var(--color-text-mid);
     font-size      : var(--font-size-kpi-sub);
-    align-self     : start;
+    align-self     : center;
     padding-top    : 0px;
 }
 
@@ -139,7 +139,7 @@ html, body {
     background-color : var(--panel-border);
     color            : var(--color-text-mid);
     border           : var(--panel-border-thickness) solid var(--panel-border);
-    border-radius    : var(--border-radius);
+    border-radius    : calc(var(--border-radius) * 1.6667);
     font-size        : var(--play-btn-font-size);
     cursor           : pointer;
 }
@@ -361,8 +361,8 @@ body.slider-thinner
     background-position: var(--header-bg-pos);
     background-repeat  : no-repeat;
     overflow           : hidden;
-    border-radius      : var(--border-radius);
-    margin-bottom      : var(--layout-gap);
+    border-radius      : 0px;
+    margin-bottom      : calc(var(--layout-gap) * 0.5 );
 }
 
 .header-text {
@@ -378,7 +378,7 @@ body.slider-thinner
     font-size     : var(--header-font-ja);
     font-weight   : 700;
     color         : #ffffff;
-    text-shadow   : 2px 3px 0 rgba(160,0,0,0.9), 0 0 10px rgba(0,0,0,0.85);
+    text-shadow   : 2px 3px 0 var(--color-primary), 0 0 10px rgba(0,0,0,0.85);
     line-height   : 1.1;
     letter-spacing: 0.08em;
 }
@@ -401,7 +401,7 @@ body.slider-thinner
     font-family   : var(--font-sans);
     font-size     : 18px;
     font-weight   : 400;
-    color         : var(--color-text-hi);
+    color         : var(--color-text-mid);
     text-shadow   : var(--header-text-shadow);
     letter-spacing: 0.06em;
 }

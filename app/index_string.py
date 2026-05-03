@@ -40,7 +40,7 @@ from app.config import (
     TOOLTIP_TEXT_HI, TOOLTIP_TEXT_MID,
     TOOLTIP_HINT, TOOLTIP_DIVIDER,
     # KPIs
-    KPI_LABEL_H, KPI_VALUE_H, KPI_SUB_H,
+    KPI_MARGIN, KPI_LABEL_H, KPI_VALUE_H, KPI_SUB_H,
     # Play button
     PLAY_BTN_SIZE, PLAY_BTN_FONT_SIZE,
     # Timeseries
@@ -140,9 +140,10 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --tooltip-divider     : {TOOLTIP_DIVIDER};
                 
                 /* KPIs */
-                --kpi-label-h : {KPI_LABEL_H}px);
+                --kpi-margin  : {KPI_MARGIN}px;
+                --kpi-label-h : {KPI_LABEL_H}px;
                 --kpi-value-h : clamp(20px, 1.5vw, {KPI_VALUE_H}px);
-                --kpi-sub-h   : {KPI_SUB_H}px);
+                --kpi-sub-h   : {KPI_SUB_H}px;
 
                 /* Play button */
                 --play-btn-size      : {PLAY_BTN_SIZE};

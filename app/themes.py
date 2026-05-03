@@ -23,11 +23,11 @@ from app.utils import hsl_adjust
 def _build_dark_theme() -> dict:
     # ── Surfaces, borders, UI states, text scale ───────────────────────
     surface = {
-        "page":      "#0c0f27",  # darkest wave — near-black indigo
+        "page":      "#0c0e21",  # darkest wave — near-black indigo
         "panel":     "#1b2750",  # deep wave body
-        "border":    "#2b5088",  # mid-wave blue border
-        "hover":     "#234070",  # hover — just above panel
-        "grid":      "#1b2443",  # chart grid
+        "border":    "#345a93",  # mid-wave blue border
+        "hover":     "#183662",  # hover — just above panel
+        "grid":      "#1b2843",  # chart grid
         "plot":      "#0e1a30",  # plot area — below panel
         "track":     "#152035",  # slider track
         "text_hint": "#6d5d46",  # dark sepia — barely legible
