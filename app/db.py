@@ -10,7 +10,7 @@ Startup cost: ~1-2s on first import. All queries after that run against RAM.
 """
 
 import duckdb as ddb
-from app.config import DB_PATH
+from app.utils import DB_PATH
 from app.sql import V_CENSUS, V_MAP_METRICS
 
 

@@ -18,12 +18,11 @@ Public API:
 """
 
 from __future__ import annotations
-from pathlib import Path
 
 import plotly.graph_objects as go
 import plotly.io as pio
 
-from app.config import CACHE_DIR, DB_PATH
+from app.utils import CACHE_DIR, DB_PATH
 
 
 _FINGERPRINT_FILE = CACHE_DIR / "_fingerprint.txt"
