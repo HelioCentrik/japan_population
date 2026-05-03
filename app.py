@@ -10,6 +10,7 @@ import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT_MID,
+                        HEADER_TITLE_JA, HEADER_TITLE_EN,
                         PLAY_INTERVAL_MS,
                         MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
                         MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
@@ -122,26 +123,30 @@ app.layout = html.Div(
             n_intervals=0,
         ),
 
-        # Header
-        # app.py — header
-        html.H2(
-            "少子高齢化 A Century of Japan's Population · 1920–2020",
-            className="dashboard-title",
-            style={
-                "color": COLOR_PRIMARY,
-                "marginBottom": "0px",
-            }
+
+        # ── Header ───────────────────────────────────────────────────────────
+        html.Div(
+            className="dashboard-header",
+            children=[
+                html.Div(
+                    className="header-text",
+                    children=[
+                        html.Div(HEADER_TITLE_JA, className="header-title-ja"),
+                        html.Div(HEADER_TITLE_EN, className="header-title-en"),
+                    ],
+                ),
+            ],
         ),
 
         html.Div(
             id="era-label",
             children=YEAR_LABELS.get(MAX_YEAR, str(MAX_YEAR)),
             style={
-                "textAlign": "center",
-                "color": COLOR_SECONDARY,
-                "fontSize": "26px",
+                "textAlign"    : "center",
+                "color"        : COLOR_SECONDARY,
+                "fontSize"     : "26px",
                 "letterSpacing": "0.05em",
-            }
+            },
         ),
 
         # KPI Cards

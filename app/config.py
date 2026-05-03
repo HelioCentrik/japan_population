@@ -231,6 +231,7 @@ YAXIS_TICK_STANDOFF    = 0
 
 HEADER_IMAGE       = "OkinawaWomanBaby_hdr.png"
 HEADER_HEIGHT      = "clamp(120px, 12vw, 175px)"
+HEADER_BG_SIZE     = "100% auto"
 HEADER_BG_POS      = "center 30%"
 HEADER_TEXT_SHADOW = "2px 2px 0 rgba(0,0,0,0.85), 0 0 10px rgba(0,0,0,0.65)"
 HEADER_FONT_JA     = 30    # px — 少子高齢化 title

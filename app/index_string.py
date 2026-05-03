@@ -32,6 +32,9 @@ from app.config import (
     LAYOUT_GAP, LAYOUT_OUTER_PAD, LAYOUT_MIN_HEIGHT,
     CHARTS_ROW_FLEX, CHARTS_TS_FLEX,
     MAP_MIN_HEIGHT, MAP_FLEX, PYRAMID_FLEX,
+    # Header
+    HEADER_IMAGE, HEADER_HEIGHT, HEADER_BG_SIZE, HEADER_BG_POS,
+    HEADER_TEXT_SHADOW, HEADER_FONT_JA, HEADER_FONT_EN,
     # Tooltip
     TOOLTIP_BG, TOOLTIP_BORDER, TOOLTIP_BORDER_SIZE,
     TOOLTIP_TEXT_HI, TOOLTIP_TEXT_MID,
@@ -41,7 +44,7 @@ from app.config import (
     # Play button
     PLAY_BTN_SIZE, PLAY_BTN_FONT_SIZE,
     # Timeseries
-    TS_SELECTOR_OFFSET_L
+    TS_SELECTOR_OFFSET_L,
 )
 
 INDEX_STRING = f'''<!DOCTYPE html>
@@ -117,6 +120,15 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --map-min-height   : {MAP_MIN_HEIGHT};
                 --map-flex         : {MAP_FLEX};
                 --pyramid-flex     : {PYRAMID_FLEX};
+                
+                /* Header */
+                --header-image      : url('/assets/{HEADER_IMAGE}');
+                --header-height     : {HEADER_HEIGHT};
+                --header-bg-size    : {HEADER_BG_SIZE};
+                --header-bg-pos     : {HEADER_BG_POS};
+                --header-text-shadow: {HEADER_TEXT_SHADOW};
+                --header-font-ja    : {HEADER_FONT_JA}px;
+                --header-font-en    : {HEADER_FONT_EN}px;
 
                 /* Tooltip */
                 --tooltip-bg          : {TOOLTIP_BG};
