@@ -309,6 +309,30 @@ html, body {
 }
 
 
+/* ── Slider mark density ────────────────────────────────────────────────────── */
+/* JS in slider_density.js sets data-year on each mark and .slider-thin /
+   .slider-thinner on body. visibility:hidden on the label keeps tick position
+   intact. 1945 is absent from both hide lists — always visible. */
+
+body.slider-thin
+    .dash-slider-mark:is([data-year="1925"],[data-year="1935"],
+                         [data-year="1955"],[data-year="1965"],
+                         [data-year="1975"],[data-year="1985"],
+                         [data-year="1995"],[data-year="2005"],
+                         [data-year="2015"]) {
+    visibility: hidden;
+}
+
+body.slider-thinner
+    .dash-slider-mark:is([data-year="1925"],[data-year="1930"],[data-year="1935"],
+                         [data-year="1940"],[data-year="1950"],[data-year="1955"],
+                         [data-year="1965"],[data-year="1970"],[data-year="1975"],
+                         [data-year="1985"],[data-year="1990"],[data-year="1995"],
+                         [data-year="2005"],[data-year="2010"],[data-year="2015"]) {
+    visibility: hidden;
+}
+
+
 /* ── Layout ────────────────────────────────────────────────────────────────── */
 
 /* Outer wrapper — full viewport height, scrolls below --min-height */
