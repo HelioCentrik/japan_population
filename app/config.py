@@ -235,8 +235,8 @@ def get_scaled_fonts(tier: str) -> dict:
 # ── 7. Spacing & borders ──────────────────────────────────────────────────────
 
 PANEL_BORDER_RADIUS    = "3px"
-PANEL_BORDER_THICKNESS = "0px"
-YAXIS_TICK_STANDOFF    = 6
+PANEL_BORDER_THICKNESS = "1px"
+YAXIS_TICK_STANDOFF    = 0
 
 
 # ── 8. KPI card grid row heights ─────────────────────────────────────────────────
