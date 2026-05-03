@@ -367,15 +367,15 @@ body.slider-thinner
 
 .header-text {
     position  : absolute;
-    right     : clamp(14px, 2vw, 28px);
-    top       : 50%;
+    right     : clamp(8px, 1vw, 14px);
+    top       : 65%;
     transform : translateY(-50%);
     text-align: right;
 }
 
 .header-title-ja {
     font-family   : var(--font-serif);
-    font-size     : clamp(20px, 2.2vw, var(--header-font-ja));
+    font-size     : var(--header-font-ja);
     font-weight   : 700;
     color         : var(--color-text-hi);
     text-shadow   : var(--header-text-shadow);
@@ -385,7 +385,7 @@ body.slider-thinner
 
 .header-title-en {
     font-family   : var(--font-sans);
-    font-size     : clamp(9px, 1vw, var(--header-font-en));
+    font-size     : var(--header-font-en);
     font-weight   : 400;
     color         : var(--color-text-mid);
     text-shadow   : var(--header-text-shadow);
