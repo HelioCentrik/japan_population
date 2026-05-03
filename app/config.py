@@ -229,7 +229,7 @@ YAXIS_TICK_STANDOFF    = 0
 # HEADER_BG_POS: CSS background-position — adjust to reframe the photo crop.
 # HEADER_TEXT_SHADOW: hard drop + soft glow for legibility over the photo.
 
-HEADER_IMAGE       = "OkinawaWomanBaby_hdr.png"
+HEADER_IMAGE       = "OkinawaWomanBaby_hdr_dk.png"
 HEADER_HEIGHT      = "132px"
 HEADER_BG_SIZE     = "100% auto"
 HEADER_BG_POS      = "center 50%"
@@ -357,7 +357,7 @@ PLAY_BTN_FONT_SIZE = f"{round(PLAY_BTN_SIZE_PX * 0.538)}px"
 
 # ── Playback ─────────────────────────────────────────────────────────────
 
-PLAY_INTERVAL_MS = 1000
+PLAY_INTERVAL_MS = 800
 
 
 # ── Markers & lines ───────────────────────────────────────────────────────
@@ -485,10 +485,3 @@ THEME = {
         "opacity_year_vline": OPACITY_YEAR_VLINE,
     },
 }
-
-
-# ── Legacy constants ──────────────────────────────────────────────────────
-# Aliases for renamed constants — kept for backward compat with older imports.
-# Remove once all consumers have been updated.
-
-FONT_MAIN_COLOR    = COLOR_TEXT_MID

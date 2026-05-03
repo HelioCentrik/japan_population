@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from app.utils import nice_axis, shorten_age_label, cohort_band, cohort_band_range
 from app.config import (
     PANEL_BORDER,
-    COLOR_TEXT_MID, CHART_PLOT_COLOR,
+    COLOR_TEXT_MID, COLOR_TEXT_HI, CHART_PLOT_COLOR,
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
     PYRAMID_BARGAP, PYRAMID_MAX_BANDS, COHORT_OUTLINE_WIDTH,
@@ -260,7 +260,7 @@ def build_pyramid_fig(year: int, area_estat: str | None = None, axis_max: int | 
             mirror=True,
             title=dict(
                 text="Age (Years)",
-                font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
+                font=dict(color=COLOR_TEXT_HI, size=FONT_SIZE_AXIS_TITLE),
             ),
             tickfont=dict(size=FONT_SIZE_AXIS_TICK),
             showgrid=False,

@@ -159,7 +159,7 @@ html, body {
     right            : 16px;
     z-index          : 20;
     background-color : var(--panel-bg);
-    color            : var(--color-text-mid);
+    color            : var(--color-text-hi);
     border           : 1px solid var(--panel-border);
     border-radius    : calc(var(--border-radius) * 0.67);
     font-size        : 20px;
@@ -377,8 +377,8 @@ body.slider-thinner
     font-family   : var(--font-serif);
     font-size     : var(--header-font-ja);
     font-weight   : 700;
-    color         : var(--color-text-hi);
-    text-shadow   : var(--header-text-shadow);
+    color         : #ffffff;
+    text-shadow   : 2px 3px 0 rgba(160,0,0,0.9), 0 0 10px rgba(0,0,0,0.85);
     line-height   : 1.1;
     letter-spacing: 0.08em;
 }
@@ -387,7 +387,7 @@ body.slider-thinner
     font-family   : var(--font-sans);
     font-size     : var(--header-font-en);
     font-weight   : 400;
-    color         : var(--color-text-mid);
+    color         : var(--color-text-hi);
     text-shadow   : var(--header-text-shadow);
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -528,7 +528,7 @@ body.slider-thinner
     transform       : translateX(-50%);
     z-index         : 20;
     font-size       : var(--font-size-legend);
-    color           : var(--color-text-mid);
+    color           : var(--color-text-hi);
     flex-shrink     : 0;
     display         : flex;
     align-items     : center;

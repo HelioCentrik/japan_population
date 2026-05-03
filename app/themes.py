@@ -23,36 +23,33 @@ from app.utils import hsl_adjust
 def _build_dark_theme() -> dict:
     # ── Surfaces, borders, UI states, text scale ───────────────────────
     surface = {
-        "page":      "#100E0C",  # sumi — warm ink black
-        "panel":     "#1C1916",  # warm charcoal — visible lift from page
-        "border":    "#2E2822",  # subtle warm border (used by bezel ::after)
-        "hover":     "#26201A",  # interactive hover — just above panel
-        "grid":      "#2A2420",  # chart grid lines — barely perceptible
-        "plot":      "#181410",  # chart plot area — slightly below panel
-        "track":     "#252018",  # slider track
-        "text_hint": "#5C514A",  # de-emphasised — barely legible
-        "text_lo":   "#8A7F74",  # faded ink — subordinate text
-        "text_mid":  "#c4bab0",  # warm mid-tone — body / axis text
-        "text_hi":   "#E8DDD0",  # washi — warm off-white / headings
+        "page":      "#0c0f27",  # darkest wave — near-black indigo
+        "panel":     "#1b2750",  # deep wave body
+        "border":    "#2b5088",  # mid-wave blue border
+        "hover":     "#234070",  # hover — just above panel
+        "grid":      "#1b2443",  # chart grid
+        "plot":      "#0e1a30",  # plot area — below panel
+        "track":     "#152035",  # slider track
+        "text_hint": "#6d5d46",  # dark sepia — barely legible
+        "text_lo":   "#907b56",  # faded parchment — subordinate
+        "text_mid":  "#e7cea6",  # parchment mid — body / axis text
+        "text_hi":   "#f2e9d9",  # bright parchment sky — headings / values
     }
 
     # ── Brand and annotation colors ────────────────────────────────────
     accent = {
-        "primary":  "#C45C3A",  # beni-iro — lacquer red / vermillion
-        "kincha":   "#a17b41",  # kincha — aged gold (year label)
-        "warning":  "#D4873A",  # warm amber warning
-        "teal":     "#3DA898",  # desaturated teal — threshold reference line
-        "amber":    "#D4873A",  # 団塊の世代
-        "lime":     "#7AB830",  # 団塊ジュニア
-        "sky":      "#9ECFDE",  # 少子化世代 — slightly warmed sky
-        "ink":      "#100E0C",  # sumi — used for shadow_color
+        "primary":  "#d4443a",  # boat-timber ochre — primary CTA / accent
+        "kincha":   "#B08A40",  # muted gold — year label / secondary UI
+        "warning":  "#d4443a",  # amber warning
+        "blue":     "#3868B8",  # Great Wave mid-blue — threshold reference line
+        "ink":      "#04080F",  # near-black — shadow_color
     }
 
     # ── Data encoding colors ───────────────────────────────────────────
     data = {
-        "male":   "#477eeb",   # keep — discrimination matters
-        "female": "#e4536b",   # keep — discrimination matters
-        "pref":   "#E8DDD0",   # timeseries prefecture overlay — warm white
+        "male":   "#477EEB",  # keep — discrimination matters
+        "female": "#E4536B",  # keep — discrimination matters
+        "pref":   "#C4A87A",  # parchment — timeseries pref overlay
     }
 
     return {
@@ -63,7 +60,7 @@ def _build_dark_theme() -> dict:
         # Brand
         "primary":   accent["primary"],
         "secondary": accent["kincha"],
-        # Text scale
+        # Text scale — warm parchment, not blue
         "text_hi":   surface["text_hi"],
         "text_mid":  surface["text_mid"],
         "text_lo":   surface["text_lo"],
@@ -74,39 +71,39 @@ def _build_dark_theme() -> dict:
         # Chart
         "chart_grid":       surface["grid"],
         "chart_plot_color": surface["plot"],
-        "accent_threshold": accent["teal"],
+        "accent_threshold": accent["blue"],
         "timeseries_pref":  data["pref"],
-        # Cohort annotations
-        "accent_dankai":      accent["amber"],
-        "accent_dankai_jr":   accent["lime"],
-        "accent_wartime_gen": accent["primary"],
-        "accent_shoushika":   accent["sky"],
+        # Cohort annotations — hardcoded; must not drift with accent renames
+        "accent_dankai":      "#D4873A",  # 団塊の世代
+        "accent_dankai_jr":   "#7AB830",  # 団塊ジュニア
+        "accent_wartime_gen": accent["warning"],  # 戦中世代
+        "accent_shoushika":   "#9ECFDE",  # 少子化世代
         # Population pyramid
         "pyramid_male":   data["male"],
         "pyramid_female": data["female"],
         # Tooltip
-        "tooltip_bg":          "#1E1B17",
-        "tooltip_border":      surface["border"],
+        "tooltip_bg":          "#0D1428",
+        "tooltip_border":      "#1A2840",
         "tooltip_border_size": "1.5px",
         "tooltip_text_hi":     surface["text_hi"],
         "tooltip_text_mid":    surface["text_mid"],
         "tooltip_hint":        surface["text_hint"],
-        "tooltip_divider":     "rgba(232, 221, 208, 0.12)",
+        "tooltip_divider":     "rgba(200, 168, 122, 0.15)",
         # Map (passthroughs)
         "map_geo": {
             "bg_color":   surface["page"],
-            "land_color": "#1C1916",
-            "line_color": "#5C4A3A",
+            "land_color": "#1A2840",
+            "line_color": surface["text_lo"],
         },
         "map_highlight_line_color": surface["text_hi"],
-        "map_highlight_fill":       "rgba(196, 92, 58, 0.12)",
+        "map_highlight_fill":       "rgba(20, 60, 160, 0.15)",
         "map_colorscale": "plasma_r",
         "map_tile_style": "carto-darkmatter",
-        # Shadows — ink-on-ink; drop shadow minimal, bezel does the work
+        # Shadows — vestigial but still wired in config.py; do not remove keys
         "bezel_hi_alpha":  0.10,
-        "bezel_lo_alpha":  0.55,
+        "bezel_lo_alpha":  0.50,
         "shadow_color":    accent["ink"],
-        "shadow_darkness": 0.6,
+        "shadow_darkness": 0.65,
         # Miscellaneous
         "warning": accent["warning"],
     }

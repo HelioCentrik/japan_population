@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 
 from app.config import (
     FONT_SIZE_AXIS_TICK, FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
-    COLOR_TEXT_MID, COLOR_PRIMARY, CHART_PLOT_COLOR,
+    COLOR_PRIMARY, COLOR_TEXT_MID, COLOR_TEXT_HI, CHART_PLOT_COLOR,
     PANEL_BORDER, ACCENT_THRESHOLD, TIMESERIES_PREF_COLOR,
     LINE_WIDTH_MAIN, LINE_WIDTH_PREF, LINE_WIDTH_1945,
     LINE_WIDTH_THRESHOLD, LINE_WIDTH_YEAR_MARKER,
@@ -124,7 +124,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
         y=national_df["aging_index"],
         mode="lines",
         name="全国 National",
-        line=dict(color=COLOR_TEXT_MID, width=LINE_WIDTH_MAIN),
+        line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN),
         hoverinfo="none",
         customdata=[cd_by_year[yr] for yr in national_df["year"]],
     ))
@@ -209,6 +209,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             orientation="h",
             x=0.195, xanchor="left",
             y=0.98, yanchor="top",
+            font=dict(color=COLOR_TEXT_HI),
         ),
         xaxis=dict(
             showline=True,
@@ -225,7 +226,7 @@ def build_aging_index_fig(selected_year: int, area_estat: str | None = None) -> 
             mirror=True,
             title=dict(
                 text="高齢化指数",
-                font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
+                font=dict(color=COLOR_TEXT_HI, size=FONT_SIZE_AXIS_TITLE),
             ),
             zeroline=False,
             ticklabelstandoff=YAXIS_TICK_STANDOFF,
@@ -322,7 +323,7 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
     # ── National lines ────────────────────────────────────────────────────────
     if area_estat is None:
         national_series = [
-            ("total",  "全国 Total",  COLOR_TEXT_MID,       LINE_WIDTH_MAIN),
+            ("total",  "全国 Total",  COLOR_TEXT_HI,       LINE_WIDTH_MAIN),
             ("male",   "全国 Male",   PYRAMID_MALE_COLOR,   LINE_WIDTH_MAIN),
             ("female", "全国 Female", PYRAMID_FEMALE_COLOR, LINE_WIDTH_MAIN),
         ]
@@ -342,7 +343,7 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
     # ── Prefecture overlays ───────────────────────────────────────────────────
     if pref_df is not None and not pref_df.empty:
         pref_series = [
-            ("total",  f"{pref_label} Total",  COLOR_TEXT_MID),
+            ("total",  f"{pref_label} Total",  COLOR_TEXT_HI),
             ("male",   f"{pref_label} Male",   PYRAMID_MALE_COLOR),
             ("female", f"{pref_label} Female", PYRAMID_FEMALE_COLOR),
         ]
@@ -378,6 +379,7 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
             orientation="h",
             x=0.195, xanchor="left",
             y=0.98, yanchor="top",
+            font=dict(color=COLOR_TEXT_HI),
         ),
         xaxis=dict(
             showline=True,
@@ -394,7 +396,7 @@ def build_timeseries_fig(selected_year: int, area_estat: str | None = None) -> g
             mirror=True,
             title=dict(
                 text="百万人 / Millions",
-                font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
+                font=dict(color=COLOR_TEXT_HI, size=FONT_SIZE_AXIS_TITLE),
             ),
             zeroline=False,
             ticklabelstandoff=YAXIS_TICK_STANDOFF,

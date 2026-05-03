@@ -9,9 +9,10 @@ from dash import Dash, html, dcc, Input, Output, State, ctx, no_update, Patch
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
-                        FONT_MAIN_COLOR, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT_MID,
+                        COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT_MID, COLOR_TEXT_HI,
                         HEADER_TITLE_JA, HEADER_TITLE_EN,
-                        PLAY_INTERVAL_MS,
+                        FONT_SIZE_AXIS_TITLE,
+                        PLAY_INTERVAL_MS, LAYOUT_GAP,
                         MAP_METRICS, MAP_METRIC_DEFAULT, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
                         MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
                         PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
@@ -19,7 +20,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT, TS_TOOLTIP_OFFSET_X, TS_TOOLTIP_OFFSET_Y,
                         ACCENT_DANKAI, ACCENT_DANKAI_JR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,
-                        get_scaled_fonts, LAYOUT_GAP, FONT_SIZE_AXIS_TITLE, )
+                        get_scaled_fonts, )
 from app.index_string import INDEX_STRING
 import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -180,7 +181,7 @@ app.layout = html.Div(
                                 yr: {
                                     "label": str(yr),
                                     "style": {
-                                        "color": COLOR_PRIMARY if yr == 1945 else FONT_MAIN_COLOR,
+                                        "color": COLOR_PRIMARY if yr == 1945 else COLOR_TEXT_MID,
                                         "fontSize": f"{FONT_SIZE_AXIS_TITLE}px",
                                         "fontWeight": "bold" if yr == 1945 else "normal",
                                     }
@@ -692,7 +693,7 @@ def show_timeseries_tooltip(hover_data, ts_view):
             html.Div(str(int(year)), className="tt-title"),
             html.Div("人口 / Population", className="tt-metric-label"),
             html.Hr(className="tt-divider"),
-            pop_row("総数", f"{total_M:.1f}M",  COLOR_TEXT_MID),
+            pop_row("総数", f"{total_M:.1f}M",  COLOR_TEXT_HI),
             pop_row("男",   f"{male_M:.1f}M",   PYRAMID_MALE_COLOR),
             pop_row("女",   f"{female_M:.1f}M", PYRAMID_FEMALE_COLOR),
             html.Div(series_prefix, className="tt-hint"),
