@@ -22,7 +22,6 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,
                         get_scaled_fonts, )
 from app.index_string import INDEX_STRING
-import scripts.build_db as bdb
 from app.kpi import build_kpi_data, render_kpi_cards
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
@@ -37,14 +36,6 @@ app = dash.Dash(__name__, title="少子高齢化 A Century of Japan's Population
 app.index_string = INDEX_STRING
 register_plotly_template()
 server = app.server  # expose for deployment (Gunicorn etc.)
-
-
-# ── Build DuckDB ───────────────────────────────────────────────────
-_DB_PATH = Path("data/japan_population.duckdb")
-if not _DB_PATH.exists():
-    print("Database not found — running build_db.py ...")
-    from scripts.build_db import build
-    build()
 
 
 # ── Census years for slider ───────────────────────────────────────────────────
