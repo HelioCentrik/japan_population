@@ -25,7 +25,7 @@ from app.index_string import INDEX_STRING
 from app.kpi import build_kpi_data, render_kpi_cards
 from app.maps import build_japan_map_fig
 from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
-from app.timeseries import build_aging_index_fig, build_timeseries_fig
+from app.timeseries import build_ts_population_fig, build_ts_aging_index_fig, build_ts_pop_share_fig
 from app.plotly_template import register_plotly_template
 from app import figure_cache
 
@@ -78,10 +78,12 @@ else:
         figure_cache.save(figure_cache.make_key("map", _yr, MAP_METRIC_DEFAULT), fig)
         fig = build_pyramid_fig(year=_yr, area_estat=None, axis_max=_prewarm_axis_max)
         figure_cache.save(figure_cache.make_key("pyramid", _yr, None, _prewarm_axis_max), fig)
-        fig = build_aging_index_fig(selected_year=_yr, area_estat=None)
-        figure_cache.save(figure_cache.make_key("timeseries", _yr, None), fig)
-        fig = build_timeseries_fig(selected_year=_yr, area_estat=None)
+        fig = build_ts_population_fig(selected_year=_yr, area_estat=None)
         figure_cache.save(figure_cache.make_key("population", _yr, None), fig)
+        fig = build_ts_aging_index_fig(selected_year=_yr, area_estat=None)
+        figure_cache.save(figure_cache.make_key("timeseries", _yr, None), fig)
+        fig = build_ts_pop_share_fig(selected_year=_yr, area_estat=None)
+        figure_cache.save(figure_cache.make_key("pop_share", _yr, None), fig)
     figure_cache.write_fingerprint()
     print(f"  Cache built and saved — {len(CENSUS_YEARS)} years × 3 builders.")
 
@@ -306,7 +308,7 @@ app.layout = html.Div(
                         dcc.Graph(
                             id="timeseries-chart",
                             clear_on_unhover=True,
-                            figure=build_timeseries_fig(selected_year=MAX_YEAR, area_estat=None),
+                            figure=build_ts_population_fig(selected_year=MAX_YEAR, area_estat=None),
                             config={"displayModeBar": False, "responsive": True},
                             style={"height": "100%"},
                         ),
@@ -662,6 +664,7 @@ def show_timeseries_tooltip(hover_data, ts_view):
         male_M        = cd[2]
         female_M      = cd[3]
         series_prefix = cd[4]
+        flag          = cd[5]
 
         def pop_row(label, value_str, color):
             return html.Div([
@@ -675,7 +678,7 @@ def show_timeseries_tooltip(hover_data, ts_view):
 
         provisional_banner = (
             html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
-            if int(year) == 1945 else None
+            if flag == 1945 else None
         )
 
         children = html.Div([
@@ -693,7 +696,7 @@ def show_timeseries_tooltip(hover_data, ts_view):
             "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
         })
 
-    else:  # aging index
+    elif ts_view == "aging_index":
         national_ai = cd[1]
         pref_ai     = cd[2]
         pref_lbl    = cd[3]
@@ -713,13 +716,6 @@ def show_timeseries_tooltip(hover_data, ts_view):
         if pref_ai is not None:
             pref_row = ai_row(pref_lbl, f"{pref_ai:.1f}", TIMESERIES_PREF_COLOR)
 
-        note = None
-        if flag == "1945":
-            note = html.Div(
-                "臨時国勢調査  /  Provisional Wartime Census",
-                className="tt-hint",
-            )
-
         provisional_banner = (
             html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
             if flag == "1945" else None
@@ -733,6 +729,57 @@ def show_timeseries_tooltip(hover_data, ts_view):
             html.Hr(className="tt-divider"),
             ai_row("全国", f"{national_ai:.1f}", COLOR_TEXT_MID),
             pref_row,
+        ], className="tt-card arrow-bottom", style={
+            "--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px",
+            "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
+        })
+
+    else:  # pop_share
+        # customdata shape: [year, youth, working, old, pref_youth, pref_working, pref_old, pref_label, flag]
+        youth_share   = cd[1]
+        working_share = cd[2]
+        old_share     = cd[3]
+        pref_youth    = cd[4]
+        pref_working  = cd[5]
+        pref_old      = cd[6]
+        pref_lbl      = cd[7]
+        flag          = cd[8]
+
+        def share_row(label, value, color):
+            return html.Div([
+                html.Div(className="pyramid-tt-cohort-strip",
+                         style={"--cohort-color": color}),
+                html.Div([
+                    html.Span(f"{label}  ", className="tt-label"),
+                    html.Span(f"{value:.1f}%", className="tt-value"),
+                ]),
+            ], className="pyramid-tt-cohort-row")
+
+        provisional_banner = (
+            html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
+            if flag == "1945" else None
+        )
+
+        pref_rows = None
+        if pref_youth is not None:
+            pref_rows = html.Div([
+                html.Hr(className="tt-divider"),
+                html.Div(pref_lbl, className="tt-hint"),
+                share_row("年少 0–14",   pref_youth,   PYRAMID_FEMALE_COLOR),
+                share_row("生産 15–64",  pref_working, COLOR_TEXT_HI),
+                share_row("老年 65+",    pref_old,     PYRAMID_MALE_COLOR),
+            ])
+
+        children = html.Div([
+            provisional_banner,
+            html.Hr(className="tt-divider") if provisional_banner else None,
+            html.Div(str(int(year)),           className="tt-title"),
+            html.Div("人口割合 / Population Share", className="tt-metric-label"),
+            html.Hr(className="tt-divider"),
+            share_row("年少 0–14",   youth_share,   PYRAMID_FEMALE_COLOR),
+            share_row("生産 15–64",  working_share, COLOR_TEXT_HI),
+            share_row("老年 65+",    old_share,     PYRAMID_MALE_COLOR),
+            pref_rows,
         ], className="tt-card arrow-bottom", style={
             "--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px",
             "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
@@ -789,11 +836,12 @@ def update_charts(year, area_estat, metric, ts_view):
         patched["data"][1]["z"]          = fd["data"][1]["z"]
         map_fig = patched
 
-    ts_fig = (
-        build_timeseries_fig(selected_year=y, area_estat=area_estat)
-        if ts_view == "population"
-        else build_aging_index_fig(selected_year=y, area_estat=area_estat)
-    )
+    if ts_view == "population":
+        ts_fig = build_ts_population_fig(selected_year=y, area_estat=area_estat)
+    elif ts_view == "aging_index":
+        ts_fig = build_ts_aging_index_fig(selected_year=y, area_estat=area_estat)
+    else:
+        ts_fig = build_ts_pop_share_fig(selected_year=y, area_estat=area_estat)
 
     return (
         map_fig,

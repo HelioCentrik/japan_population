@@ -345,6 +345,7 @@ TS_TOOLTIP_OFFSET_Y  = 20
 TS_VIEWS = {
     "population": "人口 Population",
     "aging_index": "高齢化指数 Aging Index",
+    "pop_share":   "人口割合 Population Share",
 }
 TS_VIEW_DEFAULT = "population"
 
