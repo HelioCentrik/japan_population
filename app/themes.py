@@ -98,7 +98,7 @@ def _build_dark_theme() -> dict:
         "map_highlight_line_color": surface["text_hi"],
         "map_highlight_fill":       "rgba(20, 60, 160, 0.15)",
         "map_colorscale": "plasma_r",
-        "map_tile_style": "carto-darkmatter",
+        "map_tile_style": "carto-darkmatter-nolabels",
         # Shadows — vestigial but still wired in config.py; do not remove keys
         "bezel_hi_alpha":  0.10,
         "bezel_lo_alpha":  0.50,

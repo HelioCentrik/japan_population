@@ -22,15 +22,15 @@
         if (inner) inner.style.opacity = '1';
     }
 
-    // Use Plotly.relayout (not mbMap.setZoom) so _fullLayout.mapbox.zoom stays in sync.
+    // Use Plotly.relayout (not mbMap.setZoom) so _fullLayout.map.zoom stays in sync.
     // uirevision-based Plotly.react reads _fullLayout to restore the viewport; calling
     // mbMap.setZoom directly leaves that value stale and causes filters to revert the zoom.
     function applyResizeZoom(plotDiv, height) {
         const target = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
             REF_ZOOM + Math.log2(height / REF_HEIGHT)));
-        const current = plotDiv._fullLayout?.mapbox?.zoom ?? DEFAULT_ZOOM;
+        const current = plotDiv._fullLayout?.map?.zoom ?? DEFAULT_ZOOM;
         if (Math.abs(current - target) >= 0.05) {
-            Plotly.relayout(plotDiv, {'mapbox.zoom': target});
+            Plotly.relayout(plotDiv, {'map.zoom': target});
         }
     }
 
@@ -43,7 +43,7 @@
         // figure default). Does not attempt its own correction before that point.
         plotDiv.on('plotly_afterplot', function () {
             if (revealed) return;
-            const layoutZoom = plotDiv._fullLayout?.mapbox?.zoom ?? DEFAULT_ZOOM;
+            const layoutZoom = plotDiv._fullLayout?.map?.zoom ?? DEFAULT_ZOOM;
             if (layoutZoom > DEFAULT_ZOOM + 0.1) {
                 reveal();
             }
@@ -84,9 +84,9 @@
         const zoom   = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
             REF_ZOOM + Math.log2(height / REF_HEIGHT)));
         Plotly.relayout(plotDiv, {
-            'mapbox.zoom':       zoom,
-            'mapbox.center.lat': CENTER_LAT,
-            'mapbox.center.lon': CENTER_LON,
+            'map.zoom':       zoom,
+            'map.center.lat': CENTER_LAT,
+            'map.center.lon': CENTER_LON,
         });
         return window.dash_clientside.no_update;
     };

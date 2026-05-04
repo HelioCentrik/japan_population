@@ -141,7 +141,7 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
     prefectures_js = json.loads(prefectures.to_json())
 
     # ── Base choropleth ───────────────────────────────────────────────────────
-    base_trace = go.Choroplethmapbox(
+    base_trace = go.Choroplethmap(
         geojson=prefectures_js,
         locations=prefectures["area_estat"],
         z=prefectures["_z"],
@@ -186,7 +186,7 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
             oki_locs = list(oki["area_estat"])
             oki_z    = [1.0]
 
-    traces.append(go.Choroplethmapbox(
+    traces.append(go.Choroplethmap(
         geojson=prefectures_js,
         locations=oki_locs,
         z=oki_z,
@@ -199,7 +199,7 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
     ))
 
     # ── Highlight trace — always at data[2], empty until prefecture selected ──
-    traces.append(go.Choroplethmapbox(
+    traces.append(go.Choroplethmap(
         geojson=prefectures_js,
         locations=[],
         z=[],
@@ -213,8 +213,8 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
 
     fig = go.Figure(data=traces)
     fig.update_layout(
-        uirevision="map-view",  # constant — Plotly never resets viewport on data updates
-        mapbox=dict(
+        uirevision="map-view",
+        map=dict(
             style=MAP_TILE_STYLE,
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
         ),

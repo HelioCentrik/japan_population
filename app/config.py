@@ -219,7 +219,7 @@ def get_scaled_fonts(tier: str) -> dict:
 # ── Spacing & borders ──────────────────────────────────────────────────────
 
 PANEL_BORDER_RADIUS    = "3px"
-PANEL_BORDER_THICKNESS = "1px"
+PANEL_BORDER_THICKNESS = "0px"
 YAXIS_TICK_STANDOFF    = 0
 
 
@@ -239,7 +239,7 @@ HEADER_TEXT_SHADOW = "2px 2px 0 rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.85)"
 HEADER_FONT_JA     = 52    # px — 少子高齢化 title
 HEADER_FONT_EN     = 14    # px — English subtitle
 HEADER_TITLE_JA    = "少子高齢化"
-HEADER_TITLE_EN    = f"A Century of Japan's Population · 1920–{MAX_YEAR}"
+HEADER_TITLE_EN    = f"A Century of Japan's Population · 1920-{MAX_YEAR}"
 
 
 # ── KPI card grid row heights ─────────────────────────────────────────────────

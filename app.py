@@ -413,7 +413,7 @@ def apply_initial_map_zoom(zoom):
     if zoom is None:
         return no_update
     patched = Patch()
-    patched["layout"]["mapbox"]["zoom"] = zoom
+    patched["layout"]["map"]["zoom"] = zoom
     return patched
 
 @app.callback(
