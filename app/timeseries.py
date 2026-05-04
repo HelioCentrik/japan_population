@@ -110,17 +110,40 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
             ("female", "全国 Female", PYRAMID_FEMALE_COLOR, LINE_WIDTH_MAIN),
         ]
 
+        df_non_1945 = national_df[national_df["year"] != 1945]
+        df_1945     = national_df[national_df["year"] == 1945]
+
         for col, label, color, width in national_series:
+            # Line — connects all years including 1945
             traces.append(go.Scatter(
                 x=national_df["year"],
                 y=national_df[col] / M,
-                mode="lines+markers",
+                mode="lines",
                 name=label,
                 line=dict(color=color, width=width),
-                marker=dict(color=color, size=MARKER_SIZE_DOT),
                 hoverinfo="none",
                 customdata=[cd_by_year[yr] for yr in national_df["year"]],
             ))
+            # Regular census year dots (non-1945)
+            traces.append(go.Scatter(
+                x=df_non_1945["year"],
+                y=df_non_1945[col] / M,
+                mode="markers",
+                showlegend=False,
+                marker=dict(color=color, size=MARKER_SIZE_DOT),
+                hoverinfo="skip",
+            ))
+            # 1945 — filled COLOR_PRIMARY dot at this series' y-value
+            if not df_1945.empty:
+                traces.append(go.Scatter(
+                    x=df_1945["year"],
+                    y=df_1945[col] / M,
+                    mode="markers",
+                    showlegend=False,
+                    marker=dict(color=COLOR_PRIMARY, size=MARKER_SIZE_DOT + 2),
+                    hoverinfo="none",
+                    customdata=[cd_by_year[1945]],
+                ))
 
     # ── Prefecture overlays ───────────────────────────────────────────────────
     if pref_df is not None and not pref_df.empty:
@@ -309,19 +332,14 @@ def build_ts_aging_index_fig(selected_year: int, area_estat: str | None = None) 
         hoverinfo="skip",
     ))
 
-    # 1945 — open circle, red to match the slider mark styling
+    # 1945 — filled dot, COLOR_PRIMARY to match slider mark
     if not df_1945.empty:
         traces.append(go.Scatter(
             x=df_1945["year"],
             y=df_1945["aging_index"],
             mode="markers",
             name="1945 臨時国勢調査",
-            marker=dict(
-                symbol="circle-open",
-                size=MARKER_SIZE_1945,
-                color=COLOR_PRIMARY,
-                line=dict(width=LINE_WIDTH_1945, color=COLOR_PRIMARY),
-            ),
+            marker=dict(color=COLOR_PRIMARY, size=MARKER_SIZE_DOT + 2),
             hoverinfo="none",
             customdata=[cd_by_year[1945]],
         ))
@@ -537,27 +555,18 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
             hoverinfo="skip",
         ))
 
-    # ── 1945 — single trace, three open circles ───────────────────────────────
-    # Batched into one trace to avoid three legend entries.
+    # ── 1945 — one filled dot per series at its actual y-value ───────────────
     if not df_1945.empty:
-        traces.append(go.Scatter(
-            x=[1945, 1945, 1945],
-            y=[
-                float(df_1945["youth_share"].iloc[0]),
-                float(df_1945["working_share"].iloc[0]),
-                float(df_1945["old_share"].iloc[0]),
-            ],
-            mode="markers",
-            name="1945 臨時国勢調査",
-            marker=dict(
-                symbol="circle-open",
-                size=MARKER_SIZE_1945,
-                color=COLOR_PRIMARY,
-                line=dict(width=LINE_WIDTH_1945, color=COLOR_PRIMARY),
-            ),
-            hoverinfo="none",
-            customdata=[cd_by_year[1945]] * 3,
-        ))
+        for col, _, _ in share_series:
+            traces.append(go.Scatter(
+                x=df_1945["year"],
+                y=df_1945[col],
+                mode="markers",
+                showlegend=False,
+                marker=dict(color=COLOR_PRIMARY, size=MARKER_SIZE_DOT + 2),
+                hoverinfo="none",
+                customdata=[cd_by_year[1945]],
+            ))
 
     # ── Prefecture overlay ────────────────────────────────────────────────────
     if pref_df is not None and not pref_df.empty:
