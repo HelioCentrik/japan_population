@@ -103,12 +103,12 @@ Greyed out on the choropleth. During this period Okinawa remained under US admin
 The app exposes `server = app.server` for WSGI. Deploy with Gunicorn:
 
 ```bash
-gunicorn app:server
+gunicorn app:server --workers 1 --timeout 120 --bind 0.0.0.0:$PORT
 ```
 
 **Render settings:**
 - Build command: `pip install -r requirements.txt`
 - Start command: `gunicorn app:server`
-- Python version: 3.11
+- Python version: 3.12
 
 **Cold start note:** On first request, all figures are built from the committed database into an in-memory cache (~30–60s on a standard instance). Subsequent requests are served from memory.
