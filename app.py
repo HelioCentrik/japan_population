@@ -129,6 +129,12 @@ app.layout = html.Div(
         html.Div(
             className="dashboard-header",
             children=[
+                html.A(
+                    "deanallton.com",
+                    href="https://deanallton.com",
+                    target="_blank",
+                    className="header-byline",
+                ),
                 html.Div(
                     className="header-text",
                     children=[

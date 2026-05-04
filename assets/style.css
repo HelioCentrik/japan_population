@@ -365,6 +365,22 @@ body.slider-thinner
     margin-bottom      : calc(var(--layout-gap) * 0.5 );
 }
 
+.header-byline {
+    position        : absolute;
+    top             : 0px;
+    left            : 4px;
+    font-family     : var(--font_mono);
+    font-size       : var(--font-size-kpi-sub);
+    font-weight     : 400;
+    color           : var(--color-secondary);
+    text-shadow     : 1px 1px 0 rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.85);
+    letter-spacing  : 0.12em;
+    text-decoration : none;
+}
+.header-byline:hover {
+    color: var(--color-text-mid);
+}
+
 .header-text {
     position  : absolute;
     right     : 12px;
