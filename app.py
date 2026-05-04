@@ -9,7 +9,8 @@ from dash import Dash, html, dcc, Input, Output, State, ctx, no_update, Patch
 import duckdb as ddb
 
 from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
-                        COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT_MID, COLOR_TEXT_HI,
+                        COLOR_PRIMARY, COLOR_SECONDARY, COLOR_WARNING, COLOR_TEXT_MID, COLOR_TEXT_HI,
+                        TOOLTIP_TEXT_MID, TOOLTIP_TEXT_HI,
                         HEADER_TITLE_JA, HEADER_TITLE_EN,
                         FONT_SIZE_AXIS_TITLE,
                         PLAY_INTERVAL_MS, LAYOUT_GAP,
@@ -356,6 +357,31 @@ app.clientside_callback(
 )
 
 
+def _render_delta(delta_str: str):
+    """Split a pre-formatted delta string into colored Dash spans.
+
+    Handles three cases:
+      - ""              → empty string (suppressed metric)
+      - "First census"  → plain mid-tone string
+      - "▲/▼ val  since YYYY (N yrs)" → arrow + value + suffix, each styled
+    """
+    if not delta_str:
+        return ""
+    if delta_str == "First census":
+        return html.Span(delta_str, style={"color": TOOLTIP_TEXT_MID})
+
+    arrow, rest     = delta_str.split(" ", 1)
+    is_positive     = arrow == "▲"
+    arrow_color     = ACCENT_DANKAI_JR if is_positive else COLOR_WARNING
+    value, suffix   = rest.split("  since ", 1)
+
+    return [
+        html.Span(arrow,              style={"color": arrow_color}),
+        html.Span(f" {value}",        style={"color": TOOLTIP_TEXT_HI}),
+        html.Span(f"  since {suffix}", style={"color": TOOLTIP_TEXT_MID}),
+    ]
+
+
 @app.callback(
     Output("play-interval", "disabled"),
     Output("play-btn", "children"),
@@ -514,7 +540,7 @@ def show_map_tooltip(hover_data, metric):
         ], className="tt-title"),
         html.Div(meta["label"], className="tt-metric-label"),
         html.Div(metric_str,    className="tt-metric-value"),
-        html.Div(delta_str,     className="tt-delta"),
+        html.Div(_render_delta(delta_str), className="tt-delta"),
         html.Hr(className="tt-divider") if secondary else None,
         *secondary,
         html.Div("再選択でクリア  /  Reselect to clear", className="tt-hint"),
@@ -664,7 +690,6 @@ def show_timeseries_tooltip(hover_data, ts_view):
         male_M        = cd[2]
         female_M      = cd[3]
         series_prefix = cd[4]
-        flag          = cd[5]
 
         def pop_row(label, value_str, color):
             return html.Div([
@@ -678,7 +703,7 @@ def show_timeseries_tooltip(hover_data, ts_view):
 
         provisional_banner = (
             html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
-            if flag == 1945 else None
+            if year == 1945 else None
         )
 
         children = html.Div([
