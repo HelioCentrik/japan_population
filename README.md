@@ -31,14 +31,14 @@ A single-page application with four linked panels driven by a shared year contro
 
 ### Controls
 
-| Control | Effect |
-|---|---|
-| Year slider | Updates all panels simultaneously across 21 census years (1920–2020). |
-| Play button | Autoplays through census years at a fixed interval. |
-| Prefecture click (map) | Filters the pyramid and overlays a prefecture line on the time series. |
-| Re-click / Reset | Clears prefecture selection and returns all panels to the national view. |
+| Control | Effect                                                                                                   |
+|---|----------------------------------------------------------------------------------------------------------|
+| Year slider | Updates all panels simultaneously across 21 census years (1920–2020).                                    |
+| Play button | Autoplays through census years at a fixed interval.                                                      |
+| Prefecture click (map) | Filters the pyramid and overlays a prefecture line on the time series.                                   |
+| Re-click / Reset | Clears prefecture selection and returns all panels to the national view.                                 |
 | Map metric selector | Switches the choropleth between total population, aging index, population change, and working-age share. |
-| Time series selector | Switches the time series between population (default) and aging index views. |
+| Time series selector | Switches the time series between population (default), aging index, and population share views.          |
 
 ### Panels
 
@@ -48,7 +48,7 @@ A single-page application with four linked panels driven by a shared year contro
 
 **Population pyramid** — Age/sex butterfly chart for the selected year and geography. Cohort annotations mark the 団塊世代 (dankai), 団塊ジュニア, 戦中世代 (wartime generation), and 少子化世代 birth cohorts. Hover tooltips show cohort context and population figures. The wartime generation's male deficit is visible walking up the pyramid across years.
 
-**Time series** — Switchable between two views via a dropdown selector. The default population view shows national total, male, and female population trends in millions. The aging index view shows national 高齢化指数 (1920–2020) with a reference line at 100 — the crossover point where the elderly population exceeds the child population. Prefecture overlay shown on map selection. The 1945 data point is rendered as a distinct open-circle marker in red, matching the year slider.
+**Time series** — Switchable between three views via a dropdown selector. The default population view shows national total, male, and female trends in millions. The aging index view shows national 高齢化指数 (1920–2020) with a reference line at 100 — the crossover point where the elderly population exceeds the child population. The population share view shows youth (0–14), working-age (15–64), and elderly (65+) as a percentage of total population, annotated with the empirical working-age peak and the elderly/youth crossover. Prefecture overlay shown on map selection. The 1945 data point is rendered as a distinct open-circle marker in red, matching the year slider.
 
 ---
 
