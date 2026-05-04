@@ -10,6 +10,7 @@ api.py
 assets/OkinawaWomanBaby.jpg
 data/*
 !data/japan_prefectures_simplified.parquet
+!data/japan_population.duckdb
 scripts/*
 !scripts/build_db.py
 source/*
