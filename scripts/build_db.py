@@ -10,7 +10,6 @@ Loads source/jp_census_historical_1920_2015.csv
   → creates views  (v_census, v_map_metrics)
 
 Idempotent — safe to re-run; all objects are CREATE OR REPLACE.
-Called automatically by app.py on startup if the DB file is absent.
 """
 
 import sys
