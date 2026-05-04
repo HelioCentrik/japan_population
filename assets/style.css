@@ -367,13 +367,13 @@ body.slider-thinner
 
 .header-byline {
     position        : absolute;
-    top             : 0px;
+    bottom          : 2px;
     left            : 4px;
     font-family     : var(--font_mono);
     font-size       : var(--font-size-kpi-sub);
     font-weight     : 400;
     color           : var(--color-secondary);
-    text-shadow     : 1px 1px 0 rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.85);
+    text-shadow     : 1px 1px 0 rgba(0,0,0,0.75), 0 0 10px rgba(0,0,0,0.85);
     letter-spacing  : 0.12em;
     text-decoration : none;
 }
@@ -408,18 +408,6 @@ body.slider-thinner
     letter-spacing: 0.14em;
     text-transform: uppercase;
     margin-top    : 4px;
-}
-
-.header-era-label {
-    position      : absolute;
-    bottom        : 10px;
-    left          : 20px;
-    font-family   : var(--font-sans);
-    font-size     : 18px;
-    font-weight   : 400;
-    color         : var(--color-text-mid);
-    text-shadow   : var(--header-text-shadow);
-    letter-spacing: 0.06em;
 }
 
 /* KPI row */

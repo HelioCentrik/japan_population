@@ -100,7 +100,7 @@ def _card(label: str, value, sub=None) -> html.Div:
     ], className="card")
 
 
-def render_kpi_cards(kpi: dict) -> list:
+def render_kpi_cards(kpi: dict, era_label: str = "") -> list:
     def _fmt_pop(v):
         return f"{v:,}" if v is not None else "—"
 
@@ -122,6 +122,7 @@ def render_kpi_cards(kpi: dict) -> list:
         _card(
             "国民人口  National Population",
             _fmt_pop(kpi["national_pop"]),
+            sub=era_label,
         ),
         _card(
             "人口増減  Population Change",

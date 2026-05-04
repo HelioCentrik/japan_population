@@ -142,19 +142,13 @@ app.layout = html.Div(
                         html.Div(HEADER_TITLE_EN, className="header-title-en"),
                     ],
                 ),
-                html.Div(
-                    id="era-label",
-                    children=YEAR_LABELS.get(MAX_YEAR, str(MAX_YEAR)),
-                    className="header-era-label",
-                    # remove the inline style dict — CSS class handles it now
-                ),
             ],
         ),
 
         # KPI Cards
         html.Div(
             id="kpi-row",
-            children=render_kpi_cards(build_kpi_data(MAX_YEAR)),
+            children=render_kpi_cards(build_kpi_data(MAX_YEAR), YEAR_LABELS.get(MAX_YEAR, str(MAX_YEAR))),
         ),
 
         # Play Button + Year Slider
@@ -758,7 +752,6 @@ def show_timeseries_tooltip(hover_data, ts_view):
 @app.callback(
     Output("map-graph", "figure"),
     Output("pyramid-chart", "figure"),
-    Output("era-label", "children"),
     Output("kpi-row", "children"),
     Output("timeseries-chart", "figure"),
     Input("year-slider", "value"),
@@ -814,8 +807,7 @@ def update_charts(year, area_estat, metric, ts_view):
     return (
         map_fig,
         build_pyramid_fig(year=y, area_estat=area_estat, axis_max=axis_max),
-        label,
-        render_kpi_cards(kpi_data),
+        render_kpi_cards(kpi_data, year_part),
         ts_fig,
     )
 
