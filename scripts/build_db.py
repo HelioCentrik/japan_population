@@ -224,7 +224,7 @@ def _create_views(con: ddb.DuckDBPyConnection) -> None:
 def build():
     """
     Full build: CSV → star schema → views.
-    Called directly or from app.py on first startup.
+    Called directly or from wsgi.py on first startup.
     """
     if not CSV_PATH.exists():
         sys.exit(
