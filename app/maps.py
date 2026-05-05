@@ -74,11 +74,13 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
 
     prefectures = gpd.read_parquet("data/japan_prefectures_simplified.parquet").to_crs(epsg=4326)
     prefectures = prefectures.rename(columns={"prefecture_code": "area_estat"})
+    prefectures = prefectures.drop(columns=["prefecture_name"])
 
     con = get_con()
     df = con.execute(f"""
         SELECT
             area_estat,
+            prefecture_name,
             population, aging_index, working_age_share,
             pop_delta, aging_index_delta, working_age_share_delta,
             prev_year, year_gap
