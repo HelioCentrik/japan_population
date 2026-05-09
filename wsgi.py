@@ -786,25 +786,55 @@ def show_timeseries_tooltip(hover_data, ts_view):
         })
 
     else:  # pop_share
-        # customdata shape: [year, youth, working, old, pref_youth, pref_working, pref_old, pref_label, flag]
-        youth_share   = cd[1]
-        working_share = cd[2]
-        old_share     = cd[3]
-        pref_youth    = cd[4]
-        pref_working  = cd[5]
-        pref_old      = cd[6]
-        pref_lbl      = cd[7]
-        flag          = cd[8]
+        # customdata shape:
+        # [0]year  [1]youth_share  [2]working_share  [3]old_share
+        # [4]pref_youth  [5]pref_working  [6]pref_old  [7]pref_label  [8]flag
+        # [9]nat_pop_0_14  [10]nat_pop_15_64  [11]nat_pop_65_plus
+        # [12]pref_pop_0_14  [13]pref_pop_15_64  [14]pref_pop_65_plus
+        youth_share      = cd[1]
+        working_share    = cd[2]
+        old_share        = cd[3]
+        pref_youth       = cd[4]
+        pref_working     = cd[5]
+        pref_old         = cd[6]
+        pref_lbl         = cd[7]
+        flag             = cd[8]
+        nat_pop_0_14     = cd[9]
+        nat_pop_15_64    = cd[10]
+        nat_pop_65_plus  = cd[11]
+        pref_pop_0_14    = cd[12]
+        pref_pop_15_64   = cd[13]
+        pref_pop_65_plus = cd[14]
 
-        def share_row(label, value, color):
+        def _fmt_pop(n):
+            """Format headcount to nearest sensible unit."""
+            if n is None:
+                return None
+            if n >= 1_000_000:
+                return f"{n / 1_000_000:.1f}M"
+            return f"{round(n / 1_000):,}K"
+
+        def share_row(label, share_val, pop_count, color):
+            pop_str = _fmt_pop(pop_count)
             return html.Div([
                 html.Div(className="pyramid-tt-cohort-strip",
                          style={"--cohort-color": color}),
                 html.Div([
                     html.Span(f"{label}  ", className="tt-label"),
-                    html.Span(f"{value:.1f}%", className="tt-value"),
+                    html.Span(f"{share_val:.1f}%", className="tt-value"),
+                    html.Span(f"  {pop_str}", className="tt-hint") if pop_str else None,
                 ]),
             ], className="pyramid-tt-cohort-row")
+
+        def dep_ratio_row(old, working):
+            """Old-age dependency ratio: 老年従属比 = pop_65+ / pop_15-64 × 100."""
+            if old is None or not working:
+                return None
+            ratio = old / working * 100
+            return html.Div([
+                html.Span("老年従属比  ", className="tt-label"),
+                html.Span(f"{ratio:.1f}%", className="tt-value"),
+            ], style={"paddingLeft": "12px", "marginTop": "2px", "opacity": "0.85"})
 
         provisional_banner = (
             html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
@@ -816,20 +846,22 @@ def show_timeseries_tooltip(hover_data, ts_view):
             pref_rows = html.Div([
                 html.Hr(className="tt-divider"),
                 html.Div(pref_lbl, className="tt-hint"),
-                share_row("年少 0–14",   pref_youth,   PYRAMID_FEMALE_COLOR),
-                share_row("生産 15–64",  pref_working, COLOR_TEXT_HI),
-                share_row("老年 65+",    pref_old,     PYRAMID_MALE_COLOR),
+                share_row("年少 0–14",  pref_youth,   pref_pop_0_14,    PYRAMID_FEMALE_COLOR),
+                share_row("生産 15–64", pref_working, pref_pop_15_64,   COLOR_TEXT_HI),
+                share_row("老年 65+",   pref_old,     pref_pop_65_plus, PYRAMID_MALE_COLOR),
+                dep_ratio_row(pref_old, pref_working),
             ])
 
         children = html.Div([
             provisional_banner,
             html.Hr(className="tt-divider") if provisional_banner else None,
-            html.Div(str(int(year)),           className="tt-title"),
+            html.Div(str(int(year)),               className="tt-title"),
             html.Div("人口割合 / Population Share", className="tt-metric-label"),
             html.Hr(className="tt-divider"),
-            share_row("年少 0–14",   youth_share,   PYRAMID_FEMALE_COLOR),
-            share_row("生産 15–64",  working_share, COLOR_TEXT_HI),
-            share_row("老年 65+",    old_share,     PYRAMID_MALE_COLOR),
+            share_row("年少 0–14",  youth_share,   nat_pop_0_14,    PYRAMID_FEMALE_COLOR),
+            share_row("生産 15–64", working_share, nat_pop_15_64,   COLOR_TEXT_HI),
+            share_row("老年 65+",   old_share,     nat_pop_65_plus, PYRAMID_MALE_COLOR),
+            dep_ratio_row(old_share, working_share),
             pref_rows,
         ], className="tt-card arrow-bottom", style={
             "--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px",

@@ -451,7 +451,10 @@ def _get_pop_share_data(area_estat: str | None) -> tuple:
         SELECT year,
             ROUND(pop_0_14    * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS youth_share,
             ROUND(pop_15_64   * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS working_share,
-            ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS old_share
+            ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS old_share,
+            pop_0_14,
+            pop_15_64,
+            pop_65_plus
         FROM age_buckets
         ORDER BY year
     """
@@ -493,19 +496,26 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
     #         pref_youth, pref_working, pref_old, pref_label, flag]
     if pref_df is not None and not pref_df.empty:
         merged = national_df.merge(
-            pref_df[["year", "youth_share", "working_share", "old_share"]].rename(columns={
+            pref_df[["year", "youth_share", "working_share", "old_share",
+                     "pop_0_14", "pop_15_64", "pop_65_plus"]].rename(columns={
                 "youth_share":   "pref_youth",
                 "working_share": "pref_working",
                 "old_share":     "pref_old",
+                "pop_0_14":      "pref_pop_0_14",
+                "pop_15_64":     "pref_pop_15_64",
+                "pop_65_plus":   "pref_pop_65_plus",
             }),
             on="year",
             how="left",
         )
     else:
         merged = national_df.copy()
-        merged["pref_youth"]   = float("nan")
-        merged["pref_working"] = float("nan")
-        merged["pref_old"]     = float("nan")
+        merged["pref_youth"]       = float("nan")
+        merged["pref_working"]     = float("nan")
+        merged["pref_old"]         = float("nan")
+        merged["pref_pop_0_14"]    = float("nan")
+        merged["pref_pop_15_64"]   = float("nan")
+        merged["pref_pop_65_plus"] = float("nan")
 
     pl = pref_label or ""
 
@@ -523,6 +533,14 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
             _nan_to_none(row.pref_old),
             pl,
             "1945" if row.year == 1945 else "",
+            # indices 9–11: national raw headcounts
+            float(row.pop_0_14),
+            float(row.pop_15_64),
+            float(row.pop_65_plus),
+            # indices 12–14: prefecture raw headcounts (None when no pref selected)
+            _nan_to_none(row.pref_pop_0_14),
+            _nan_to_none(row.pref_pop_15_64),
+            _nan_to_none(row.pref_pop_65_plus),
         ]
         for row in merged.itertuples()
     }
@@ -530,6 +548,9 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
     traces = []
 
     # ── National lines ────────────────────────────────────────────────────────
+    # Fade when a prefecture is active so the dotted overlay is easy to read.
+    nat_opacity = 0.25 if area_estat is not None else 1.0
+
     share_series = [
         ("youth_share",   "年少人口 0–14",  PYRAMID_FEMALE_COLOR),
         ("working_share", "生産年齢 15–64", COLOR_TEXT_HI),
@@ -543,6 +564,7 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
             mode="lines",
             name=label,
             line=dict(color=color, width=LINE_WIDTH_MAIN),
+            opacity=nat_opacity,
             hoverinfo="none",
             customdata=[cd_by_year[yr] for yr in national_df["year"]],
         ))
@@ -552,6 +574,7 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
             mode="markers",
             showlegend=False,
             marker=dict(color=color, size=MARKER_SIZE_DOT),
+            opacity=nat_opacity,
             hoverinfo="skip",
         ))
 
@@ -564,6 +587,7 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
                 mode="markers",
                 showlegend=False,
                 marker=dict(color=COLOR_PRIMARY, size=MARKER_SIZE_DOT + 2),
+                opacity=nat_opacity,
                 hoverinfo="none",
                 customdata=[cd_by_year[1945]],
             ))
