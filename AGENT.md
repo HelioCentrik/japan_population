@@ -39,6 +39,21 @@ U-shaped over the century: high in 1920 (youth-driven), minimum ~43.5 in
 1990 (Japan's demographic dividend peak), rising again since (now
 elderly-driven). The 1990 trough is Japan's highest-productivity window.
 
+### Population Share View (人口割合)
+A time series showing youth (0–14), working-age (15–64), and elderly (65+) as a
+percentage of the classified population across all census years. The three shares
+always sum to 100%. Note: the ~1.45M individuals with unknown age are excluded from
+the denominator — they are a data quality artifact, not a demographic category.
+
+Key inflection points:
+- Working-age share peaked ~69.5% around 1990–1995 (Japan's demographic dividend peak).
+- Elderly share crossed youth share around 1997 (same event as aging index crossing 100).
+- The old-age dependency ratio (`老年従属比`) — elderly share / working-age share × 100
+  — is derived from this view and shown in hover tooltips.
+
+Prefecture overlay available: prefecture lines rendered as dotted, national lines
+faded to 25% opacity when a prefecture is selected.
+
 ### Population Pyramid
 Visualizes age-sex distribution for a given year and geography. The national
 pyramid shifted from a classic triangular base (1920s, many young) to a
@@ -82,6 +97,9 @@ pyramid 5 years per census.
 - In which census year did Japan's aging index first exceed 100?
 - Which regions are aging fastest / slowest?
 - What is the total dependency ratio trend over time?
+- How has the share of youth / working-age / elderly population changed since [year]?
+- When did the elderly share first exceed the youth share nationally?
+- What is the old-age dependency ratio (老年従属比) in [year] nationally or for [prefecture]
 
 ---
 
@@ -96,7 +114,11 @@ pyramid 5 years per census.
 | Dependency burden | old_age_dep or total_dep depending on context |
 | Prefecture | area_estat / prefecture_name |
 | Region | area_level grouping of prefectures |
-| Population change | pop_delta (in v_map_metrics) |
+| Population change          | pop_delta (in v_map_metrics)                              |
+| Youth share / 年少割合     | youth_share — pop_0_14 / classified pop × 100             |
+| Working-age share / 生産割合 | working_share — pop_15_64 / classified pop × 100         |
+| Elderly share / 老年割合   | old_share — pop_65_plus / classified pop × 100            |
+| Old-age dependency ratio / 老年従属比 | old_share / working_share × 100 (= pop_65+ / pop_15–64 × 100) 
 
 ---
 

@@ -205,6 +205,52 @@ GROUP BY year
 ORDER BY year
 ```
 
+### Time Series — Aging Index
+```sql
+WITH age_buckets AS (
+    SELECT year,
+        SUM(CASE WHEN age_start >= 65                                                THEN population ELSE 0 END) AS pop_65_plus,
+        SUM(CASE WHEN age_start <= 10 AND age_end <= 14 THEN population ELSE 0 END) AS pop_0_14
+    FROM v_census
+    WHERE age_scheme = 'scheme_a'
+      AND age_group  != 'Total'
+      AND sex         = 'total'
+      AND area_level  = 2   -- swap for AND area_estat = '{area_estat}' for prefecture overlay
+    GROUP BY year
+)
+SELECT year,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14, 0), 1) AS aging_index
+FROM age_buckets
+ORDER BY year
+```
+
+### Time Series — Population Share (年少 / 生産 / 老年)
+**Denominator note:** Uses `pop_0_14 + pop_15_64 + pop_65_plus` as the denominator, not the `Total` row. This intentionally excludes the ~1.45M individuals with unknown age — they are a data quality artifact, not a meaningful demographic category. The three shares always sum to 100%.
+
+```sql
+WITH age_buckets AS (
+    SELECT year,
+        SUM(CASE WHEN age_start <= 10 AND age_end <= 14 THEN population ELSE 0 END) AS pop_0_14,
+        SUM(CASE WHEN age_start >= 15 AND age_end <= 64 THEN population ELSE 0 END) AS pop_15_64,
+        SUM(CASE WHEN age_start >= 65                   THEN population ELSE 0 END) AS pop_65_plus
+    FROM v_census
+    WHERE age_scheme = 'scheme_a'
+      AND age_group  != 'Total'
+      AND sex         = 'total'
+      AND area_level  = 2   -- swap for AND area_estat = '{area_estat}' for prefecture overlay
+    GROUP BY year
+)
+SELECT year,
+    ROUND(pop_0_14    * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS youth_share,
+    ROUND(pop_15_64   * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS working_share,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS old_share,
+    pop_0_14,
+    pop_15_64,
+    pop_65_plus
+FROM age_buckets
+ORDER BY year
+```
+
 ### Available Census Years
 ```sql
 SELECT DISTINCT year, era_name, era_year FROM d_years ORDER BY year
