@@ -361,8 +361,11 @@ app.layout = html.Div(
             children=[
                 html.Button("‹", id="side-panel-toggle-btn", className="side-panel-btn",
                             n_clicks=0, title="Project info"),
-                html.Button("G", id="side-panel-ai-btn", className="side-panel-btn",
-                            n_clicks=0, title="Ask Gemini"),
+                html.Button(
+                    html.Img(src="/assets/gemini-color.png", style={"width": "28px", "height": "28px"}),
+                    id="side-panel-ai-btn", className="side-panel-btn",
+                    n_clicks=0, title="Ask Gemini",
+                ),
             ]
         ),
 
