@@ -497,5 +497,5 @@ THEME = {
 # API key sourced from environment variable GEMINI_API_KEY — never hardcoded.
 
 AI_MODEL_NAME    = "gemini-2.5-flash-lite"
-AI_MAX_TOKENS    = 1024
+AI_MAX_TOKENS    = 512
 AI_HISTORY_LIMIT = 6
