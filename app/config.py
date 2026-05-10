@@ -22,6 +22,7 @@ Sections:
   Markers & lines
   THEME dict
   Legacy constants
+  AI / Gemini
 """
 
 from app.utils import hex_to_rgb as _hex_to_rgb, rgba as _rgba, hsl_adjust as _hsl_adjust, _get_max_year
@@ -489,3 +490,11 @@ THEME = {
         "opacity_year_vline": OPACITY_YEAR_VLINE,
     },
 }
+
+
+# ── AI / Gemini ─────────────────────────────────────────────────────────────
+# API key sourced from environment variable GEMINI_API_KEY — never hardcoded.
+
+AI_MODEL_NAME    = "gemini-2.0-flash"
+AI_MAX_TOKENS    = 1024
+AI_HISTORY_LIMIT = 6
