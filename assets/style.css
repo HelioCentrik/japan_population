@@ -982,16 +982,17 @@ body.slider-thinner
 
 .ai-input {
     flex           : 1 1 0;
-    min-height     : 60px;
+    height         : auto;
     max-height     : 140px;
-    resize         : vertical;
+    resize         : none;
+    overflow-y     : hidden;
     background     : var(--page-bg);
     color          : var(--color-text-hi);
     border         : var(--panel-border-thickness) solid var(--panel-border);
-    border-radius  : var(--border-radius);
+    border-radius  : 20px;
     padding        : 0.5rem 0.65rem;
     font-family    : var(--font-sans);
-    font-size      : var(--font-size-kpi-sub);
+    font-size      : var(--font-size-ai-panel);
     line-height    : 1.5;
     outline        : none;
     box-sizing     : border-box;

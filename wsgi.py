@@ -382,6 +382,7 @@ app.layout = html.Div(
                                             id="ai-input",
                                             placeholder="日本の人口について質問してください…",
                                             className="ai-input",
+                                            rows=1,
                                         ),
                                         html.Button(
                                             "送信",

@@ -25,7 +25,7 @@ from app.config import (
     FONT_SIZE_LEGEND, FONT_SIZE_CHART_TITLE,
     FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
     FONT_SIZE_KPI_LABEL, FONT_SIZE_KPI_VALUE, FONT_SIZE_KPI_SUB,
-    FONT_SIZE_TITLE,
+    FONT_SIZE_TITLE, FONT_SIZE_AI_PANEL,
     # Borders
     PANEL_BORDER_RADIUS, PANEL_BORDER_THICKNESS,
     # Layout
@@ -112,6 +112,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --font-size-kpi-value     : {FONT_SIZE_KPI_VALUE}px;
                 --font-size-kpi-sub       : {FONT_SIZE_KPI_SUB}px;
                 --font-size-title         : {FONT_SIZE_TITLE}px;
+                --font-size-ai-panel      : {FONT_SIZE_AI_PANEL}px;
 
                 /* Borders */
                 --border-radius            : {PANEL_BORDER_RADIUS};

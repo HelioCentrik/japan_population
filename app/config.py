@@ -197,6 +197,7 @@ FONT_SIZE_KPI_LABEL     = 12
 FONT_SIZE_KPI_VALUE     = 22
 FONT_SIZE_KPI_SUB       = 12
 FONT_SIZE_TITLE         = 32
+FONT_SIZE_AI_PANEL      = 14
 
 # ── Font tier scaling ─────────────────────────────────────────────────────
 # Breakpoints mirror the @media thresholds in style.css exactly.
@@ -495,6 +496,6 @@ THEME = {
 # ── AI / Gemini ─────────────────────────────────────────────────────────────
 # API key sourced from environment variable GEMINI_API_KEY — never hardcoded.
 
-AI_MODEL_NAME    = "gemini-2.0-flash"
+AI_MODEL_NAME    = "gemini-2.5-flash-lite"
 AI_MAX_TOKENS    = 1024
 AI_HISTORY_LIMIT = 6
