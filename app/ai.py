@@ -6,14 +6,17 @@ Public API:
     ask_gemini(question, history) -> str
         Returns the model's response text, or an "ERROR: ..." string on failure.
 
-History format (matches Gemini's native schema — store as-is in dcc.Store):
+History format (stored in dcc.Store — strings in parts list):
     [{"role": "user" | "model", "parts": ["message text"]}, ...]
+
+The SDK expects parts as dicts ({"text": "..."}), so we convert on the way in.
 """
 
 import os
 from pathlib import Path
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from app.config import AI_MODEL_NAME, AI_MAX_TOKENS, AI_HISTORY_LIMIT
 
@@ -32,7 +35,7 @@ def ask_gemini(question: str, history: list) -> str:
 
     Args:
         question: The user's current question.
-        history:  List of prior turns in Gemini format:
+        history:  Prior turns from dcc.Store:
                   [{"role": "user"|"model", "parts": ["text"]}, ...]
 
     Returns:
@@ -43,22 +46,25 @@ def ask_gemini(question: str, history: list) -> str:
         return "ERROR: GEMINI_API_KEY environment variable is not set."
 
     try:
-        genai.configure(api_key=api_key)
+        client = genai.Client(api_key=api_key)
 
-        model = genai.GenerativeModel(
-            model_name=AI_MODEL_NAME,
-            system_instruction=AGENT_MD,
-            generation_config=genai.GenerationConfig(
+        # Build contents list from stored history + new question.
+        # Storage uses plain strings in parts; SDK expects {"text": "..."} dicts.
+        trimmed = history[-AI_HISTORY_LIMIT:] if len(history) > AI_HISTORY_LIMIT else history
+        contents = [
+            {"role": turn["role"], "parts": [{"text": turn["parts"][0]}]}
+            for turn in trimmed
+        ]
+        contents.append({"role": "user", "parts": [{"text": question}]})
+
+        response = client.models.generate_content(
+            model=AI_MODEL_NAME,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=AGENT_MD,
                 max_output_tokens=AI_MAX_TOKENS,
             ),
         )
-
-        # Trim history before sending — keep the last N messages.
-        # Trimming here (not in the callback) keeps the callback thin.
-        trimmed_history = history[-AI_HISTORY_LIMIT:] if len(history) > AI_HISTORY_LIMIT else history
-
-        chat = model.start_chat(history=trimmed_history)
-        response = chat.send_message(question)
         return response.text
 
     except Exception as e:
