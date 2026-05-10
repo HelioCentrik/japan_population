@@ -96,6 +96,7 @@ app.layout = html.Div(
     className="page-root",
     children=[
         dcc.Store(id="panel-mode", data=None),
+        dcc.Store(id="last-panel-mode", data="project"),
         html.Div(
             className="dashboard-outer",
             style={
@@ -467,25 +468,36 @@ def _render_delta(delta_str: str):
 
 @app.callback(
     Output("panel-mode", "data"),
+    Output("last-panel-mode", "data"),
     Input("side-panel-toggle-btn", "n_clicks"),
     Input("side-panel-ai-btn", "n_clicks"),
     State("panel-mode", "data"),
+    State("last-panel-mode", "data"),
     prevent_initial_call=True,
 )
-def update_panel_mode(toggle_clicks, ai_clicks, current_mode):
+def update_panel_mode(toggle_clicks, ai_clicks, current_mode, last_mode):
     trigger = ctx.triggered_id
     if trigger == "side-panel-toggle-btn":
-        return None if current_mode is not None else "project"
+        if current_mode is not None:
+            return None, no_update          # collapse — remember last mode
+        return last_mode, no_update         # reopen to last mode
     if trigger == "side-panel-ai-btn":
-        return None if current_mode == "ai" else "ai"
-    return no_update
+        new_mode = "project" if current_mode == "ai" else "ai"
+        return new_mode, new_mode           # swap content + update last
+    return no_update, no_update
 
+
+_GEMINI_ICON = html.Img(
+    src="/assets/gemini-color.png",
+    style={"width": "28px", "height": "28px"},
+)
+_INFO_ICON = html.Span("ⓘ", className="ai-btn-info-icon")
 
 @app.callback(
     Output("side-panel", "className"),
     Output("side-panel-toggle-btn", "children"),
     Output("side-panel-toggle-btn", "className"),
-    Output("side-panel-ai-btn", "className"),
+    Output("side-panel-ai-btn", "children"),
     Output("ai-panel", "style"),
     Output("side-panel-inner", "className"),
     Input("panel-mode", "data"),
@@ -494,10 +506,10 @@ def update_panel_state(mode):
     panel_cls  = "side-panel open" if mode is not None else "side-panel"
     chevron    = "›" if mode is not None else "‹"
     toggle_cls = "side-panel-btn active" if mode == "project" else "side-panel-btn"
-    ai_cls     = "side-panel-btn active" if mode == "ai"      else "side-panel-btn"
+    ai_icon    = _INFO_ICON if mode == "ai" else _GEMINI_ICON
     ai_style   = {"display": "flex"} if mode == "ai" else {"display": "none"}
     inner_cls  = "side-panel-inner ai-mode" if mode == "ai" else "side-panel-inner"
-    return panel_cls, chevron, toggle_cls, ai_cls, ai_style, inner_cls
+    return panel_cls, chevron, toggle_cls, ai_icon, ai_style, inner_cls
 
 
 PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")

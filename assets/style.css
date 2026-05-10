@@ -402,6 +402,12 @@ body.slider-thinner
     color        : var(--color-primary);
 }
 
+.ai-btn-info-icon {
+    font-size    : 22px;
+    line-height  : 1;
+    color        : var(--color-text-hi);
+}
+
 /* Side panel */
 
 .side-panel {
