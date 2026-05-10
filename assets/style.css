@@ -403,9 +403,15 @@ body.slider-thinner
 }
 
 .ai-btn-info-icon {
-    font-size    : 22px;
-    line-height  : 1;
-    color        : var(--color-text-hi);
+    width   : 28px;
+    height  : 28px;
+    display : block;
+    opacity : 0.85;
+}
+
+.side-panel-btn.active .ai-btn-info-icon {
+    filter  : invert(55%) sepia(90%) saturate(500%) hue-rotate(155deg) brightness(1.1);
+    opacity : 1;
 }
 
 /* Side panel */

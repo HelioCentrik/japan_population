@@ -492,7 +492,16 @@ _GEMINI_ICON = html.Img(
     src="/assets/gemini-color.png",
     style={"width": "28px", "height": "28px"},
 )
-_INFO_ICON = html.Span("ⓘ", className="ai-btn-info-icon")
+_INFO_ICON = html.Img(
+    src=(
+        "data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E"
+        "%3Ccircle cx='12' cy='12' r='11' stroke='white' stroke-width='1.5' fill='none'/%3E"
+        "%3Ctext x='12' y='17' text-anchor='middle' font-family='Georgia%2C serif' "
+        "font-style='italic' font-size='16' fill='white'%3Ei%3C/text%3E"
+        "%3C/svg%3E"
+    ),
+    className="ai-btn-info-icon",
+)
 
 @app.callback(
     Output("side-panel", "className"),
