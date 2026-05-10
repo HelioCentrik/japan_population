@@ -1,5 +1,5 @@
-# Japan Population Dashboard
-### 日本の人口ダッシュボード
+# A Century of Japan's Population (1920 - 2020)
+### 少子高齢化
 
 100 years of Japanese census data. Visualized across all 47 prefectures. Built as a full-stack portfolio piece targeting the Japanese market.
 
