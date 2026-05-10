@@ -21,6 +21,7 @@ from app.config import (PAGE_BG, PANEL_BG, PANEL_BORDER,
                         TIMESERIES_PREF_COLOR, TS_VIEWS, TS_VIEW_DEFAULT, TS_TOOLTIP_OFFSET_X, TS_TOOLTIP_OFFSET_Y,
                         ACCENT_DANKAI, ACCENT_DANKAI_JR,
                         MAX_YEAR, OKINAWA_AREA_ESTAT,
+                        AI_HISTORY_LIMIT,
                         get_scaled_fonts, )
 from app.index_string import INDEX_STRING
 from app.kpi import build_kpi_data, render_kpi_cards
@@ -29,6 +30,7 @@ from app.pyramid import build_pyramid_fig, get_pyramid_axis_max
 from app.timeseries import build_ts_population_fig, build_ts_aging_index_fig, build_ts_pop_share_fig
 from app.plotly_template import register_plotly_template
 from app import figure_cache
+from app.ai import ask_gemini
 
 
 
@@ -499,6 +501,66 @@ def render_panel_content(mode):
     if mode == "project":
         return dcc.Markdown(PROJECT_MD, link_target="_blank")
     return None
+
+
+def _render_conversation(history: list) -> list:
+    """Build Dash children from Gemini-format conversation history.
+
+    Each turn in history is {"role": "user"|"model", "parts": ["text"]}.
+    Error responses (prefixed "ERROR:") get a distinct CSS class.
+    """
+    children = []
+    for turn in history:
+        role = turn.get("role", "")
+        text = turn.get("parts", [""])[0]
+        is_error = role == "model" and text.startswith("ERROR:")
+
+        if role == "user":
+            children.append(html.Div(
+                dcc.Markdown(text, className="ai-msg-text"),
+                className="ai-msg ai-msg-user",
+            ))
+        elif role == "model":
+            children.append(html.Div(
+                dcc.Markdown(text, className="ai-msg-text"),
+                className="ai-msg ai-msg-error" if is_error else "ai-msg ai-msg-model",
+            ))
+    return children
+
+
+@app.callback(
+    Output("ai-pending-question", "data"),
+    Output("ai-input", "value"),
+    Input("ai-submit-btn", "n_clicks"),
+    State("ai-input", "value"),
+    prevent_initial_call=True,
+)
+def submit_question(n_clicks, question):
+    if not question or not question.strip():
+        return no_update, no_update
+    return question.strip(), ""
+
+
+@app.callback(
+    Output("ai-chat-output", "children"),
+    Output("ai-chat-history", "data"),
+    Input("ai-pending-question", "data"),
+    State("ai-chat-history", "data"),
+    prevent_initial_call=True,
+)
+def fetch_ai_response(question, history):
+    if not question:
+        return no_update, no_update
+
+    response = ask_gemini(question, history)
+
+    new_history = history + [
+        {"role": "user",  "parts": [question]},
+        {"role": "model", "parts": [response]},
+    ]
+    new_history = new_history[-AI_HISTORY_LIMIT:]
+
+    return _render_conversation(new_history), new_history
 
 
 @app.callback(
