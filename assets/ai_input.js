@@ -7,12 +7,11 @@ document.addEventListener('input', function (e) {
     el.style.height = el.scrollHeight + 'px';
 });
 
-// Reset height when Dash clears the value via callback
-document.addEventListener('DOMContentLoaded', function () {
-    const observer = new MutationObserver(function () {
-        const el = document.getElementById('ai-input');
-        if (el && el.value === '') {
-            el.style.height = 'auto';
-        }
-    });
-    observer.observe(doc
+// Dash sets .value as a JS property (not an HTML attribute) so MutationObserver
+// won't catch it. A lightweight poll is the reliable fix.
+setInterval(function () {
+    const el = document.getElementById('ai-input');
+    if (el && el.value === '') {
+        el.style.height = 'auto';
+    }
+}, 150);
