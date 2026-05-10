@@ -29,6 +29,7 @@ from app.config import (
     # Borders
     PANEL_BORDER_RADIUS, PANEL_BORDER_THICKNESS,
     # Layout
+    SIDE_PANEL_WIDTH, SIDE_PANEL_TRANSITION,
     LAYOUT_GAP, LAYOUT_OUTER_PAD, LAYOUT_MIN_HEIGHT,
     CHARTS_ROW_FLEX, CHARTS_TS_FLEX,
     MAP_MIN_HEIGHT, MAP_FLEX, PYRAMID_FLEX,
@@ -116,14 +117,16 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --panel-border-thickness   : {PANEL_BORDER_THICKNESS};
 
                 /* Layout */
-                --layout-gap       : {LAYOUT_GAP};
-                --outer-pad        : {LAYOUT_OUTER_PAD};
-                --min-height       : {LAYOUT_MIN_HEIGHT};
-                --charts-row-flex  : {CHARTS_ROW_FLEX};
-                --charts-ts-flex   : {CHARTS_TS_FLEX};
-                --map-min-height   : {MAP_MIN_HEIGHT};
-                --map-flex         : {MAP_FLEX};
-                --pyramid-flex     : {PYRAMID_FLEX};
+                --side-panel-width      : {SIDE_PANEL_WIDTH};
+                --side-panel-transition : {SIDE_PANEL_TRANSITION};
+                --layout-gap            : {LAYOUT_GAP};
+                --outer-pad             : {LAYOUT_OUTER_PAD};
+                --min-height            : {LAYOUT_MIN_HEIGHT};
+                --charts-row-flex       : {CHARTS_ROW_FLEX};
+                --charts-ts-flex        : {CHARTS_TS_FLEX};
+                --map-min-height        : {MAP_MIN_HEIGHT};
+                --map-flex              : {MAP_FLEX};
+                --pyramid-flex          : {PYRAMID_FLEX};
                 
                 /* Header */
                 --header-image      : url('/assets/{HEADER_IMAGE}');

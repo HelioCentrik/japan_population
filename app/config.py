@@ -8,7 +8,6 @@ Everything else (layout, fonts, sizes, structural map config, etc.) is defined h
 To swap themes: change ACTIVE_THEME_NAME in app/themes.py and restart the app.
 
 Sections:
-  Private helpers     (hex parsing, rgba builder, HSL adjustment utility)
   Layout
   Colors              (unpacked from active theme — do not hardcode here)
   Shadows             (derived from theme's shadow_color × shadow_darkness)
@@ -33,6 +32,9 @@ from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 
 # ── Layout ─────────────────────────────────────────────────────────────────
+
+SIDE_PANEL_WIDTH      = "380px"
+SIDE_PANEL_TRANSITION = "0.3s ease"
 
 LAYOUT_GAP        = "clamp(0.3rem, 0.35vw, 0.5rem)"
 LAYOUT_OUTER_PAD  = "clamp(0.35rem, 0.6vw, 0.75rem)"
