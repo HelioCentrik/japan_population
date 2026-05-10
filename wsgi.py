@@ -109,6 +109,8 @@ app.layout = html.Div(
                 dcc.Store(id="resume-year", data=None),
                 dcc.Store(id="map-init-zoom", data=None),
                 dcc.Store(id="font-tier", data="lg"),
+                dcc.Store(id="ai-chat-history",    data=[]),
+                dcc.Store(id="ai-pending-question", data=None),
                 dcc.Interval(
                     id="zoom-init",
                     interval=200,    # fires once 200ms after page load — enough for flex layout to settle
@@ -484,7 +486,39 @@ def render_panel_content(mode):
     if mode == "project":
         return dcc.Markdown(PROJECT_MD, link_target="_blank")
     if mode == "ai":
-        return html.Div("Gemini — coming soon.", className="side-panel-placeholder")
+        return html.Div(
+            className="ai-panel",
+            children=[
+                html.Div(className="ai-panel-header", children=[
+                    html.Span("Gemini", className="ai-panel-title"),
+                    html.Span("Ask about Japan's demographics", className="ai-panel-subtitle"),
+                ]),
+                dcc.Loading(
+                    id="ai-loading",
+                    type="circle",
+                    color="var(--color-primary)",
+                    children=html.Div(id="ai-chat-output", className="ai-chat-output"),
+                ),
+                html.Div(
+                    className="ai-input-row",
+                    children=[
+                        dcc.Textarea(
+                            id="ai-input",
+                            placeholder="e.g. Which prefecture has the highest aging index in 2020?",
+                            className="ai-input",
+                            debounce=False,
+                            n_submit=0,
+                        ),
+                        html.Button(
+                            "→",
+                            id="ai-submit-btn",
+                            className="ai-submit-btn",
+                            n_clicks=0,
+                        ),
+                    ],
+                ),
+            ],
+        )
     return None
 
 
