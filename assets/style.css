@@ -970,7 +970,7 @@ body.slider-thinner
 .ai-msg-text p {
     margin         : 0 0 0.4em 0;
     font-family    : var(--font-sans);
-    font-size      : var(--font-size-kpi-sub);
+    font-size      : var(--font-size-ai-panel);
     color          : var(--color-text-mid);
 }
 
@@ -995,7 +995,7 @@ body.slider-thinner
     margin         : 0.25em 0 0.25em 1.2em;
     padding        : 0;
     font-family    : var(--font-sans);
-    font-size      : var(--font-size-kpi-sub);
+    font-size      : var(--font-size-ai-panel);
     color          : var(--color-text-mid);
 }
 
