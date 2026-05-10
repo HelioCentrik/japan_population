@@ -33,7 +33,7 @@ from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 # ── Layout ─────────────────────────────────────────────────────────────────
 
-SIDE_PANEL_WIDTH      = "380px"
+SIDE_PANEL_WIDTH      = "400px"
 SIDE_PANEL_TRANSITION = "0.3s ease"
 
 LAYOUT_GAP        = "clamp(0.3rem, 0.35vw, 0.5rem)"

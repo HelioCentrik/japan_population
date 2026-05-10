@@ -109,7 +109,6 @@ app.layout = html.Div(
                 dcc.Store(id="resume-year", data=None),
                 dcc.Store(id="map-init-zoom", data=None),
                 dcc.Store(id="font-tier", data="lg"),
-                # dcc.Interval(id="resize-poll", interval=200, n_intervals=0),
                 dcc.Interval(
                     id="zoom-init",
                     interval=200,    # fires once 200ms after page load — enough for flex layout to settle
@@ -440,6 +439,50 @@ def _render_delta(delta_str: str):
         html.Span(f" {value}",        style={"color": TOOLTIP_TEXT_HI}),
         html.Span(f"  since {suffix}", style={"color": TOOLTIP_TEXT_MID}),
     ]
+
+
+@app.callback(
+    Output("panel-mode", "data"),
+    Input("side-panel-toggle-btn", "n_clicks"),
+    Input("side-panel-ai-btn", "n_clicks"),
+    State("panel-mode", "data"),
+    prevent_initial_call=True,
+)
+def update_panel_mode(toggle_clicks, ai_clicks, current_mode):
+    trigger = ctx.triggered_id
+    if trigger == "side-panel-toggle-btn":
+        return None if current_mode is not None else "project"
+    if trigger == "side-panel-ai-btn":
+        return None if current_mode == "ai" else "ai"
+    return no_update
+
+
+@app.callback(
+    Output("side-panel", "className"),
+    Output("side-panel-toggle-btn", "children"),
+    Output("side-panel-toggle-btn", "className"),
+    Output("side-panel-ai-btn", "className"),
+    Input("panel-mode", "data"),
+)
+def update_panel_state(mode):
+    panel_cls  = "side-panel open" if mode is not None else "side-panel"
+    chevron    = "›" if mode is not None else "‹"
+    toggle_cls = "side-panel-btn active" if mode == "project" else "side-panel-btn"
+    ai_cls     = "side-panel-btn active" if mode == "ai"      else "side-panel-btn"
+    return panel_cls, chevron, toggle_cls, ai_cls
+
+
+PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")
+@app.callback(
+    Output("side-panel-content", "children"),
+    Input("panel-mode", "data"),
+)
+def render_panel_content(mode):
+    if mode == "project":
+        return dcc.Markdown(PROJECT_MD, link_target="_blank")
+    if mode == "ai":
+        return html.Div("Gemini — coming soon.", className="side-panel-placeholder")
+    return None
 
 
 @app.callback(

@@ -423,6 +423,7 @@ body.slider-thinner
 .side-panel-inner {
     width      : var(--side-panel-width);
     height     : 100%;
+    color      : var(--color-text-mid);
     overflow-y : auto;
     padding    : 1.25rem 1.1rem;
     box-sizing : border-box;
