@@ -133,27 +133,6 @@ app.layout = html.Div(
                         html.Div(
                             className="header-byline-group",
                             children=[
-                                html.Div(
-                                    className="header-info-icon",
-                                    children=[
-                                        html.Span("i", className="header-info-i"),
-                                        html.Div(
-                                            className="header-info-tooltip",
-                                            children=[
-                                                html.Div("Data Sources", className="header-info-title"),
-                                                html.Div([html.Span("Census — ", className="header-info-label"),
-                                                          "Statistics Bureau of Japan (e-Stat), 国勢調査 1920–2020"],
-                                                         className="header-info-row"),
-                                                html.Div([html.Span("Geometry — ", className="header-info-label"),
-                                                          "Geospatial Information Authority of Japan (国土地理院) via dataofjapan/land"],
-                                                         className="header-info-row"),
-                                                html.Div([html.Span("Photo — ", className="header-info-label"),
-                                                          "Bert Mosher / The American Photo Service, Remembering Okinawa"],
-                                                         className="header-info-row"),
-                                            ],
-                                        ),
-                                    ],
-                                ),
                                 html.A(
                                     "deanallton.com",
                                     href="https://deanallton.com",
