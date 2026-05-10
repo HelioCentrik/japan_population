@@ -112,7 +112,7 @@ app.layout = html.Div(
                 dcc.Store(id="resume-year", data=None),
                 dcc.Store(id="map-init-zoom", data=None),
                 dcc.Store(id="font-tier", data="lg"),
-                dcc.Store(id="ai-chat-history",    data=[]),
+                dcc.Store(id="ai-chat-history", data=[], storage_type="local"),
                 dcc.Store(id="ai-pending-question", data=None),
                 dcc.Interval(
                     id="zoom-init",
@@ -371,14 +371,15 @@ app.layout = html.Div(
                                 html.Div(
                                     className="ai-chat-wrapper",
                                     children=[
-                                        dcc.Loading(
-                                            id="ai-loading",
-                                            type="circle",
-                                            color=COLOR_PRIMARY,
-                                            children=html.Div(
-                                                id="ai-chat-output",
-                                                className="ai-chat-output",
+                                        html.Div(id="ai-chat-output", className="ai-chat-output"),
+                                        html.Div(
+                                            dcc.Loading(
+                                                id="ai-loading",
+                                                type="circle",
+                                                color=COLOR_PRIMARY,
+                                                children=html.Div(id="ai-thinking-indicator"),
                                             ),
+                                            className="ai-thinking-wrapper",
                                         ),
                                     ]
                                 ),
@@ -549,28 +550,44 @@ def _render_conversation(history: list) -> list:
 
 
 @app.callback(
+    Output("ai-chat-output", "children", allow_duplicate=True),
+    Input("ai-chat-history", "data"),
+    prevent_initial_call="initial_duplicate",
+)
+def restore_chat_on_load(history):
+    if not history:
+        return no_update
+    return _render_conversation(history)
+
+
+@app.callback(
     Output("ai-pending-question", "data"),
     Output("ai-input", "value"),
+    Output("ai-chat-output", "children", allow_duplicate=True),
     Input("ai-submit-btn", "n_clicks"),
     State("ai-input", "value"),
+    State("ai-chat-history", "data"),
     prevent_initial_call=True,
 )
-def submit_question(n_clicks, question):
+def submit_question(n_clicks, question, history):
     if not question or not question.strip():
-        return no_update, no_update
-    return question.strip(), ""
+        return no_update, no_update, no_update
+    q = question.strip()
+    preview = history + [{"role": "user", "parts": [q]}]
+    return q, "", _render_conversation(preview)
 
 
 @app.callback(
     Output("ai-chat-output", "children"),
     Output("ai-chat-history", "data"),
+    Output("ai-thinking-indicator", "children"),
     Input("ai-pending-question", "data"),
     State("ai-chat-history", "data"),
     prevent_initial_call=True,
 )
 def fetch_ai_response(question, history):
     if not question:
-        return no_update, no_update
+        return no_update, no_update, no_update
 
     response = ask_gemini(question, history)
 
@@ -580,7 +597,7 @@ def fetch_ai_response(question, history):
     ]
     new_history = new_history[-AI_HISTORY_LIMIT:]
 
-    return _render_conversation(new_history), new_history
+    return _render_conversation(new_history), new_history, None
 
 
 @app.callback(

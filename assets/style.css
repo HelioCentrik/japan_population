@@ -917,17 +917,24 @@ body.slider-thinner
     min-height     : 0;
 }
 
-/* Thread the dcc.Loading anonymous divs into the flex chain */
-.ai-chat-wrapper > div,
-.ai-chat-wrapper > div > div {
+/* ai-chat-output fills remaining height; thinking wrapper stays compact */
+.ai-chat-wrapper > div {
     display        : flex;
     flex-direction : column;
     flex           : 1 1 0;
     min-height     : 0;
 }
 
+.ai-chat-wrapper > .ai-thinking-wrapper {
+    flex           : 0 0 auto;
+}
+
 #ai-loading {
-    flex : 0 0 auto;
+    flex           : 0 0 auto;
+}
+
+#ai-thinking-indicator {
+    min-height     : 0;
 }
 
 /* Chat output area */
