@@ -4,106 +4,210 @@
 
 This semantic model covers Japan's national census data from 1920 to 2020,
 structured as a star schema with prefecture-level granularity (47 prefectures,
-area_level = 2). It is designed to answer questions about Japan's demographic
-trajectory: aging, population decline, working-age contraction, and
-dependency burden — at both national and prefecture level.
-
-All population figures are sourced from Japan's official decennial/quinquennial
-census via the e-Stat government statistics API.
+`area_level = 2`). It answers questions about Japan's demographic trajectory —
+aging, population decline, working-age contraction, and dependency burden — at
+both national and prefecture level. All figures are sourced from Japan's official
+decennial/quinquennial census via the e-Stat government statistics API.
 
 ---
 
-## Core concepts and how to interpret them
+## Response Guidance
 
-### Aging Index (高齢化指数)
-The headline metric. Ratio of elderly (65+) to children (0–14), multiplied
-by 100. A value above 100 means there are more elderly than children —
-Japan likely crossed this threshold around 1997, but the first census to
-confirm it was 2000 (index ~119). It has not returned below it. Higher = more aged.
-Prefecture rankings by aging index reveal which regions are aging fastest.
+- **Default:** 2–4 sentences. Get to the point, then stop.
+- **List questions** ("what are the key takeaways", "what events happened"): up to 4
+  bullets, one substantive sentence each. No nested bullets. No sub-sections.
+- **Complex or multi-part questions:** up to 6 bullets if genuinely needed.
+- **No preamble.** Don't open with "Great question" or "The dashboard shows that..."
+  — start with the answer.
+- **No closing summary.** Don't restate what you just said. End when the content ends.
+- **Prefer concrete over abstract.** Name the year, the metric, the prefecture. Avoid
+  vague qualifiers like "significantly" or "dramatically" unless the magnitude warrants it.
+- If a question can't be answered from census data (projections, birth rates, economics),
+  say so briefly and stop.
 
-### Old-Age Dependency Ratio (老年従属人口指数)
-How many elderly people (65+) exist per 100 working-age adults (15–64).
-This is the primary economic burden metric. It was ~8.6 in 1920 and ~48.5
-by 2020 — meaning the working-age population now supports roughly 5x more
-elderly than a century ago.
+---
 
-### Working-Age Share (生産年齢人口割合)
-The share of total population aged 15–64. Peaked at ~69.5% in 1990–1995.
-Declining since. This is the core driver of Japan's economic output
-constraint.
+## Dashboard Visual Guide
 
-### Total Dependency Ratio (従属人口指数)
-Combined burden: (children 0–14 + elderly 65+) / working-age (15–64) × 100.
-U-shaped over the century: high in 1920 (youth-driven), minimum ~43.5 in
-1990 (Japan's demographic dividend peak), rising again since (now
-elderly-driven). The 1990 trough is Japan's highest-productivity window.
+### KPI Cards
 
-### Population Share View (人口割合)
-A time series showing youth (0–14), working-age (15–64), and elderly (65+) as a
-percentage of the classified population across all census years. The three shares
-always sum to 100%. Note: the ~1.45M individuals with unknown age are excluded from
-the denominator — they are a data quality artifact, not a demographic category.
+Four metric cards displayed in the side panel. They update when the year slider moves
+or a prefecture is selected via the map.
 
-Key inflection points:
-- Working-age share peaked ~69.5% around 1990–1995 (Japan's demographic dividend peak).
-- Elderly share crossed youth share around 1997 (same event as aging index crossing 100).
-- The old-age dependency ratio (`老年従属比`) — elderly share / working-age share × 100
-  — is derived from this view and shown in hover tooltips.
+| Card | Metric | Notes |
+|---|---|---|
+| 人口 Population | Total population | Switches to prefecture total on map click |
+| 高齢化指数 Aging Index | Elderly (65+) / Children (0–14) × 100 | >100 = more elderly than children |
+| 老年従属人口指数 Old-Age Dependency Ratio | Elderly per 100 working-age adults | Primary economic burden metric |
+| 生産年齢人口割合 Working-Age Share | % of population aged 15–64 | Peaked ~69.5% nationally in 1990–1995 |
 
-Prefecture overlay available: prefecture lines rendered as dotted, national lines
-faded to 25% opacity when a prefecture is selected.
+---
+
+### Map Panel
+
+Choropleth of Japan's 47 prefectures. Click a prefecture to filter the pyramid and
+time series to that region. Click the ocean or the active prefecture again to return
+to the national view.
+
+**Metric selector** (dropdown, top-left of panel):
+
+| Metric | Colorscale | Notes |
+|---|---|---|
+| 人口 Population | Sequential (plasma, light = high) | Raw headcount |
+| 高齢化指数 Aging Index | Diverging blue–white–red, midpoint 100 | Red = heavily aged; blue = younger |
+| 人口増減 Population Change | Diverging red–yellow–white–blue–violet | Red = decline; violet = strong growth |
+| 生産年齢人口割合 Working-Age Share | Sequential cool (YlGnBu) | Higher = more productive-age population |
+
+**Okinawa note:** For 1950 and 1955, Okinawa's prefectural tile is visually greyed out
+because those figures are methodologically suspect — Okinawa was under US administration
+and was not enumerated as part of Japan's official census in those years.
+
+---
 
 ### Population Pyramid
-Visualizes age-sex distribution for a given year and geography. The national
-pyramid shifted from a classic triangular base (1920s, many young) to a
-barrel/inverted shape (2020, many elderly). The WWII cohort notch
-(male deficit in the 25–29 band in 1950, sex ratio 83.8) moves up the
-pyramid 5 years per census.
+
+Horizontal bar chart showing age-sex distribution for the selected year and geography
+(national by default; prefecture view when a prefecture is clicked on the map).
+
+**Bars:**
+- **Blue bars (left):** Male population. Displayed as negative values to push left.
+- **Pink/red bars (right):** Female population.
+- Y-axis: 5-year age bands (0–4 through 80+ or 85+, depending on census year).
+- Band count varies by year — terminal band changed over time (80+ in earlier years,
+  85+ in later ones).
+
+**Cohort annotations** (not shown in legend — hover the markers to identify them):
+
+| Visual | Color | Cohort | Birth years | Visible when |
+|---|---|---|---|---|
+| Outlined band (no fill) | Orange | 団塊の世代 Dankai | 1947–1949 | Year ≥ 1950 |
+| Outlined band (no fill) | Green | 団塊ジュニア Dankai Junior | 1971–1974 | Year ≥ 1975 |
+| Diamond markers on male bars | Amber | 戦中世代 Wartime Generation | 1910–1925 | National, 1950–2015 |
+| Diamond markers at center | Sky blue | 少子化世代 Shoushika | 1986–1990 | National, year ≥ 1990 |
+
+Hovering a diamond marker shows a tooltip card with the cohort name (Japanese), birth
+year range, and the age band that cohort occupies in the selected year.
+
+The dankai and dankai junior outlines are shapes drawn over the bars — they don't appear
+in the legend and don't have hover behavior. They mark which age bands the cohort occupies
+as the pyramid updates year by year.
+
+**WWII sex ratio scar:** When the male-to-female ratio in any age band drops below 90,
+a subtle marker appears. In 1950, the 25–29 band shows a ratio of 83.8 — a direct
+artifact of WWII combat deaths. This notch advances 5 years with each census and reaches
+the 55–59 band by 1975.
+
+**1945 note:** The pyramid for 1945 uses kazoedoshi (数え年) age data remapped to
+standard 5-year bands via a −1 label shift. Age band 0–4 is absent. Treat it as
+approximate, not ground truth.
 
 ---
 
-## Rules the agent must follow
+### Time Series
 
-- **Always filter `age_scheme = 'scheme_a'`** — this is the standardized
-  age grouping that is consistent across all census years. Do not use
-  other schemes for derived metrics.
-- **Never mix the 'Total' age group row with band-level arithmetic.** When
-  computing derived metrics (aging index, dependency ratios, shares), sum
-  individual age bands only — mixing Total with bands causes double-counting.
-  Exception: to retrieve total population for a geography/year, query
-  `WHERE age_group = 'Total'` directly. Summing bands will undercount by
-  ~1.45M people with unknown age.
-- **The 65+ bucket uses `age_start >= 65`** — do not filter on `age_end`
-  for this group, as terminal bands vary by census year (80+, 85+, etc.).
-- **Growth rates are annualized**, not period-aggregated. Formula:
-  `(pop_b / pop_a) ^ (1 / (year_b - year_a)) - 1`. Do not assume 5-year
-  periods even though most intervals are 5 years.
-- **Use `area_level = 2` for prefecture-level queries, `area_level = 1` for
-  national-level queries.** Do not sum prefecture rows to derive national
-  figures — use the dedicated national rows.
+Line chart covering all census years 1920–2020. The metric selector (top-left of panel)
+controls what is plotted.
+
+**Metric selector options:**
+
+| Option | What it shows |
+|---|---|
+| 人口 Population | Total population over time |
+| 高齢化指数 Aging Index | Ratio of elderly to children × 100; dashed threshold line at 100 |
+| 人口割合 Population Share | Three lines — youth (0–14), working-age (15–64), elderly (65+) — always summing to 100% |
+
+**Prefecture overlay:** When a prefecture is selected via the map, a dotted prefecture
+line is added to the chart. In Population Share view, national lines fade to 25% opacity
+to make the prefecture lines readable.
+
+**Year marker:** A vertical line marks the currently selected year across all metrics.
+
+**1945 data point:** The 1945 observation is rendered with a distinct red marker on all
+time series views. The red color signals that the data is provisional and should be
+interpreted with caution — it uses kazoedoshi age counting and was collected under
+wartime/immediate post-war conditions. It is accessible via the slider but excluded from
+automated playback.
+
+**Aging Index threshold line:** A horizontal dashed line at 100 marks the structural
+inversion point — the level at which elderly outnumber children. Japan crossed this
+around 1997; the 2000 census (aging index ~119) is the first census to confirm it.
+
+---
+
+## Core Metrics & Concepts
+
+### Aging Index (高齢化指数)
+Elderly (65+) / Children (0–14) × 100. Above 100 means more elderly than children.
+Japan likely crossed 100 around 1997; confirmed by the 2000 census (~119). Has not
+returned below it. Higher = more aged. Prefecture rankings reveal regional variation.
+
+### Old-Age Dependency Ratio (老年従属人口指数)
+Elderly (65+) per 100 working-age adults (15–64). Was ~8.6 in 1920; ~48.5 by 2020.
+The working-age population now supports roughly 5× more elderly than a century ago.
+
+### Working-Age Share (生産年齢人口割合)
+Share of total population aged 15–64. Peaked ~69.5% in 1990–1995. Declining since.
+Core driver of Japan's economic output constraint.
+
+### Total Dependency Ratio (従属人口指数)
+(Children 0–14 + Elderly 65+) / Working-age (15–64) × 100. U-shaped over the century:
+high in 1920 (youth-driven), minimum ~43.5 in 1990 (demographic dividend peak), rising
+since (now elderly-driven). The 1990 trough is Japan's highest-productivity window.
+
+### Population Share View (人口割合)
+Youth (0–14), working-age (15–64), and elderly (65+) as a percentage of the classified
+population. Always sums to 100%. The ~1.45M individuals with unknown age are excluded
+from the denominator — they are a data quality artifact. Key inflection: elderly share
+crossed youth share around 1997 (same event as the aging index crossing 100).
+
+---
+
+## Cohort Reference
+
+### 団塊の世代 — Dankai no Sedai (Baby Boomers)
+Born 1947–1949. Japan's post-WWII birth surge. The largest single cohort in the pyramid
+for most of the 20th century. Their entry into the 65+ bracket in the 2010s drove a sharp
+acceleration in the aging index and old-age dependency ratio. Marked with **orange outlines**
+on the pyramid bars.
+
+### 団塊ジュニア — Dankai Junior
+Born 1971–1974. Children of the dankai generation. A secondary bulge visible in the
+pyramid. Their working-age peak corresponded with the late-1990s economic stagnation.
+As they age toward 65+ (from 2036), another wave of dependency burden is expected.
+Marked with **green outlines** on the pyramid bars.
+
+### 戦中世代 — Wartime Generation
+Born 1910–1925. Came of age during WWII. The male deficit in this cohort's age bands is
+the source of the sex ratio scar visible in the 1950 pyramid (25–29 band, ratio 83.8).
+Tracked via **amber diamond markers** on the male (left) side of the pyramid. National
+view only; visible for census years 1950–2015.
+
+### 少子化世代 — Shoushika (Low Birth Rate Generation)
+Born 1986–1990. The cohort born into Japan's sustained low-birth-rate era. Their small
+size relative to preceding cohorts signals the long-term contraction of the youth base.
+Tracked via **sky blue diamond markers** at the pyramid's center axis. National view
+only; visible from 1990 onward.
+
+---
+
+## Rules the Agent Must Follow
+
+- **Always filter `age_scheme = 'scheme_a'`** — standardized age grouping, consistent
+  across all census years. Do not use other schemes for derived metrics.
+- **Never mix the 'Total' age group row with band-level arithmetic.** When computing
+  derived metrics, sum individual age bands only. Exception: to retrieve total population,
+  query `WHERE age_group = 'Total'` directly — summing bands undercounts by ~1.45M.
+- **The 65+ bucket uses `age_start >= 65`** — do not filter on `age_end`, as terminal
+  bands vary by census year (80+, 85+, etc.).
+- **Growth rates are annualized.** Formula: `(pop_b / pop_a) ^ (1 / (year_b - year_a)) - 1`.
+  Do not assume 5-year periods even though most intervals are 5 years.
+- **Use `area_level = 2` for prefecture queries, `area_level = 1` for national.** Do not
+  sum prefecture rows to derive national figures.
 - **Old-Age Dependency Ratio is NOT a selectable map metric.**
 
 ---
 
-## Questions this model is designed to answer
-
-- Which prefectures have the highest / lowest aging index in [year]?
-- How has Japan's working-age population share changed since [year]?
-- What is the old-age dependency ratio nationally / in [prefecture]?
-- How does [prefecture]'s aging trajectory compare to the national average?
-- What does the population pyramid look like for [year] nationally or in
-  [prefecture]?
-- In which census year did Japan's aging index first exceed 100?
-- Which regions are aging fastest / slowest?
-- What is the total dependency ratio trend over time?
-- How has the share of youth / working-age / elderly population changed since [year]?
-- When did the elderly share first exceed the youth share nationally?
-- What is the old-age dependency ratio (老年従属比) in [year] nationally or for [prefecture]
-
----
-
-## Synonyms and terminology
+## Synonyms & Terminology
 
 | Term the user might use | Resolves to |
 |---|---|
@@ -113,52 +217,51 @@ pyramid 5 years per census.
 | Aging rate / aging ratio | aging_index (高齢化指数) |
 | Dependency burden | old_age_dep or total_dep depending on context |
 | Prefecture | area_estat / prefecture_name |
-| Region | area_level grouping of prefectures |
-| Population change          | pop_delta (in v_map_metrics)                              |
-| Youth share / 年少割合     | youth_share — pop_0_14 / classified pop × 100             |
-| Working-age share / 生産割合 | working_share — pop_15_64 / classified pop × 100         |
-| Elderly share / 老年割合   | old_share — pop_65_plus / classified pop × 100            |
-| Old-age dependency ratio / 老年従属比 | old_share / working_share × 100 (= pop_65+ / pop_15–64 × 100) 
+| Population change | pop_delta (in v_map_metrics) |
+| Youth share / 年少割合 | youth_share — pop_0_14 / classified pop × 100 |
+| Working-age share / 生産割合 | working_share — pop_15_64 / classified pop × 100 |
+| Elderly share / 老年割合 | old_share — pop_65_plus / classified pop × 100 |
+| Old-age dependency ratio / 老年従属比 | old_share / working_share × 100 |
+| Baby boomers / boomers | 団塊の世代 (Dankai), born 1947–1949 |
+| Orange band / outline on pyramid | 団塊の世代 (Dankai) cohort |
+| Green band / outline on pyramid | 団塊ジュニア (Dankai Junior) cohort |
+| Amber / orange diamonds on pyramid | 戦中世代 (Wartime Generation) markers |
+| Blue / sky blue diamonds on pyramid | 少子化世代 (Shoushika) markers |
+| Red dot / marker on time series | 1945 provisional data point |
+| Dashed line on aging index chart | Threshold at aging index = 100 |
+| Grey prefecture on map | Okinawa 1950 or 1955 (suspect data) |
+
+---
+
+## Known Data Quirks
+
+- **1945 census is provisional.** Collected under wartime and immediate post-war
+  conditions. Not fully accurate. Use for continuity only — do not treat as ground truth.
+  Age bands use kazoedoshi (数え年) counting, remapped to scheme_a via a −1 label shift
+  (e.g., the 1–5 band becomes 0–4). Age band 0–4 is absent from the raw data. This is an
+  approximation, not a perfect conversion. The aging index cannot be reliably computed for
+  1945 due to these limitations.
+- **WWII cohort notch:** 1950 census shows male deficit in the 25–29 band (sex ratio 83.8,
+  natural ~103). Advances 5 years per census; reaches 55–59 by 1975. Historical artifact,
+  not a data error.
+- **Terminal age band varies by census year.** Some years use 80+, later years 85+.
+  The `age_start >= 65` filter handles this correctly.
+- **Okinawa 1950 and 1955 data is methodologically suspect.** Under US administration
+  until 1972; not enumerated in Japan's official census those years. Treat as estimates.
+- **Summing prefecture rows ≠ national total.** Always use the dedicated national rows
+  (`area_level = 1`). Prefecture-level totals exclude the ~1.45M unknown-age individuals
+  included in the national total.
 
 ---
 
 ## What this model does NOT cover
 
-- Population projections or forecasts beyond 2020 (all data is historical
-  census). Do not extrapolate or estimate future values.
-- Individual-level data. All data is aggregated at prefecture level
-  (area_level = 2) or national level (area_level = 1).
-- Foreign resident population as a distinct category. Census data includes
-  all residents regardless of nationality; no foreign/domestic breakdown
-  is available in this schema.
-- Birth rates, death rates, or migration flows. This model covers stock
-  (population at a point in time), not flows.
-- Economic indicators. Dependency ratios describe demographic burden, not
-  GDP, labor productivity, or fiscal impact directly.
-
----
-
-## Known data quirks to surface when relevant
-
-- **WWII cohort notch:** The 1950 census shows a male deficit in the 25–29
-  age band (sex ratio 83.8, well below the natural ~103). This notch
-  advances 5 years per subsequent census and reaches 55–59 by 1975.
-  It is a historical artifact, not a data error.
-- **Terminal age band varies by census year** (some use 80+, later censuses
-  use 85+). The `age_start >= 65` filter handles this correctly without
-  needing adjustment.
-- **1945 census is provisional.** The 1945 data was collected under wartime
-  and immediate post-war conditions and is not fully accurate. It is included
-  for continuity but figures should be interpreted with caution. Do not treat
-  1945 values as ground truth for precise trend analysis.
-- **1945 age bands use kazoedoshi (数え年) counting**, where age at birth is
-  1, not 0. The raw data (scheme_b) has been remapped onto standard 5-year
-  bands (scheme_a) via a −1 label shift (e.g. the 1–5 band becomes 0–4).
-  This is an approximation — not a perfect conversion — and contributes to
-  the imprecision noted above. Querying `age_scheme = 'scheme_a'` via
-  v_census returns the remapped values automatically.
-- **Okinawa 1950 and 1955 data is methodologically suspect.** Okinawa was
-  under US administration from 1945 until 1972 and was not enumerated as
-  part of Japan's official census in those years. The 1950 and 1955 figures
-  for Okinawa should be treated as estimates and interpreted with caution.
-- **Terminal age band varies by census year**
+- Population projections or forecasts beyond 2020. All data is historical census.
+  Do not extrapolate or estimate future values.
+- Individual-level data. All data is aggregated at prefecture or national level.
+- Foreign resident population as a distinct category. Census includes all residents
+  regardless of nationality; no foreign/domestic breakdown available.
+- Birth rates, death rates, or migration flows. This model covers stock (population at
+  a point in time), not flows.
+- Economic indicators. Dependency ratios describe demographic burden, not GDP, labor
+  productivity, or fiscal impact directly.
