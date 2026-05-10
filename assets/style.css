@@ -422,13 +422,13 @@ body.slider-thinner
     overflow    : hidden;
     transition  : width var(--side-panel-transition);
     background  : var(--panel-bg);
-    border-left : var(--panel-border-thickness) solid var(--panel-border);
     height      : 100vh;
     box-sizing  : border-box;
 }
 
 .side-panel.open {
     width : var(--side-panel-width);
+    border-left : 1px solid var(--panel-border);
 }
 
 .side-panel-inner {
