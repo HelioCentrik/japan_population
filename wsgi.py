@@ -95,7 +95,7 @@ else:
 app.layout = html.Div(
     className="page-root",
     children=[
-        dcc.Store(id="panel-mode", data=None),
+        dcc.Store(id="panel-mode", data="project"),
         dcc.Store(id="last-panel-mode", data="project"),
         html.Div(
             className="dashboard-outer",
