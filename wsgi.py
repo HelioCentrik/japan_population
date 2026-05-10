@@ -380,11 +380,43 @@ app.layout = html.Div(
                     className="side-panel-inner",
                     children=[
                         html.Div(id="side-panel-content"),
+                        html.Div(
+                            id="ai-panel",
+                            className="ai-panel",
+                            style={"display": "none"},
+                            children=[
+                                dcc.Loading(
+                                    id="ai-loading",
+                                    type="circle",
+                                    color=COLOR_PRIMARY,
+                                    children=html.Div(
+                                        id="ai-chat-output",
+                                        className="ai-chat-output",
+                                    ),
+                                ),
+                                html.Div(
+                                    className="ai-input-row",
+                                    children=[
+                                        dcc.Textarea(
+                                            id="ai-input",
+                                            placeholder="日本の人口について質問してください…",
+                                            className="ai-input",
+                                            debounce=False,
+                                        ),
+                                        html.Button(
+                                            "送信",
+                                            id="ai-submit-btn",
+                                            className="ai-submit-btn",
+                                            n_clicks=0,
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
                     ]
                 ),
             ]
         ),
-
     ]
 )
 
@@ -467,6 +499,7 @@ def update_panel_mode(toggle_clicks, ai_clicks, current_mode):
     Output("side-panel-toggle-btn", "children"),
     Output("side-panel-toggle-btn", "className"),
     Output("side-panel-ai-btn", "className"),
+    Output("ai-panel", "style"),
     Input("panel-mode", "data"),
 )
 def update_panel_state(mode):
@@ -474,7 +507,8 @@ def update_panel_state(mode):
     chevron    = "›" if mode is not None else "‹"
     toggle_cls = "side-panel-btn active" if mode == "project" else "side-panel-btn"
     ai_cls     = "side-panel-btn active" if mode == "ai"      else "side-panel-btn"
-    return panel_cls, chevron, toggle_cls, ai_cls
+    ai_style   = {"display": "flex"} if mode == "ai" else {"display": "none"}
+    return panel_cls, chevron, toggle_cls, ai_cls, ai_style
 
 
 PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")
@@ -485,40 +519,6 @@ PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")
 def render_panel_content(mode):
     if mode == "project":
         return dcc.Markdown(PROJECT_MD, link_target="_blank")
-    if mode == "ai":
-        return html.Div(
-            className="ai-panel",
-            children=[
-                html.Div(className="ai-panel-header", children=[
-                    html.Span("Gemini", className="ai-panel-title"),
-                    html.Span("Ask about Japan's demographics", className="ai-panel-subtitle"),
-                ]),
-                dcc.Loading(
-                    id="ai-loading",
-                    type="circle",
-                    color="var(--color-primary)",
-                    children=html.Div(id="ai-chat-output", className="ai-chat-output"),
-                ),
-                html.Div(
-                    className="ai-input-row",
-                    children=[
-                        dcc.Textarea(
-                            id="ai-input",
-                            placeholder="e.g. Which prefecture has the highest aging index in 2020?",
-                            className="ai-input",
-                            debounce=False,
-                            n_submit=0,
-                        ),
-                        html.Button(
-                            "→",
-                            id="ai-submit-btn",
-                            className="ai-submit-btn",
-                            n_clicks=0,
-                        ),
-                    ],
-                ),
-            ],
-        )
     return None
 
 
