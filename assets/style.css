@@ -439,6 +439,13 @@ body.slider-thinner
     padding    : 0rem 1.1rem;
     box-sizing : border-box;
 }
+.side-panel-inner a {
+    color           : var(--color-primary);
+    text-decoration : underline;
+}
+.side-panel-inner a:hover {
+    color           : var(--color-text-hi);
+}
 
 /* Header */
 
