@@ -287,7 +287,7 @@ html, body {
 
 /* Year Slider */
 .dash-slider-track {
-    background-color: var(--slider-track) !important;
+    background-color: var(--color-slider-track) !important;
     height          : 3px !important;
 }
 
@@ -961,8 +961,7 @@ body.slider-thinner
 
 .ai-msg-user {
     align-self     : flex-end;
-    background     : var(--color-ui-hover);
-    border         : var(--panel-border-thickness) solid var(--panel-border);
+    background     : var(--panel-border);
 }
 
 .ai-msg-model {

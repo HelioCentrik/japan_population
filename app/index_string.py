@@ -15,7 +15,7 @@ from app.config import (
     COLOR_PRIMARY, COLOR_SECONDARY, COLOR_WARNING,
     COLOR_TEXT_HI, COLOR_TEXT_MID, COLOR_TEXT_LO, COLOR_TEXT_HINT,
     # UI accents
-    COLOR_UI_HOVER, SLIDER_TRACK_COLOR, CHART_PLOT_COLOR, CHART_GRID_COLOR,
+    COLOR_UI_HOVER, COLOR_SLIDER_TRACK, CHART_PLOT_COLOR, CHART_GRID_COLOR,
     # Shadows (pre-computed rgba strings)
     SHADOW_PANEL, SHADOW_MAP_INSET, SHADOW_BEZEL, SHADOW_DROP, SHADOW_FULL,
     # Font stacks
@@ -69,24 +69,24 @@ INDEX_STRING = f'''<!DOCTYPE html>
             :root {{
 
                 /* Backgrounds */
-                --page-bg          : {PAGE_BG};
-                --panel-bg         : {PANEL_BG};
-                --panel-border     : {PANEL_BORDER};
+                --page-bg            : {PAGE_BG};
+                --panel-bg           : {PANEL_BG};
+                --panel-border       : {PANEL_BORDER};
 
                 /* Text scale */
-                --color-primary    : {COLOR_PRIMARY};
-                --color-secondary  : {COLOR_SECONDARY};
-                --color-text-hi    : {COLOR_TEXT_HI};
-                --color-text-mid   : {COLOR_TEXT_MID};
-                --color-text-lo    : {COLOR_TEXT_LO};
-                --color-text-hint  : {COLOR_TEXT_HINT};
-                --color-warning    : {COLOR_WARNING};
+                --color-primary      : {COLOR_PRIMARY};
+                --color-secondary    : {COLOR_SECONDARY};
+                --color-text-hi      : {COLOR_TEXT_HI};
+                --color-text-mid     : {COLOR_TEXT_MID};
+                --color-text-lo      : {COLOR_TEXT_LO};
+                --color-text-hint    : {COLOR_TEXT_HINT};
+                --color-warning      : {COLOR_WARNING};
 
                 /* UI accents */
-                --color-ui-hover   : {COLOR_UI_HOVER};
-                --slider-track     : {SLIDER_TRACK_COLOR};
-                --chart-plot-color : {CHART_PLOT_COLOR};
-                --chart-grid       : {CHART_GRID_COLOR};
+                --color-ui-hover     : {COLOR_UI_HOVER};
+                --color-slider-track : {COLOR_SLIDER_TRACK};
+                --chart-plot-color   : {CHART_PLOT_COLOR};
+                --chart-grid         : {CHART_GRID_COLOR};
 
                 /* Shadows (derived from PAGE_BG x SHADOW_DARKNESS in config.py) */
                 --shadow-panel     : {SHADOW_PANEL};

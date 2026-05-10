@@ -71,7 +71,7 @@ COLOR_TEXT_HINT = _t["text_hint"]
 
 # UI interaction
 COLOR_UI_HOVER     = _t["ui_hover"]
-SLIDER_TRACK_COLOR = _t["slider_track"]
+COLOR_SLIDER_TRACK = _t["slider_track"]
 COLOR_WARNING      = _t["warning"]
 
 # Chart
@@ -398,7 +398,7 @@ THEME = {
         "text_lo":              COLOR_TEXT_LO,
         "text_hint":            COLOR_TEXT_HINT,
         "ui_hover":             COLOR_UI_HOVER,
-        "slider_track":         SLIDER_TRACK_COLOR,
+        "slider_track":         COLOR_SLIDER_TRACK,
         "chart_grid":           CHART_GRID_COLOR,
         "threshold":            ACCENT_THRESHOLD,
         "dankai":               ACCENT_DANKAI,
@@ -497,5 +497,5 @@ THEME = {
 # API key sourced from environment variable GEMINI_API_KEY — never hardcoded.
 
 AI_MODEL_NAME    = "gemini-3.1-flash-lite"
-AI_MAX_TOKENS    = 512
+AI_MAX_TOKENS    = 384
 AI_HISTORY_LIMIT = 6
