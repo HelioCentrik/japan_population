@@ -358,6 +358,7 @@ app.layout = html.Div(
             className="side-panel",
             children=[
                 html.Div(
+                    id="side-panel-inner",
                     className="side-panel-inner",
                     children=[
                         html.Div(id="side-panel-content"),
@@ -366,14 +367,19 @@ app.layout = html.Div(
                             className="ai-panel",
                             style={"display": "none"},
                             children=[
-                                dcc.Loading(
-                                    id="ai-loading",
-                                    type="circle",
-                                    color=COLOR_PRIMARY,
-                                    children=html.Div(
-                                        id="ai-chat-output",
-                                        className="ai-chat-output",
-                                    ),
+                                html.Div(
+                                    className="ai-chat-wrapper",
+                                    children=[
+                                        dcc.Loading(
+                                            id="ai-loading",
+                                            type="circle",
+                                            color=COLOR_PRIMARY,
+                                            children=html.Div(
+                                                id="ai-chat-output",
+                                                className="ai-chat-output",
+                                            ),
+                                        ),
+                                    ]
                                 ),
                                 html.Div(
                                     className="ai-input-row",
@@ -481,6 +487,7 @@ def update_panel_mode(toggle_clicks, ai_clicks, current_mode):
     Output("side-panel-toggle-btn", "className"),
     Output("side-panel-ai-btn", "className"),
     Output("ai-panel", "style"),
+    Output("side-panel-inner", "className"),
     Input("panel-mode", "data"),
 )
 def update_panel_state(mode):
@@ -489,7 +496,8 @@ def update_panel_state(mode):
     toggle_cls = "side-panel-btn active" if mode == "project" else "side-panel-btn"
     ai_cls     = "side-panel-btn active" if mode == "ai"      else "side-panel-btn"
     ai_style   = {"display": "flex"} if mode == "ai" else {"display": "none"}
-    return panel_cls, chevron, toggle_cls, ai_cls, ai_style
+    inner_cls  = "side-panel-inner ai-mode" if mode == "ai" else "side-panel-inner"
+    return panel_cls, chevron, toggle_cls, ai_cls, ai_style, inner_cls
 
 
 PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")
