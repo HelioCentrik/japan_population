@@ -1038,8 +1038,23 @@ body.slider-thinner
     align-items    : flex-end;
 }
 
+.ai-input-wrapper {
+    position : relative;
+    flex     : 1 1 0;
+}
+
+.ai-input-icon {
+    position        : absolute;
+    left            : 0.55rem;
+    top             : 50%;
+    transform       : translateY(-50%);
+    width           : 20px;
+    height          : 20px;
+    opacity         : 0.6;
+    pointer-events  : none;
+}
+
 .ai-input {
-    flex           : 1 1 0;
     height         : auto;
     max-height     : 140px;
     resize         : none;
@@ -1049,6 +1064,7 @@ body.slider-thinner
     border         : var(--panel-border-thickness) solid var(--panel-border);
     border-radius  : 20px;
     padding        : 0.5rem 0.65rem;
+    padding-left   : 2rem;
     font-family    : var(--font-sans);
     font-size      : var(--font-size-ai-panel);
     line-height    : 1.5;
@@ -1058,6 +1074,7 @@ body.slider-thinner
 
 .ai-input::placeholder {
     color          : var(--color-text-hint);
+    font-size      : var(--font-size-kpi-sub);
 }
 
 .ai-input:focus {

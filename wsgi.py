@@ -386,11 +386,20 @@ app.layout = html.Div(
                                 html.Div(
                                     className="ai-input-row",
                                     children=[
-                                        dcc.Textarea(
-                                            id="ai-input",
-                                            placeholder="日本の人口について質問してください…",
-                                            className="ai-input",
-                                            rows=1,
+                                        html.Div(
+                                            className="ai-input-wrapper",
+                                            children=[
+                                                html.Img(
+                                                    src="/assets/gemini-color.png",
+                                                    className="ai-input-icon",
+                                                ),
+                                                dcc.Textarea(
+                                                    id="ai-input",
+                                                    placeholder="日本の人口について質問してください…",
+                                                    className="ai-input",
+                                                    rows=1,
+                                                ),
+                                            ]
                                         ),
                                         html.Button(
                                             "送信",
