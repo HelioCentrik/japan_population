@@ -9,7 +9,7 @@ from plotly import graph_objects as go
 
 from app.utils import ceil_half_magnitude
 from app.config import (
-    COLOR_TEXT_MID, MAP_GEO,
+    COLOR_TEXT_HI, COLOR_TEXT_MID, MAP_GEO,
     MAP_MARGINS, MAP_TILE_STYLE,
     MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
@@ -165,11 +165,11 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
             title=dict(
                 text=colorbar_label,
                 side="bottom",
-                font=dict(size=FONT_SIZE_COLORBAR, color=COLOR_TEXT_MID),
+                font=dict(size=FONT_SIZE_COLORBAR, color=COLOR_TEXT_HI),
             ),
             x=0.02, xanchor="left",
             thickness=16, len=0.6,
-            tickfont=dict(size=FONT_SIZE_COLORBAR_TICK, color=COLOR_TEXT_MID),
+            tickfont=dict(size=FONT_SIZE_COLORBAR_TICK, color=COLOR_TEXT_HI),
             **colorbar_extra,
         ),
     )
