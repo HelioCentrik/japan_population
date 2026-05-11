@@ -1034,13 +1034,16 @@ body.slider-thinner
     display        : flex;
     flex-shrink    : 0;
     gap            : 0.5rem;
-    padding-bottom : 1rem;
-    align-items    : flex-end;
+    padding-bottom : 0.5rem;
+    align-items    : flex-center;
 }
 
 .ai-input-wrapper {
+    display        : flex;
+    flex-shrink    : 0;
     position : relative;
     flex     : 1 1 0;
+    align-items    : flex-center;
 }
 
 .ai-input-icon {
