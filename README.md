@@ -100,15 +100,15 @@ Greyed out on the choropleth. During this period Okinawa remained under US admin
 
 ## Deployment
 
-The app exposes `server = app.server` for WSGI. Deploy with Gunicorn:
+Live at **[japan-population.deanallton.com](https://japan-population.deanallton.com)** (also accessible via [deanallton.com](https://deanallton.com)).
+
+The app exposes `server = app.server` for WSGI. Served with Gunicorn behind a reverse proxy on a self-hosted Linux server:
 
 ```bash
-gunicorn wsgi:server --workers 1 --timeout 120 --bind 0.0.0.0:$PORT
+gunicorn wsgi:server --workers 1 --timeout 120 --bind 127.0.0.1:8050
 ```
 
-**Render settings:**
-- Build command: `pip install -r requirements.txt`
-- Start command: `gunicorn wsgi:server --workers 1 --timeout 120 --bind 0.0.0.0:$PORT`
-- Python version: 3.12
+**Required environment variables:**
+- `GEMINI_API_KEY` — Gemini API key for the AI Q&A panel
 
-**Cold start note:** On first request, all figures are built from the committed database into an in-memory cache (~30–60s on a standard instance). Subsequent requests are served from memory.
+**Cold start note:** On first request, all figures are built from the committed database into an in-memory cache (~30–60s). Subsequent requests are served from memory. The disk-backed figure cache persists across restarts — if the database hasn't changed, the first request is near-instant.
