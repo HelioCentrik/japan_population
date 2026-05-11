@@ -5,6 +5,8 @@
 
 **[GitHub](https://github.com/HelioCentrik/japan_population)**
 
+***Click the Gemini icon*** to query **Gemini 3.1 Flash Lite** about this dashboard.
+
 ---
 
 ## What It Shows
