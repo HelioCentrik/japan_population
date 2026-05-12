@@ -5,7 +5,7 @@
 
 **[GitHub](https://github.com/HelioCentrik/japan_population)**
 
-***Click the Gemini icon*** to query **Gemini 3.1 Flash Lite** about this dashboard.
+***Click the Gemini icon*** to query the dashboard with **Gemini 3.1 Flash Lite**.
 
 ---
 
@@ -19,7 +19,7 @@ Japan has the most advanced aging crisis of any major economy. Every prefecture 
 
 **Population Pyramid** — The anchor chart. Shows Japan's age and sex breakdown for any census year, nationally or by prefecture. The shift from a wide base in 1920 to an inverted barrel by 2020 tells the whole story at a glance. Key birth cohorts — the post-war boom (団塊世代), its echo, the wartime generation's male deficit, and the low-fertility generations — are annotated directly on the chart.
 
-**Choropleth Map** — Prefecture-level map switchable between total population, aging index, population change, and working-age share. Click a prefecture to filter the pyramid and overlay it on the time series.
+**Map of Japan** — Prefecture-level map switchable between total population, aging index, population change, and working-age share. Click a prefecture to filter the pyramid and overlay it on the time series.
 
 **Time Series** — National trend across all 21 census years, switchable between raw population, aging index, and the youth/working-age/elderly share breakdown.
 
@@ -50,7 +50,7 @@ Python · JavaScript · Dash 4 · Plotly 6 · DuckDB · GeoPandas · Render
 
 **Boundary geometry** — [Geospatial Information Authority of Japan](https://www.gsi.go.jp/)
 (国土地理院), via [dataofjapan/land](https://github.com/dataofjapan/land).
-Simplified at tolerance=0.001 via Shapely.
+Simplified at tolerance=0.01 via Shapely.
 
 **Header photo** — Okinawa, c. 1950–1954. Bert Mosher / The American Photo Service,
 archived by [Remembering Okinawa](https://www.rememberingokinawa.com/page/american_photo_2).
