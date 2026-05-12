@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ### Run
 
 ```bash
-python wsgi.py
+python main.py
 ```
 
 ---
