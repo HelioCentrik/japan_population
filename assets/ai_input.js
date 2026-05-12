@@ -15,3 +15,13 @@ setInterval(function () {
         el.style.height = 'auto';
     }
 }, 150);
+
+// Enter submits; Shift+Enter inserts newline
+document.addEventListener('keydown', function (e) {
+    if (!e.target || e.target.id !== 'ai-input') return;
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const btn = document.getElementById('ai-submit-btn');
+        if (btn) btn.click();
+    }
+});
