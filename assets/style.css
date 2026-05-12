@@ -439,6 +439,14 @@ body.slider-thinner
     padding    : 0rem 1.1rem;
     box-sizing : border-box;
 }
+.side-panel-inner h1,
+.side-panel-inner h2,
+.side-panel-inner h3,
+.side-panel-inner h4,
+.side-panel-inner h5,
+.side-panel-inner h6 {
+    color : var(--color-text-hi);
+}
 .side-panel-inner a {
     color           : var(--color-primary);
     text-decoration : underline;
