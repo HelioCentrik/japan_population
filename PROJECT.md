@@ -39,7 +39,7 @@ Raw government data from Japan's e-Stat API
 
 ## Stack
 
-Python · JavaScript · Dash 4 · Plotly 6 · DuckDB · GeoPandas · Render
+Python · JavaScript · Dash 4 · Plotly 6 · DuckDB · GeoPandas
 
 ---
 
