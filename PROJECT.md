@@ -45,12 +45,8 @@ Python · JavaScript · Dash 4 · Plotly 6 · DuckDB · GeoPandas · Render
 
 ## Data & Attribution
 
-**Census data** — Statistics Bureau of Japan, 国勢調査 1920–2020, via
-[e-Stat](https://www.e-stat.go.jp/). Non-commercial use with attribution.
+**Census data** — Statistics Bureau of Japan, 国勢調査 1920–2020, via [e-Stat](https://www.e-stat.go.jp/). Non-commercial use with attribution.
 
-**Boundary geometry** — [Geospatial Information Authority of Japan](https://www.gsi.go.jp/)
-(国土地理院), via [dataofjapan/land](https://github.com/dataofjapan/land).
-Simplified at tolerance=0.01 via Shapely.
+**Boundary geometry** — [Geospatial Information Authority of Japan](https://www.gsi.go.jp/) (国土地理院), via [dataofjapan/land](https://github.com/dataofjapan/land). Simplified at tolerance=0.01 via Shapely.
 
-**Header photo** — Okinawa, c. 1950–1954. Bert Mosher / The American Photo Service,
-archived by [Remembering Okinawa](https://www.rememberingokinawa.com/page/american_photo_2).
+**Header photo** — Okinawa, c. 1950–1954. Bert Mosher / The American Photo Service, archived by [Remembering Okinawa](https://www.rememberingokinawa.com/page/american_photo_2).
