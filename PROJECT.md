@@ -17,7 +17,7 @@ Japan has the most advanced aging crisis of any major economy. Every prefecture 
 
 ## The Visuals
 
-**Population Pyramid** — The anchor chart. Shows Japan's age and sex breakdown for any census year, nationally or by prefecture. The shift from a wide base in 1920 to an inverted barrel by 2020 tells the whole story at a glance. Key birth cohorts — the post-war boom (団塊世代), its echo, the wartime generation's male deficit, and the low-fertility generations — are annotated directly on the chart.
+**Population Pyramid** — Shows Japan's age and sex breakdown for any census year, nationally or by prefecture. The shift from a wide base in 1920 to an inverted barrel by 2020 tells the whole story at a glance. Key birth cohorts — the post-war boom (団塊世代), its echo, the wartime generation's male deficit, and the low-fertility generations — are annotated directly on the chart.
 
 **Map of Japan** — Prefecture-level map switchable between total population, aging index, population change, and working-age share. Click a prefecture to filter the pyramid and overlay it on the time series.
 
