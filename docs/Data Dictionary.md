@@ -8,13 +8,16 @@ Reference for all tables, views, and fields in `japan_population.duckdb`.
 
 ```mermaid
 erDiagram
-    f_census    }o--|| d_prefectures : "area_estat"
-    f_census    }o--|| d_age_groups  : "age_group_id"
-    f_census    }o--|| d_sex         : "sex_id"
-    f_census    }o--|| d_years       : "year"
-    f_tfr       }o--|| d_prefectures : "area_estat"
-    f_migration }o--|| d_prefectures : "area_estat"
-    f_migration }o--|| d_years       : "year"
+    f_census      }o--|| d_prefectures : "area_estat"
+    f_census      }o--|| d_age_groups  : "age_group_id"
+    f_census      }o--|| d_sex         : "sex_id"
+    f_census      }o--|| d_years       : "year"
+    f_tfr         }o--|| d_prefectures : "area_estat"
+    f_migration   }o--|| d_prefectures : "area_estat"
+    f_migration   }o--|| d_years       : "year"
+    f_projections }o--|| d_prefectures : "area_estat"
+    f_projections }o--|| d_age_groups  : "age_group_id"
+    f_projections }o--|| d_sex         : "sex_id"
 ```
 
 ---
@@ -158,6 +161,30 @@ Prefecture-level net migration rollups aligned to census intervals. One row per 
 **Source:** e-Stat 住民基本台帳人口移動報告 (Basic Resident Register Migration Report). Stitched from 8 overlapping datasets spanning 1982–2025, deduplicated by source priority (earliest publication wins). No prefecture-level data exists prior to 1982.
 
 **NULL handling:** Census years 1960, 1965, 1970, 1975, 1980 are all NULL — no source data. Do not infer zero; these prefectures simply have no coverage for those periods.
+
+&nbsp;
+
+### `f_projections`
+
+IPSS prefectural population projections. One row per prefecture × projection year × age group × sex combination.
+
+| Field            | Type | Description                                                   |
+|------------------|------|---------------------------------------------------------------|
+| `area_estat`     | str  | 5-digit e-Stat prefecture code → FK to `d_prefectures`        |
+| `projection_year`| int  | Projection year. Not a FK to `d_years` — future years only.   |
+| `age_group_id`   | int  | → FK to `d_age_groups` (scheme_a bands only)                  |
+| `sex_id`         | int  | → FK to `d_sex`                                               |
+| `population`     | int  | Projected headcount                                           |
+
+**Source:** National Institute of Population and Social Security Research (IPSS) — 日本の地域別将来推計人口（平成30（2018）年推計）. Per-prefecture Excel files at `https://www.ipss.go.jp/pp-shicyoson/j/shicyoson18/3kekka/Municipalities/`.
+
+**Coverage:** 2015–2045 in 5-year intervals. 47 prefectures × 7 years × 18 age groups × 3 sex values = 17,766 rows.
+
+**Age bands:** scheme_a only (18 bands: 0–4 through 85+). IPSS publishes 85–89 and 90+ as separate bands; both are summed into the `85+` group (`age_start=85, is_open_ended=true`) to match `d_age_groups`. The `総数` (total) and `（再掲）` (sub-aggregate) rows are excluded — sum individual bands instead.
+
+**2015 baseline:** The 2015 rows serve as the projection baseline, not a census observation. IPSS adjusts the 2015 starting population upward by ~1–2% to account for census undercounting, so `f_projections` 2015 figures will not exactly match `f_census` 2015. This is expected and documented IPSS methodology.
+
+**ETL:** `scripts/fetch_ipss.py` — downloads per-prefecture XLS files, caches locally under `data/ipss_raw/`, parses and writes `f_projections`. Re-running is idempotent (`DROP TABLE IF EXISTS` before write). Cached files are reused on subsequent runs.
 
 ---
 
