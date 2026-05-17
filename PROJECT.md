@@ -25,15 +25,19 @@ Japan has the most advanced aging crisis of any major economy. Every prefecture 
 
 **KPI Cards** - Six headline figures for the selected year: population, change, aging index, children's share, and the most- and least-aged prefectures.
 
+The Gemini AI panel can answer questions across all four datasets — including historical birth rates and TFR trends by prefecture, internal migration patterns, and IPSS population projections through 2045.
+
 ---
 
 ## The Pipeline
 
-Raw government data from Japan's e-Stat API  
-→ ETL and schema validation  
-→ DuckDB star schema (fact + 4 dimension tables, 2 pre-aggregated views)  
-→ in-memory load at runtime  
-→ two-layer figure cache → Dash/Plotly frontend with a CSS token pipeline for theming. Deployed on Render via Gunicorn.
+Four government sources (e-Stat census API, MHLW vital statistics, IPSS regional projections, e-Stat migration reports)  
+→ per-source ETL scripts with validation, deduplication, and schema alignment  
+→ DuckDB star schema (4 fact tables · 4 dimension tables · 2 pre-aggregated views)  
+→ two-layer figure cache (in-memory dict + disk store with DB fingerprint invalidation)  
+→ Dash/Plotly frontend with a CSS custom property token pipeline for theming  
+→ Gemini Flash AI side panel grounded in a structured domain knowledge base  
+Self-hosted via Gunicorn behind Nginx.
 
 ---
 
@@ -46,6 +50,12 @@ Python · JavaScript · Dash 4 · Plotly 6 · DuckDB · GeoPandas
 ## Data & Attribution
 
 **Census data** - Statistics Bureau of Japan, 国勢調査 1920-2020, via [e-Stat](https://www.e-stat.go.jp/). Non-commercial use with attribution.
+
+**TFR data** - Ministry of Health, Labour and Welfare, Vital Statistics (人口動態統計). Prefecture-level, 1960–2024, via [e-Stat](https://www.e-stat.go.jp/).
+
+**Population projections** - National Institute of Population and Social Security Research (国立社会保障・人口問題研究所), 2018 edition. Prefecture-level projections, 2015–2045, from [ipss.go.jp](https://www.ipss.go.jp/pp-shicyoson/e/shicyoson18/t-page.asp).
+
+**Internal migration** - Statistics Bureau of Japan, 住民基本台帳人口移動報告. Prefecture-level net migration, 1985–2020, via [e-Stat](https://www.e-stat.go.jp/).
 
 **Boundary geometry** - [Geospatial Information Authority of Japan](https://www.gsi.go.jp/) (国土地理院), via [dataofjapan/land](https://github.com/dataofjapan/land). Simplified at tolerance=0.01 via Shapely.
 
