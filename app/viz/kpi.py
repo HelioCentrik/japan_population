@@ -1,13 +1,13 @@
-# app/kpi.py
+# app/viz/kpi.py
 from functools import lru_cache
 
 from dash import html
 
-from app.config import (
+from app.aesthetics.config import (
     ACCENT_DANKAI_JR, COLOR_WARNING,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
 )
-from app.db import get_con
+from app.data.db import get_con
 
 
 @lru_cache(maxsize=32)

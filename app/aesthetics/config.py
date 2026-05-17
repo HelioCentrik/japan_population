@@ -1,11 +1,11 @@
-# app/config.py
+# app/aesthetics/config.py
 """
 Single source of truth for all dashboard constants.
 
-Colors and shadows come from the active theme in app/themes.py.
+Colors and shadows come from the active theme in app/aesthetics/themes.py.
 Everything else (layout, fonts, sizes, structural map config, etc.) is defined here.
 
-To swap themes: change ACTIVE_THEME_NAME in app/themes.py and restart the app.
+To swap themes: change ACTIVE_THEME_NAME in app/aesthetics/themes.py and restart the app.
 
 Sections:
   Layout
@@ -26,8 +26,8 @@ Sections:
 """
 
 from app.utils import hex_to_rgb as _hex_to_rgb, rgba as _rgba, hsl_adjust as _hsl_adjust, _get_max_year
-from app.fonts import _stack
-from app.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
+from app.aesthetics.fonts import _stack
+from app.aesthetics.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 
 
@@ -156,8 +156,8 @@ SHADOW_FULL = f"{SHADOW_DROP}, {SHADOW_BEZEL}"
 
 
 # ── Fonts ──────────────────────────────────────────────────────────────────
-# Font names match the catalogue in app/fonts.py.
-# [GF] families must be linked in app/index_string.py to load on client.
+# Font names match the catalogue in app/aesthetics/fonts.py.
+# [GF] families must be linked in app/aesthetics/index_string.py to load on client.
 
 FONT_STACK_SANS = _stack(
     "Noto Sans JP",   # [GF]

@@ -1,9 +1,9 @@
-# app/timeseries.py
+# app/viz/timeseries.py
 from functools import lru_cache
 
 import plotly.graph_objects as go
 
-from app.config import (
+from app.aesthetics.config import (
     FONT_SIZE_AXIS_TICK, FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
     COLOR_PRIMARY, COLOR_TEXT_MID, COLOR_TEXT_HI, CHART_PLOT_COLOR,
     PANEL_BORDER, ACCENT_THRESHOLD, TIMESERIES_PREF_COLOR,
@@ -15,8 +15,8 @@ from app.config import (
     TIMESERIES_MARGIN_L, TIMESERIES_MARGIN_R, TIMESERIES_MARGIN_T, TIMESERIES_MARGIN_B,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
 )
-from app.db import get_con
-from app import figure_cache
+from app.data.db import get_con
+from app.data import figure_cache
 
 
 

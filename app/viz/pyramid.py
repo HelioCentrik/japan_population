@@ -1,10 +1,10 @@
-# app/pyramid.py
+# app/viz/pyramid.py
 from functools import lru_cache
 
 import plotly.graph_objects as go
 
 from app.utils import nice_axis, shorten_age_label, cohort_band, cohort_band_range
-from app.config import (
+from app.aesthetics.config import (
     PANEL_BORDER,
     COLOR_TEXT_MID, COLOR_TEXT_HI, CHART_PLOT_COLOR,
     ACCENT_DANKAI, ACCENT_DANKAI_JR, ACCENT_SHOUSHIKA, ACCENT_WARTIME_GEN,
@@ -15,8 +15,8 @@ from app.config import (
     MARKER_SIZE_DIAMOND, MARKER_SIZE_LEGEND_SQ,
     MAX_YEAR,
 )
-from app.db import get_con
-from app import figure_cache
+from app.data.db import get_con
+from app.data import figure_cache
 
 
 

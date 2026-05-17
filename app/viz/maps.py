@@ -1,14 +1,14 @@
-# app/maps.py
+# app/viz/maps.py
 import json
 import numpy as np
 from functools import lru_cache
 
 import geopandas as gpd
-from app.db import get_con
+from app.data.db import get_con
 from plotly import graph_objects as go
 
 from app.utils import ceil_half_magnitude
-from app.config import (
+from app.aesthetics.config import (
     COLOR_TEXT_HI, COLOR_TEXT_MID, MAP_GEO,
     MAP_MARGINS, MAP_TILE_STYLE,
     MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
@@ -17,7 +17,7 @@ from app.config import (
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
     MAX_YEAR, POP_DELTA_SIGMA,
 )
-from app import figure_cache
+from app.data import figure_cache
 
 
 

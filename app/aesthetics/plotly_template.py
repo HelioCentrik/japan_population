@@ -1,4 +1,4 @@
-# app/plotly_template.py
+# app/aesthetics/plotly_template.py
 """
 Builds and registers a Plotly layout template from the active theme.
 Call register_plotly_template() once at app startup, before any figure
@@ -12,7 +12,7 @@ explicit in each figure builder.
 import plotly.graph_objects as go
 import plotly.io as pio
 
-from app.config import (
+from app.aesthetics.config import (
     PANEL_BG,
     COLOR_TEXT_MID,
     CHART_GRID_COLOR,
