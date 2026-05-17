@@ -6,41 +6,13 @@ Reference for all tables, views, and fields in `japan_population.duckdb`.
 
 ## Schema
 
-```
-           ┌───────────────┐
-           │   d_years     │
-           │ year (PK)     │
-           │ era_name      │
-           │ era_year      │
-           └──────┬────────┘
-                  │
-┌──────────────┐  │  ┌────────────────────┐
-│ d_prefectures│  │  │   d_age_groups     │
-│ area_estat   │──┼──│ age_group_id (PK)  │
-│ pref_code    │  │  │ age_group (EN)     │
-│ pref_name_ja │  │  │ age_group_ja       │
-│ pref_name    │  │  │ age_start/end      │
-│ level        │  │  │ is_open_ended      │
-│ parent_estat │  │  │ source_scheme      │
-└──────────────┘  │  └────────────────────┘
-        │         │          │
-        └────┬────┘──────────┘
-             │
-      ┌──────┴────────┐
-      │   f_census    │
-      │ year          │→ d_years
-      │ area_estat    │→ d_prefectures
-      │ age_group_id  │→ d_age_groups
-      │ sex_id        │→ d_sex
-      │ population    │
-      └───────────────┘
-             │
-      ┌──────┴────────┐
-      │    d_sex      │
-      │ sex_id (PK)   │
-      │ sex (EN)      │
-      │ sex_ja        │
-      └───────────────┘
+```mermaid
+erDiagram
+    f_census }o--|| d_prefectures : "area_estat"
+    f_census }o--|| d_age_groups  : "age_group_id"
+    f_census }o--|| d_sex         : "sex_id"
+    f_census }o--|| d_years       : "year"
+    f_tfr    }o--|| d_prefectures : "area_estat"
 ```
 
 ---
@@ -146,6 +118,22 @@ Core fact table. One row per year × prefecture × age group × sex combination.
 | `age_group_id` | int  | → FK to `d_age_groups`                                 |
 | `sex_id`       | int  | → FK to `d_sex`                                        |
 | `population`   | int  | Headcount                                              |
+
+### `f_tfr`
+
+Prefecture-level Total Fertility Rate. Standalone fact table — no age or sex dimension.
+
+| Field       | Type   | Description                                           |
+|-------------|--------|-------------------------------------------------------|
+| `area_estat`| str    | 5-digit e-Stat prefecture code → FK to `d_prefectures` |
+| `year`      | int    | Calendar year (annual, not census-keyed)              |
+| `tfr`       | double | Total fertility rate (avg births per woman)           |
+
+**Source:** e-Stat statsDataId `0003411598` — 都道府県別にみた年次別合計特殊出生率
+
+**Coverage:** 1960–2024, annual. 3 suppressed values excluded.
+
+**Notes:** Annual grain vs. the census cadence — filter to census years when joining to `f_census` or `v_map_metrics`. No data pre-1960; the map metric selector snaps `min` year to 1960 when TFR is active.
 
 ---
 
