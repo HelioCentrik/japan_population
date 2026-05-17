@@ -33,7 +33,7 @@ The Gemini AI panel can answer questions across all four datasets — including 
 
 Four government sources (e-Stat census API, MHLW vital statistics, IPSS regional projections, e-Stat migration reports)  
 → per-source ETL scripts with validation, deduplication, and schema alignment  
-→ DuckDB star schema (4 fact tables · 4 dimension tables · 2 pre-aggregated views)  
+→ DuckDB star schema (4 fact tables · 4 dimension tables · 5 pre-aggregated views)  
 → two-layer figure cache (in-memory dict + disk store with DB fingerprint invalidation)  
 → Dash/Plotly frontend with a CSS custom property token pipeline for theming  
 → Gemini Flash AI side panel grounded in a structured domain knowledge base  
