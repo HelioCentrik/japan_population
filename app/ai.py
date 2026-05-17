@@ -18,7 +18,7 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 
-from app.config import AI_MODEL_NAME, AI_MAX_TOKENS, AI_HISTORY_LIMIT
+from app.aesthetics.config import AI_MODEL_NAME, AI_MAX_TOKENS, AI_HISTORY_LIMIT
 
 
 

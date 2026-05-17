@@ -1,4 +1,4 @@
-# app/themes.py
+# app/aesthetics/themes.py
 """
 Theme definitions for the Japan Population Dashboard.
 

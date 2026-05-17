@@ -1,7 +1,7 @@
-# app/fonts.py
+# app/aesthetics/fonts.py
 """
 Japanese-compatible web font catalogue and CSS font-stack builder.
-Font *sizes* are defined in app/config.py — not here.
+Font *sizes* are defined in app/aesthetics/config.py — not here.
 
 [GF] = available on Google Fonts.
 Google Fonts families must be loaded in index_string.py via <link> or @import

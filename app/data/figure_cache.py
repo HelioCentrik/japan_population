@@ -1,4 +1,4 @@
-# app/figure_cache.py
+# app/data/figure_cache.py
 """
 Disk-backed figure cache with fingerprint-based invalidation.
 

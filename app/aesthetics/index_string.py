@@ -1,4 +1,4 @@
-# app/index_string.py
+# app/aesthetics/index_string.py
 """
 Generates the Dash HTML shell, injecting all design-system tokens as CSS custom
 properties in the <head>. This is the bridge between config.py (Python constants)
@@ -8,7 +8,7 @@ Google Fonts [GF] are also loaded here. Only families actually referenced in the
 configured FONT_STACK_* constants are included — avoid loading fonts not in use.
 """
 
-from app.config import (
+from app.aesthetics.config import (
     # Backgrounds
     PAGE_BG, PANEL_BG, PANEL_BORDER,
     # Text scale
@@ -129,7 +129,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --map-min-height        : {MAP_MIN_HEIGHT};
                 --map-flex              : {MAP_FLEX};
                 --pyramid-flex          : {PYRAMID_FLEX};
-                
+
                 /* Header */
                 --header-image      : url('/assets/{HEADER_IMAGE}');
                 --header-height     : {HEADER_HEIGHT};
@@ -147,7 +147,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --tooltip-text-mid    : {TOOLTIP_TEXT_MID};
                 --tooltip-hint        : {TOOLTIP_HINT};
                 --tooltip-divider     : {TOOLTIP_DIVIDER};
-                
+
                 /* KPIs */
                 --kpi-margin  : {KPI_MARGIN}px;
                 --kpi-label-h : {KPI_LABEL_H}px;
@@ -157,7 +157,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 /* Play button */
                 --play-btn-size      : {PLAY_BTN_SIZE};
                 --play-btn-font-size : {PLAY_BTN_FONT_SIZE};
-                
+
                 /* Timeseries */
                 --ts-selector-offset-l: {TS_SELECTOR_OFFSET_L};
             }}

@@ -1,9 +1,9 @@
-# app/sql.py
+# app/data/sql.py
 """
 Shared SQL view definitions.
 
 Single source of truth for v_census and v_map_metrics. Imported by both
-app/db.py (in-memory singleton) and scripts/build_db.py (file DB build).
+app/data/db.py (in-memory singleton) and scripts/build_db.py (file DB build).
 Keeping definitions here ensures both consumers always run identical SQL.
 """
 
