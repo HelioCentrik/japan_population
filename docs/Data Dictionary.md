@@ -8,11 +8,13 @@ Reference for all tables, views, and fields in `japan_population.duckdb`.
 
 ```mermaid
 erDiagram
-    f_census }o--|| d_prefectures : "area_estat"
-    f_census }o--|| d_age_groups  : "age_group_id"
-    f_census }o--|| d_sex         : "sex_id"
-    f_census }o--|| d_years       : "year"
-    f_tfr    }o--|| d_prefectures : "area_estat"
+    f_census    }o--|| d_prefectures : "area_estat"
+    f_census    }o--|| d_age_groups  : "age_group_id"
+    f_census    }o--|| d_sex         : "sex_id"
+    f_census    }o--|| d_years       : "year"
+    f_tfr       }o--|| d_prefectures : "area_estat"
+    f_migration }o--|| d_prefectures : "area_estat"
+    f_migration }o--|| d_years       : "year"
 ```
 
 ---
@@ -119,6 +121,8 @@ Core fact table. One row per year × prefecture × age group × sex combination.
 | `sex_id`       | int  | → FK to `d_sex`                                        |
 | `population`   | int  | Headcount                                              |
 
+&nbsp;
+
 ### `f_tfr`
 
 Prefecture-level Total Fertility Rate. Standalone fact table — no age or sex dimension.
@@ -134,6 +138,26 @@ Prefecture-level Total Fertility Rate. Standalone fact table — no age or sex d
 **Coverage:** 1960–2024, annual. 3 suppressed values excluded.
 
 **Notes:** Annual grain vs. the census cadence — filter to census years when joining to `f_census` or `v_map_metrics`. No data pre-1960; the map metric selector snaps `min` year to 1960 when TFR is active.
+
+&nbsp;
+
+### `f_migration`
+
+Prefecture-level net migration rollups aligned to census intervals. One row per prefecture per census year.
+
+| Field | Type | Description |
+|---|---|---|
+| `area_estat` | str | 5-digit e-Stat prefecture code. PK component. FK to `d_prefectures`. |
+| `census_year` | int | Census year. PK component. FK to `d_years`. |
+| `net_migration` | int | Sum of annual 転入超過数 (net in-migrants) for the 5-year window ending on `census_year`. Negative = net outflow. NULL for census years 1960–1980 (no prefecture-level source data). |
+
+**Grain:** One row per `area_estat × census_year`. 47 rows per census year (prefectures only, no national aggregate).
+
+**Rollup window:** Census year Y = Σ annual net migration for years (Y−4) through Y inclusive. Census year 1985 is partial — data begins 1982, so the window covers 4 of 5 years.
+
+**Source:** e-Stat 住民基本台帳人口移動報告 (Basic Resident Register Migration Report). Stitched from 8 overlapping datasets spanning 1982–2025, deduplicated by source priority (earliest publication wins). No prefecture-level data exists prior to 1982.
+
+**NULL handling:** Census years 1960, 1965, 1970, 1975, 1980 are all NULL — no source data. Do not infer zero; these prefectures simply have no coverage for those periods.
 
 ---
 
