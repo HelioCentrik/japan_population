@@ -278,22 +278,17 @@ See `knowledge/masuda_report.md`.
 
 ## Known Data Quirks
 
-- **1945 census is provisional.** Collected under wartime and immediate post-war
-  conditions. Not fully accurate. Use for continuity only — do not treat as ground truth.
-  Age bands use kazoedoshi (数え年) counting, remapped to scheme_a via a −1 label shift
-  (e.g., the 1–5 band becomes 0–4). Age band 0–4 is absent from the raw data. This is an
-  approximation, not a perfect conversion. The aging index cannot be reliably computed for
-  1945 due to these limitations.
-- **WWII cohort notch:** 1950 census shows male deficit in the 25–29 band (sex ratio 83.8,
-  natural ~103). Advances 5 years per census; reaches 55–59 by 1975. Historical artifact,
-  not a data error.
-- **Terminal age band varies by census year.** Some years use 80+, later years 85+.
-  The `age_start >= 65` filter handles this correctly.
-- **Okinawa 1950 and 1955 data is methodologically suspect.** Under US administration
-  until 1972; not enumerated in Japan's official census those years. Treat as estimates.
-- **Summing prefecture rows ≠ national total.** Always use the dedicated national rows
-  (`area_level = 1`). Prefecture-level totals exclude the ~1.45M unknown-age individuals
-  included in the national total.
+See `knowledge/census.md` for full detail on all quirks.
+
+- **1945 is provisional.** Kazoedoshi age reckoning, 0–4 band absent, aging index
+  unreliable. Use for continuity only.
+- **WWII sex ratio scar.** Male deficit in 25–29 band (1950, ratio 83.8). Advances 5
+  years per census. Not a data error.
+- **Terminal age band varies.** Use `age_start >= 65` for elderly counts, not `age_end`.
+- **Okinawa 1950 and 1955 are estimates.** Not standard census enumeration. Treat with
+  caution.
+- **Summing prefectures ≠ national total.** Always use `area_level = 1` for national
+  figures.
 
 ---
 
