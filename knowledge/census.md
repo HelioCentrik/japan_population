@@ -57,8 +57,9 @@ marker as a visual warning. Do not present 1945 figures as ground truth.
 ### WWII Sex Ratio Scar
 
 The 1950 census shows a male deficit in the 25–29 age band — sex ratio 83.8 against a
-natural baseline of ~103. This is a direct artifact of WWII combat deaths among men born
-approximately 1921–1925 (prime conscription age). It is not a data error.
+natural baseline of ~105 (normal range 103–107). This is a direct artifact of WWII
+combat deaths among men born approximately 1921–1925 (prime conscription age). It is
+not a data error.
 
 The scar advances 5 years per census: 25–29 in 1950 → 30–34 in 1955 → … → 55–59 by
 1975. By 1980 it has diffused into older bands and is no longer sharply visible. The
@@ -72,15 +73,24 @@ not filter on `age_end` or `is_open_ended` directly when computing elderly total
 
 ### Okinawa 1950 and 1955
 
-Okinawa was under US administration from 1945 until 1972 and was not enumerated as part
-of Japan's official census methodology in 1950 and 1955. The figures present in the DB
-for those years are estimates derived from a separate source, not standard census
-enumeration. Two specific issues:
+Okinawa was under US administration from 1945 until reversion to Japan on 15 May 1972,
+and was not enumerated as part of Japan's official census methodology in 1950 and 1955.
+The 1950 census was conducted by the US Military Government of the Ryukyu Islands; the
+1955 census by the Government of the Ryukyu Islands. Both used the de jure population
+concept and a reference date of December 1 (vs. October 1 for Japan proper). The
+figures present in the DB for those years are drawn from these separate enumerations,
+not from standard Statistics Bureau census methodology.
 
-- The 70–74 age band for these two years actually contains "70 years and older"
-  open-ended values rather than a true 5-year band, confirmed in e-Stat footnotes.
-- This inflates 1950/1955 totals relative to adjacent years, producing an anomalous
-  population trajectory: 574k (1940) → 880k (1950) → 777k (1955) → 882k (1960).
+Two specific issues affect 1950 and 1955:
+
+- The Statistics Bureau's own documentation notes that the 1950 and 1955 Okinawa
+  results are tabulations of the population **aged 14 years and over only**. The
+  under-14 population for those years is therefore incomplete or estimated.
+- The 70–74 age band for these two years contains "70 years and older" open-ended
+  values rather than a true 5-year band, confirmed in e-Stat footnotes. This inflates
+  the 70–74 count relative to adjacent census years.
+- These issues together produce an anomalous population trajectory:
+  574k (1940) → 880k (1950) → 777k (1955) → 882k (1960).
 
 The map greys out Okinawa for 1950 and 1955 with a tooltip explaining the data quality
 issue. Do not present these figures as comparable to other prefectures in those years.
@@ -91,3 +101,21 @@ The national aggregate rows (`area_level = 1`) include ~1.45M individuals whose 
 was unknown or unclassified at enumeration time. These individuals are not distributed
 across prefecture rows. Always use `area_level = 1` rows for national figures — do not
 sum prefecture rows to derive a national total.
+
+---
+
+## Sources
+
+- **Primary census data (1920–2015):** e-Stat stat ID `000031523105`
+  https://www.e-stat.go.jp/stat-search/files?tstat=000001011857
+- **2020 census data:** e-Stat API, stat ID `0003410381`
+  https://www.e-stat.go.jp/
+- **Okinawa enumeration methodology and coverage gaps (1950–1970):** Statistics Bureau,
+  2020 Population Census — Explanation of Terms (PDF), pp. covering Okinawa-ken
+  https://www.stat.go.jp/english/data/kokusei/2020/pdf/exp.pdf
+- **Okinawa pre-reversion census history:** Statistics Bureau, Outline of the 2010
+  Population Census of Japan (PDF), Part 2
+  https://www.stat.go.jp/english/data/kokusei/2010/final_en/pdf/02-01.pdf
+- **Natural sex ratio at birth (103–107 range):** Hesketh & Xing (2006),
+  "Abnormal sex ratios in human populations: Causes and consequences", PNAS
+  https://www.pnas.org/doi/10.1073/pnas.0602203103
