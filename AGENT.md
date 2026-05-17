@@ -22,8 +22,8 @@ decennial/quinquennial census via the e-Stat government statistics API.
 - **No closing summary.** Don't restate what you just said. End when the content ends.
 - **Prefer concrete over abstract.** Name the year, the metric, the prefecture. Avoid
   vague qualifiers like "significantly" or "dramatically" unless the magnitude warrants it.
-- If a question can't be answered from census data (projections, birth rates, economics),
-  say so briefly and stop.
+- If a question can't be answered from census, projections, TFR, or migration data — such as 
+  economics, post-2045 forecasts, individual-level data — say so briefly and stop.
 
 ---
 
@@ -190,6 +190,48 @@ only; visible from 1990 onward.
 
 ---
 
+## Census Data
+
+Japan's official decennial/quinquennial census, 1920–2020. Grain: one row per
+`year × area_estat × age_group_id × sex_id`. Primary query surface is `v_census`.
+47 prefectures (`area_level = 2`) plus national aggregate (`area_level = 1`).
+
+See `knowledge/census.md` for full source details, age band schemes, and known
+data quirks.
+
+---
+
+## Supplementary Data
+
+### `f_projections` — IPSS Prefectural Projections
+Grain: `projection_year × area_estat × age_group_id × sex_id`. Join to `d_prefectures`
+on `area_estat`; join to `d_age_groups` on `age_group_id` (scheme_a, 18 bands).
+Coverage: 2015–2045, 5-year intervals, 47 prefectures. 2015 rows are projection
+baseline — not census observations. Do not extrapolate beyond 2045.
+
+See `knowledge/ipss_findings.md`.
+
+### `f_tfr` — Prefecture-Level Total Fertility Rate
+Grain: `area_estat × year` (annual). Join to `d_prefectures` on `area_estat`.
+Coverage: 1960–2024. No data pre-1960. Filter to census years when joining to `f_census`.
+
+See `knowledge/tfr_narrative.md`.
+
+### `f_migration` — Net Internal Migration
+Grain: `area_estat × census_year`. Join to `d_prefectures` on `area_estat`.
+Coverage: census years 1985–2020. NULL for 1960–1980 — no source data, do not infer
+zero. Figures represent 5-year cumulative net migration ending on the census year.
+
+See `knowledge/migration.md`.
+
+### Masuda Report — Extinction-Risk Municipalities (Tertiary Reference)
+Not a DB table. Policy context for the aging and working-age share metrics. Provides
+the 消滅可能性都市 framing behind prefecture-level risk patterns visible in the map.
+
+See `knowledge/masuda_report.md`.
+
+---
+
 ## Rules the Agent Must Follow
 
 - **Always filter `age_scheme = 'scheme_a'`** — standardized age grouping, consistent
@@ -230,6 +272,7 @@ only; visible from 1990 onward.
 | Red dot / marker on time series | 1945 provisional data point |
 | Dashed line on aging index chart | Threshold at aging index = 100 |
 | Grey prefecture on map | Okinawa 1950 or 1955 (suspect data) |
+| Projection year / forecast year | projection_year (field in f_projections) |
 
 ---
 
@@ -256,8 +299,6 @@ only; visible from 1990 onward.
 
 ## What this model does NOT cover
 
-- Population projections or forecasts beyond 2020. All data is historical census.
-  Do not extrapolate or estimate future values.
 - Individual-level data. All data is aggregated at prefecture or national level.
 - Foreign resident population as a distinct category. Census includes all residents
   regardless of nationality; no foreign/domestic breakdown available.
