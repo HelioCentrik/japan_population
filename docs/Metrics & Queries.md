@@ -154,6 +154,28 @@ FROM v_map_metrics
 WHERE year = {year}
 ```
 
+### Map — TFR
+```sql
+-- Always query v_map_metrics, not f_tfr directly.
+-- NULL for census years before 1960 — no source data.
+SELECT area_estat, prefecture_name, prefecture_name_ja, year, tfr
+FROM v_map_metrics
+WHERE year = {year}
+  AND tfr IS NOT NULL
+```
+
+### Map — Net Migration
+```sql
+-- Always query v_map_metrics, not f_migration directly.
+-- NULL for census years outside 1985–2020.
+-- Values represent cumulative net migration for the 5-year window ending on census year.
+-- 1985 is partial (4 years; source data begins 1982).
+SELECT area_estat, prefecture_name, prefecture_name_ja, year, net_migration
+FROM v_map_metrics
+WHERE year = {year}
+  AND net_migration IS NOT NULL
+```
+
 ### Pyramid — National
 ```sql
 SELECT age_group, age_start, sex, SUM(population) AS population

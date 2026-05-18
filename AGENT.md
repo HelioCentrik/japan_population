@@ -53,10 +53,12 @@ to the national view.
 
 | Metric | Colorscale | Notes |
 |---|---|---|
-| 人口 Population | Sequential (plasma, light = high) | Raw headcount |
-| 高齢化指数 Aging Index | Diverging blue–white–red, midpoint 100 | Red = heavily aged; blue = younger |
-| 人口増減 Population Change | Diverging red–yellow–white–blue–violet | Red = decline; violet = strong growth |
-| 生産年齢人口割合 Working-Age Share | Sequential cool (YlGnBu) | Higher = more productive-age population |
+| 人口 Population | Sequential (plasma, light = high) | Raw headcount; all census years |
+| 人口増減 Population Change | Diverging red–yellow–white–blue–violet | Red = decline; violet = strong growth; all census years |
+| 合計特殊出生率 TFR | Sequential (viridis) | Coverage: census years 1960–present. Slider snaps to min 1960 when active. NULL for pre-1960 years. |
+| 純移動数 Net Migration | Diverging (green = net inflow; red = net outflow) | Coverage: census years 1985–2020. Slider snaps to that window when active. NULL outside range. 1985 is partial (4 of 5 years). |
+
+**Year-snap behaviour:** When the metric selector changes, a dedicated callback in `callbacks/selection.py` updates the slider `min`, `max`, `marks`, and `value` to reflect the active metric's valid census-year window. The slider physically cannot land on an out-of-coverage year. Playback (`toggle_playback`, `advance_year`) filters `PLAYBACK_YEARS` through the same bounds via `MAP_METRICS[metric]["min_year"/"max_year"]`. The primary chart callback (`update_charts`) needs no awareness of coverage — it always receives a valid year as input.
 
 **Okinawa note:** For 1950 and 1955, Okinawa's prefectural tile is visually greyed out
 because those figures are methodologically suspect — Okinawa was under US administration

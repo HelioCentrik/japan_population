@@ -99,6 +99,8 @@ WHERE year = {year}
 | `working_age_share_delta` | float | Working-age share change since previous census. NULL for 1920.                            |
 | `prev_year`               | int   | The previous census year used to compute deltas. NULL for 1920.                           |
 | `year_gap`                | int   | Years elapsed since previous census. Not uniform — ranges from 2 to 5.                    |
+| `tfr`                     | float | Total fertility rate for the census year, joined from `f_tfr` on `area_estat` and `year`. NULL for census years before 1960 — no source data. Annual grain in `f_tfr`; filtered to census years here. |
+| `net_migration`           | int   | Cumulative net internal migration for the 5-year window ending on `year`, joined from `f_migration` on `area_estat` and `census_year`. NULL for census years outside 1985–2020. 1985 is partial (4 of 5 years; data begins 1982). Negative = net outflow. |
 
 **Grain:** One row per `area_estat × year`. 47 rows per year (prefectures only, no national aggregate).
 
@@ -107,6 +109,76 @@ In 1945's census, age was collected as kazoedoshi (数え年) per official metho
 **NULL handling:** 1920 has NULL for all delta columns — it's the first census year. Pre-format delta strings in Python before passing to Plotly hovertemplate; the template has no conditional logic.
 
 **Depends on:** `v_census` must exist before this view is created. Run `scripts/query_db.py` before `scripts/create_views.py`.
+
+---
+
+### `v_tfr`
+
+Convenience view joining `f_tfr` to `d_prefectures`. **Do not use as the map query surface — use `v_map_metrics` instead**, which already exposes `tfr` per census year.
+
+**Purpose:** Reference and AI knowledge-base queries on annual TFR by prefecture. The grain is annual (not census-keyed), so it is not directly joinable to `v_census` without a year filter.
+
+**Grain:** One row per `area_estat × year` (annual). Coverage: 1960–2024, 47 prefectures.
+
+| Field | Type | Description |
+|---|---|---|
+| `area_estat` | str | 5-digit e-Stat prefecture code |
+| `prefecture_name` | str | Prefecture name (EN) |
+| `prefecture_name_ja` | str | Prefecture name (JA) |
+| `year` | int | Calendar year |
+| `tfr` | double | Total fertility rate |
+
+**NULL handling:** No NULLs — 3 suppressed source values were excluded at ETL time. Pre-1960 simply has no rows.
+
+---
+
+### `v_migration`
+
+Convenience view joining `f_migration` to `d_prefectures`. **Do not use as the map query surface — use `v_map_metrics` instead**, which already exposes `net_migration` per census year.
+
+**Purpose:** Reference queries on net migration by prefecture and census year.
+
+**Grain:** One row per `area_estat × census_year`. Coverage: census years 1985–2020, 47 prefectures.
+
+| Field | Type | Description |
+|---|---|---|
+| `area_estat` | str | 5-digit e-Stat prefecture code |
+| `prefecture_name` | str | Prefecture name (EN) |
+| `prefecture_name_ja` | str | Prefecture name (JA) |
+| `census_year` | int | Census year (1985–2020) |
+| `net_migration` | int | Cumulative net in-migrants for 5-year window ending on `census_year`. Negative = net outflow. |
+
+**NULL handling:** No NULLs in the view — census years 1960–1980 simply have no rows (excluded at ETL). In `v_map_metrics`, those years produce NULLs via the LEFT JOIN.
+
+---
+
+### `v_projections`
+
+Convenience view joining `f_projections` to all dimension tables. Mirrors the structure of `v_census` for projection years.
+
+**Purpose:** Time-series overlays and AI queries on IPSS prefectural projections (2015–2045).
+
+**Grain:** One row per `area_estat × projection_year × age_group_id × sex_id`. Coverage: 2015–2045 in 5-year intervals, 47 prefectures, 18 age bands, 3 sex values = 17,766 rows.
+
+| Field | Type | Description |
+|---|---|---|
+| `area_estat` | str | 5-digit e-Stat prefecture code |
+| `prefecture_name` | str | Prefecture name (EN) |
+| `prefecture_name_ja` | str | Prefecture name (JA) |
+| `projection_year` | int | Projection year (2015–2045). Not a FK to `d_years`. |
+| `age_group_id` | int | → FK to `d_age_groups` (scheme_a only) |
+| `age_group` | str | Age band label |
+| `age_start` | int | Lower bound of age band |
+| `age_end` | int / null | Upper bound. NULL for open-ended terminal band (85+). |
+| `is_open_ended` | bool | True if no upper bound |
+| `sex_id` | int | → FK to `d_sex` |
+| `sex` | str | `total`, `male`, or `female` |
+| `sex_ja` | str | Japanese sex label |
+| `population` | int | Projected headcount |
+
+**NULL handling:** None. IPSS does not use suppression; all rows present for all covered years.
+
+**2015 baseline note:** IPSS adjusts the 2015 baseline upward by ~1–2% to account for census undercounting. `v_projections` 2015 figures will not exactly match `v_census` 2015. This is expected IPSS methodology.
 
 ---
 
