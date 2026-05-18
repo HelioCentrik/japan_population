@@ -37,6 +37,19 @@ def _render_delta(delta_str: str):
         html.Span(f"  since {suffix}", style={"color": TOOLTIP_TEXT_MID}),
     ]
 
+def _render_signed_metric(metric: str, value_str: str):
+    """Signed metrics get a colored directional arrow; the value itself stays neutral."""
+    if metric not in ("net_migration", "pop_delta") or value_str in ("—", ""):
+        return value_str
+    is_positive = value_str.startswith("+")
+    arrow_color = ACCENT_DANKAI_JR if is_positive else COLOR_PRIMARY
+    arrow       = "▲" if is_positive else "▼"
+    plain       = value_str.lstrip("+-")
+    return [
+        html.Span(arrow, style={"color": arrow_color, "marginRight": "3px"}),
+        html.Span(plain),
+    ]
+
 def _metric_value_style(metric: str, value_str: str) -> dict:
     """Conditional color for metrics where sign carries directional meaning."""
     if metric == "net_migration" and value_str not in ("—", ""):
@@ -122,13 +135,7 @@ def show_map_tooltip(hover_data, metric):
             html.Span(f"  {name_en}", className="tt-name-en"),
         ], className="tt-title"),
         html.Div(meta["label"], className="tt-metric-label"),
-        html.Div(className="tt-metric-value", children=[
-            html.Span(metric_str, style=(
-                {"color": ACCENT_DANKAI_JR if metric_str.startswith("+") else COLOR_PRIMARY}
-                if metric in ("net_migration", "pop_delta") and metric_str not in ("—", "")
-                else {}
-            )),
-        ]),
+        html.Div(_render_signed_metric(metric, metric_str), className="tt-metric-value"),
         html.Div(_render_delta(delta_str), className="tt-delta"),
         html.Hr(className="tt-divider") if secondary else None,
         *secondary,
