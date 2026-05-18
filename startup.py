@@ -1,7 +1,7 @@
 # startup.py
 import duckdb as ddb
 
-con = ddb.connect("data/japan_population.duckdb")
+con = ddb.connect("data/japan_population.duckdb", read_only=True)
 years_df = con.execute(
     "SELECT DISTINCT year, era_name, era_year FROM d_years ORDER BY year"
 ).df()
