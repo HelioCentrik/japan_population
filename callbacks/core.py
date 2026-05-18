@@ -1,5 +1,5 @@
 # callbacks/core.py
-from dash import Input, Output, Patch, ctx, State
+from dash import Input, Output, Patch, State, ctx, no_update
 import plotly.graph_objects as go
 
 from dash_app import app
@@ -13,6 +13,7 @@ from app.viz.timeseries import build_ts_pop_share_fig, build_ts_population_fig, 
 from app.viz.kpi import build_kpi_data, render_kpi_cards
 
 
+
 @app.callback(
     Output("map-graph", "figure"),
     Output("pyramid-chart", "figure"),
@@ -22,10 +23,13 @@ from app.viz.kpi import build_kpi_data, render_kpi_cards
     Input("selected-prefecture", "data"),
     Input("metric-selector", "value"),
     Input("ts-view-selector", "value"),
+    Input("charts-ready-trigger", "data"),
     State("show-projections", "data"),
     prevent_initial_call=True,
 )
-def update_charts(year, area_estat, metric, ts_view, show_projections):
+def update_charts(year, area_estat, metric, ts_view, charts_ready, show_projections):
+    if not charts_ready:
+        return no_update, no_update, no_update, no_update
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:

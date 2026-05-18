@@ -4,7 +4,9 @@ from pathlib import Path
 from dash import html, dcc, Input, Output, State, Patch, ctx, no_update
 
 from dash_app import app
-from app.aesthetics.config import MAX_YEAR, TS_VIEW_TFR
+from app.aesthetics.config import TS_VIEW_TFR
+from app.state import is_ready
+
 
 
 _GEMINI_ICON = html.Img(
@@ -23,6 +25,18 @@ _INFO_ICON = html.Img(
 )
 
 PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")
+
+
+@app.callback(
+    Output("loading-overlay", "className"),
+    Output("ready-poll", "disabled"),
+    Output("charts-ready-trigger", "data"),   # ← new
+    Input("ready-poll", "n_intervals"),
+)
+def dismiss_loading_overlay(n):
+    if is_ready():
+        return "loading-overlay hidden", True, True
+    return "loading-overlay", False, no_update
 
 
 @app.callback(

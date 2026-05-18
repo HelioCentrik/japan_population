@@ -3,7 +3,6 @@ from dash import html, dcc
 
 from dash_app import app
 from startup import CENSUS_YEARS, YEAR_LABELS
-from prewarm import _prewarm_axis_max
 from app.aesthetics.config import (
     PAGE_BG, COLOR_PRIMARY, COLOR_TEXT_MID,
     PLAY_INTERVAL_MS, LAYOUT_GAP,
@@ -14,10 +13,6 @@ from app.aesthetics.config import (
     HEADER_TITLE_JA, HEADER_TITLE_EN,
     MAX_YEAR,
 )
-from app.viz.maps import build_japan_map_fig
-from app.viz.pyramid import build_pyramid_fig
-from app.viz.timeseries import build_ts_population_fig
-from app.viz.kpi import build_kpi_data, render_kpi_cards
 
 
 app.layout = html.Div(
@@ -36,6 +31,7 @@ app.layout = html.Div(
                 "overflow-y": "visible",
             },
             children=[
+                dcc.Store(id="charts-ready-trigger", data=None),
                 dcc.Store(id="selected-prefecture", data=None),
                 dcc.Store(id="resume-year", data=None),
                 dcc.Store(id="map-init-zoom", data=None),
@@ -47,6 +43,12 @@ app.layout = html.Div(
                     id="zoom-init",
                     interval=200,    # fires once 200ms after page load — enough for flex layout to settle
                     max_intervals=1,
+                    n_intervals=0,
+                ),
+                dcc.Interval(
+                    id="ready-poll",
+                    interval=300,        # check every 300ms
+                    max_intervals=60,    # give up after 18s (shouldn't take that long)
                     n_intervals=0,
                 ),
 
@@ -84,10 +86,7 @@ app.layout = html.Div(
                 ),
 
                 # KPI Cards
-                html.Div(
-                    id="kpi-row",
-                    children=render_kpi_cards(build_kpi_data(MAX_YEAR), YEAR_LABELS.get(MAX_YEAR, str(MAX_YEAR))),
-                ),
+                html.Div(id="kpi-row", className="kpi-row", children=[]),
 
                 # Play Button + Year Slider
                 html.Div(
@@ -179,7 +178,7 @@ app.layout = html.Div(
                                                 dcc.Graph(
                                                     id="map-graph",
                                                     clear_on_unhover=True,
-                                                    figure=build_japan_map_fig(year=MAX_YEAR, metric=MAP_METRIC_DEFAULT),
+                                                    figure={},
                                                     config={"displayModeBar": False, "responsive": False},
                                                     style={"height": "100%"},
                                                 ),
@@ -215,9 +214,7 @@ app.layout = html.Div(
                                                             id="pyramid-chart",
                                                             className="pyramid-graph",
                                                             clear_on_unhover=True,
-                                                            figure=build_pyramid_fig(year=MAX_YEAR,
-                                                                                     area_estat=None,
-                                                                                     axis_max=_prewarm_axis_max),
+                                                            figure={},
                                                             config={"displayModeBar": False, "responsive": True},
                                                             style={"height": "100%"},
                                                         ),
@@ -266,7 +263,7 @@ app.layout = html.Div(
                                 dcc.Graph(
                                     id="timeseries-chart",
                                     clear_on_unhover=True,
-                                    figure=build_ts_population_fig(selected_year=MAX_YEAR, area_estat=None),
+                                    figure={},
                                     config={"displayModeBar": False, "responsive": True},
                                     style={"height": "100%"},
                                 ),
@@ -356,6 +353,28 @@ app.layout = html.Div(
                     ]
                 ),
             ]
+        ),
+        html.Div(
+            id="loading-overlay",
+            className="loading-overlay",
+            children=[
+                html.Div(
+                    className="loading-overlay-content",
+                    children=[
+                        html.Div("日本の人口ダッシュボード", className="loading-overlay-title"),
+                        html.Div(
+                            className="loading-overlay-message",
+                            children=[
+                                html.Span("データと図を読み込んでいます"),
+                                html.Span("Loading data and figures…", className="loading-overlay-en"),
+                            ],
+                        ),
+                        html.Div(className="loading-dots", children=[
+                            html.Span(), html.Span(), html.Span(),
+                        ]),
+                    ],
+                ),
+            ],
         ),
     ]
 )
