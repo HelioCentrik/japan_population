@@ -273,6 +273,56 @@ FROM age_buckets
 ORDER BY year
 ```
 
+### Time Series — TFR (National Average)
+```sql
+-- National average: mean of all prefecture TFR values for each year.
+-- Coverage: 1960–present. No rows pre-1960 — do not infer zero.
+-- Filter to census years only when aligning with f_census or v_map_metrics.
+SELECT year, ROUND(AVG(tfr), 2) AS tfr
+FROM f_tfr
+GROUP BY year
+ORDER BY year
+```
+
+### Time Series — TFR (Prefecture Overlay)
+```sql
+-- Single prefecture dashed overlay on TFR view.
+SELECT year, tfr
+FROM f_tfr
+WHERE area_estat = '{area_estat}'
+ORDER BY year
+```
+
+### Time Series — IPSS National Projection (Population)
+```sql
+-- Medium-variant continuation for the population view, bolted on at 2020.
+-- Fetch all three variants to build the high/low confidence band.
+SELECT projection_year, variant, total_population
+FROM f_national_projections
+WHERE projection_year >= {IPSS_HANDOFF_YEAR}
+ORDER BY projection_year, variant
+```
+
+### Time Series — IPSS National Projection (Shares)
+```sql
+-- Derive youth / working-age / elderly shares from f_national_projections.
+-- Denominator: sum of the three age buckets — matches the census share denominator.
+-- Use for the dashed projection continuation on the population share view.
+SELECT
+    projection_year,
+    variant,
+    ROUND(pop_0_14    * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS youth_share,
+    ROUND(pop_15_64   * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS working_share,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS old_share
+FROM f_national_projections
+WHERE projection_year >= {IPSS_HANDOFF_YEAR}
+ORDER BY projection_year, variant
+```
+
+**Projection handoff note:** Census observation lines end at 2020 (`IPSS_HANDOFF_YEAR`). IPSS projection lines begin at 2020 — the medium variant continues as a dashed line; the high/low variants form the shaded confidence band. The handoff is set at 2020 rather than 2015 because the 2015 IPSS baseline diverges ~1–2% above the 2015 census figure (IPSS upward-adjusts for census undercounting). Joining at 2015 would produce a visible step discontinuity; joining at 2020 uses a confirmed census observation as the anchor.
+
+---
+
 ### Available Census Years
 ```sql
 SELECT DISTINCT year, era_name, era_year FROM d_years ORDER BY year
