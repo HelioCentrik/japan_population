@@ -18,7 +18,7 @@ erDiagram
     f_projections }o--|| d_prefectures : "area_estat"
     f_projections }o--|| d_age_groups  : "age_group_id"
     f_projections }o--|| d_sex         : "sex_id"
-    f_national_projections }o--|| d_years       : "year"
+    f_national_projections
 ```
 
 ---
