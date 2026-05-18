@@ -258,6 +258,32 @@ IPSS prefectural population projections. One row per prefecture × projection ye
 
 **ETL:** `scripts/fetch_ipss.py` — downloads per-prefecture XLS files, caches locally under `data/ipss_raw/`, parses and writes `f_projections`. Re-running is idempotent (`DROP TABLE IF EXISTS` before write). Cached files are reused on subsequent runs.
 
+&nbsp;
+
+### `f_national_projections`
+
+IPSS 2017 national population projections with three fertility variants. One row per projection year × variant combination.
+
+| Field | Type | Description |
+|---|---|---|
+| `projection_year` | int | Projection year, 2015–2065, annual. Not a FK to `d_years`. |
+| `variant` | varchar | Fertility assumption: `'medium'`, `'high'`, or `'low'`. All hold mortality at the medium assumption. |
+| `total_population` | bigint | Projected national headcount (raw, not thousands). |
+| `pop_0_14` | bigint | Population aged 0–14. |
+| `pop_15_64` | bigint | Population aged 15–64. |
+| `pop_65_plus` | bigint | Population aged 65 and over. |
+
+**Source:** National Institute of Population and Social Security Research (IPSS), Population Projections for Japan: 2016–2065 (平成29年推計), Tables 1-1 (medium), 1-2 (high), 1-3 (low).
+`https://www.ipss.go.jp/pp-zenkoku/e/zenkoku_e2017/pp_zenkoku2017e.asp`
+
+**Coverage:** 2015–2065, annual. 51 years × 3 variants = 153 rows.
+
+**Variants:** The three variants differ only in their fertility assumption (low/medium/high TFR trajectory). Mortality is held at the medium assumption in all three. Use high as the upper population bound and low as the lower bound for confidence band visualisation.
+
+**2015 baseline:** All three variants share the same 2015 starting population (~127.1M). Divergence begins in 2016. The 2015 figure is an IPSS-adjusted baseline — ~0.2% above the raw `f_census` 2020 figure from the opposite direction (the 2020 census showed Japan at ~126.1M, confirming the medium projection was slightly optimistic on pace of decline).
+
+**ETL:** `scripts/fetch_ipss_national.py` — downloads three XLSXes, caches under `data/ipss_raw/national/`, converts from thousands to raw headcount. Idempotent.
+
 ---
 
 ## Dimension Tables
