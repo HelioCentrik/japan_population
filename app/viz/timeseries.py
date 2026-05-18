@@ -224,6 +224,7 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
     ]:
         traces.append(go.Scatter(
             x=med_p["year"], y=med_p[col],
+            uid=f"proj_pop_share_med_{col}",
             mode="lines",
             name=label,
             line=dict(color=color, width=LINE_WIDTH_MAIN, dash="dash"),
@@ -242,48 +243,19 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
 
         traces.append(go.Scatter(
             x=lo_p["year"], y=lo_p[col],
+            uid=f"proj_pop_share_lo_{col}",
             mode="lines", line=dict(width=0),
             showlegend=False, hoverinfo="skip",
         ))
         traces.append(go.Scatter(
             x=hi_p["year"], y=hi_p[col],
+            uid=f"proj_pop_share_hi_{col}",
             mode="lines", line=dict(width=0),
             fill="tonexty", fillcolor=band_color,
             showlegend=False, hoverinfo="skip",
         ))
 
     fig = go.Figure(data=traces)
-
-    # ── Working-age peak annotation ───────────────────────────────────────────
-    # Derived from data — not hardcoded — the peak census year is empirical.
-    peak_idx  = national_df["working_share"].idxmax()
-    peak_year = int(national_df.loc[peak_idx, "year"])
-    peak_val  = float(national_df.loc[peak_idx, "working_share"])
-
-    fig.add_annotation(
-        x=peak_year,
-        y=peak_val,
-        text=f"生産年齢人口 ピーク {peak_year}年  ↓",
-        showarrow=False,
-        xanchor="center",
-        yanchor="bottom",
-        font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
-        bgcolor="rgba(0,0,0,0)",
-    )
-
-    # ── Crossover annotation (old-age share exceeds youth share) ─────────────
-    # Same demographic event as aging index > 100 — same interpolated crossover year.
-    fig.add_annotation(
-        x=_CROSSOVER_YEAR,
-        y=1,
-        yref="paper",
-        text="老年 > 年少  ↑",
-        showarrow=False,
-        xanchor="left",
-        yanchor="top",
-        font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
-        bgcolor="rgba(0,0,0,0)",
-    )
 
     # ── Selected year indicator ───────────────────────────────────────────────
     fig.add_vline(
@@ -491,6 +463,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     # Low bound — invisible line, anchors the fill
     traces.append(go.Scatter(
         x=lo["year"], y=lo["total_population"] / M,
+        uid="proj_pop_lo",
         mode="lines",
         line=dict(width=0),
         showlegend=False,
@@ -499,6 +472,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     # High bound — fills down to low
     traces.append(go.Scatter(
         x=hi["year"], y=hi["total_population"] / M,
+        uid="proj_pop_hi",
         mode="lines",
         line=dict(width=0),
         fill="tonexty",
@@ -509,6 +483,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     # Medium — dashed continuation of total line
     traces.append(go.Scatter(
         x=med["year"], y=med["total_population"] / M,
+        uid="proj_pop_med",
         mode="lines",
         name="IPSS 中位推計 Medium",
         line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN, dash="dash"),
@@ -522,6 +497,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
         if not pref_proj.empty:
             traces.append(go.Scatter(
                 x=pref_proj["year"], y=pref_proj["total"] / M,
+                uid="proj_pop_pref",
                 mode="lines",
                 name=f"{pref_label} 推計",
                 line=dict(color=ACCENT_DANKAI_JR, width=LINE_WIDTH_PREF, dash="dash"),

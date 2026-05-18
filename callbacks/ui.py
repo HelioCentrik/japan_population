@@ -1,9 +1,10 @@
 # callbacks/ui.py
 from pathlib import Path
 
-from dash import html, dcc, Input, Output, State, ctx, no_update
+from dash import html, dcc, Input, Output, State, Patch, ctx, no_update
 
 from dash_app import app
+from app.aesthetics.config import MAX_YEAR, TS_VIEW_TFR
 
 
 _GEMINI_ICON = html.Img(
@@ -72,3 +73,35 @@ def render_panel_content(mode):
     if mode == "project":
         return dcc.Markdown(PROJECT_MD, link_target="_blank")
     return None
+
+
+@app.callback(
+    Output("show-projections", "data"),
+    Output("proj-toggle-btn", "className"),
+    Input("proj-toggle-btn", "n_clicks"),
+    State("show-projections", "data"),
+    prevent_initial_call=True,
+)
+def toggle_projections_store(n_clicks, currently_showing):
+    new_val = not currently_showing
+    cls     = "proj-toggle-btn active" if new_val else "proj-toggle-btn"
+    return new_val, cls
+
+
+@app.callback(
+    Output("timeseries-chart", "figure", allow_duplicate=True),
+    Input("show-projections", "data"),
+    State("timeseries-chart", "figure"),
+    State("ts-view-selector", "value"),
+    prevent_initial_call=True,
+)
+def toggle_projection_traces(show, figure, ts_view):
+    if ts_view == TS_VIEW_TFR:
+        return no_update
+
+    p = Patch()
+    for i, trace in enumerate(figure["data"]):
+        if trace.get("uid", "").startswith("proj_"):
+            p["data"][i]["visible"] = show
+
+    return p

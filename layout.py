@@ -40,6 +40,7 @@ app.layout = html.Div(
                 dcc.Store(id="resume-year", data=None),
                 dcc.Store(id="map-init-zoom", data=None),
                 dcc.Store(id="font-tier", data="lg"),
+                dcc.Store(id="show-projections", data=True),
                 dcc.Store(id="ai-chat-history", data=[], storage_type="local"),
                 dcc.Store(id="ai-pending-question", data=None),
                 dcc.Interval(
@@ -248,6 +249,19 @@ app.layout = html.Div(
                                             searchable=False,
                                         ),
                                     ],
+                                ),
+                                html.Button(
+                                    children=[
+                                        html.Span("推計", className="proj-toggle-label"),
+                                        html.Div(
+                                            html.Div(className="proj-toggle-thumb"),
+                                            className="proj-toggle-track",
+                                        ),
+                                    ],
+                                    id="proj-toggle-btn",
+                                    className="proj-toggle-btn active",
+                                    n_clicks=0,
+                                    title="Toggle IPSS projections",
                                 ),
                                 dcc.Graph(
                                     id="timeseries-chart",

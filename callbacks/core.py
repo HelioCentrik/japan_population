@@ -1,10 +1,11 @@
 # callbacks/core.py
-from dash import Input, Output, Patch, ctx
+from dash import Input, Output, Patch, ctx, State
+import plotly.graph_objects as go
 
 from dash_app import app
 from startup import CENSUS_YEARS, YEAR_LABELS, PREFECTURE_LOOKUP
 from app.aesthetics.config import (
-    MAP_METRIC_DEFAULT, get_scaled_fonts,
+    MAP_METRIC_DEFAULT, get_scaled_fonts, TS_VIEW_TFR,
 )
 from app.viz.maps import build_japan_map_fig
 from app.viz.pyramid import build_pyramid_fig, get_pyramid_axis_max
@@ -21,9 +22,10 @@ from app.viz.kpi import build_kpi_data, render_kpi_cards
     Input("selected-prefecture", "data"),
     Input("metric-selector", "value"),
     Input("ts-view-selector", "value"),
+    State("show-projections", "data"),
     prevent_initial_call=True,
 )
-def update_charts(year, area_estat, metric, ts_view):
+def update_charts(year, area_estat, metric, ts_view, show_projections):
     y = int(year)
     year_part = YEAR_LABELS.get(y, str(y))
     if area_estat and area_estat in PREFECTURE_LOOKUP:
@@ -67,6 +69,13 @@ def update_charts(year, area_estat, metric, ts_view):
         ts_fig = build_ts_population_fig(selected_year=y, area_estat=area_estat)
     else:
         ts_fig = build_ts_tfr_fig(selected_year=y, area_estat=area_estat)
+
+    if not show_projections and ts_view != TS_VIEW_TFR:
+        fig_dict = ts_fig.to_dict()
+        for i, trace_dict in enumerate(fig_dict["data"]):
+            if trace_dict.get("uid", "").startswith("proj_"):
+                fig_dict["data"][i]["visible"] = False
+        ts_fig = go.Figure(fig_dict)
 
     return (
         map_fig,

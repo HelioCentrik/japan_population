@@ -29,7 +29,7 @@ _FINGERPRINT_FILE = CACHE_DIR / "_fingerprint.txt"
 _store: dict[str, go.Figure] = {}
 
 # Bump when figure trace structure changes (forces cache rebuild on next start).
-_SCHEMA_VERSION = "v2"
+_SCHEMA_VERSION = "v3"
 
 
 def _current_fingerprint() -> str:
