@@ -26,6 +26,7 @@ _TABLES = [
     "f_tfr",
     "f_migration",
     "f_projections",
+    "f_national_projections",
 ]
 
 

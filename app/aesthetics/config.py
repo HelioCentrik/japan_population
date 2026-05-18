@@ -290,6 +290,8 @@ MAP_NET_MIGRATION_COLORSCALE = [
     [1.00, "#2166ac"],   # blue       — heavy inflow
 ]
 
+MIGRATION_CUTOFF_YEAR = 1985       # f_migration coverage begins
+
 # ── Metric selector ───────────────────────────────────────────────────────
 
 OKINAWA_AREA_ESTAT = "47000"
@@ -339,7 +341,7 @@ MAP_METRICS = {
         "fmt":        lambda v: f"{int(v):+,}" if v == v else "—",
         "delta_fmt":  lambda v: "",   # no delta column — suppressed in tooltip
         "min_year":   1985,
-        "max_year":   2020,
+        "max_year":   MAX_YEAR,
     },
 }
 
@@ -379,9 +381,9 @@ TS_VIEW_DEFAULT = "pop_share"
 TS_VIEW_TFR = "tfr"
 
 TFR_REPLACEMENT_RATE  = 2.1
-TFR_CUTOFF_YEAR       = 1960   # f_tfr coverage begins
-MIGRATION_CUTOFF_YEAR = 1985   # f_migration coverage begins
-IPSS_HANDOFF_YEAR     = 2020   # projection bolt-on starts here
+TFR_CUTOFF_YEAR       = 1960       # f_tfr coverage begins
+IPSS_HANDOFF_YEAR     = MAX_YEAR   # projection bolt-on starts here
+PROJECTION_BAND_ALPHA = 0.2
 
 
 # ── Play button ──────────────────────────────────────────────────────────
