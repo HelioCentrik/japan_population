@@ -360,7 +360,7 @@ PYRAMID_TOOLTIP_OFFSET_X    = 12
 PYRAMID_TOOLTIP_OFFSET_Y    = 20
 
 
-# ── imeseries configuration ──────────────────────────────────────────────
+# ── Timeseries configuration ──────────────────────────────────────────────
 TIMESERIES_MARGIN_L  = 52
 TIMESERIES_MARGIN_R  = 12
 TIMESERIES_MARGIN_T  = 12
@@ -376,6 +376,11 @@ TS_VIEWS = {
     "aging_index": "高齢化指数 Aging Index",
 }
 TS_VIEW_DEFAULT = "pop_share"
+
+TFR_REPLACEMENT_RATE  = 2.1
+TFR_CUTOFF_YEAR       = 1960   # f_tfr coverage begins
+MIGRATION_CUTOFF_YEAR = 1985   # f_migration coverage begins
+IPSS_HANDOFF_YEAR     = 2020   # projection bolt-on starts here
 
 
 # ── Play button ──────────────────────────────────────────────────────────
