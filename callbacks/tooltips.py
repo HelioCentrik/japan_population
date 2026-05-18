@@ -317,13 +317,13 @@ def show_timeseries_tooltip(hover_data, ts_view):
             "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
         })
 
-    elif ts_view == "aging_index":
-        national_ai = cd[1]
-        pref_ai     = cd[2]
-        pref_lbl    = cd[3]
-        flag        = cd[4]
+    elif ts_view == "tfr":
+        # customdata shape: [year, national_tfr, pref_tfr_or_None, pref_label]
+        national_tfr = cd[1]
+        pref_tfr     = cd[2]
+        pref_lbl     = cd[3]
 
-        def ai_row(label, value_str, color):
+        def tfr_row(label, value_str, color):
             return html.Div([
                 html.Div(className="pyramid-tt-cohort-strip",
                          style={"--cohort-color": color}),
@@ -334,22 +334,16 @@ def show_timeseries_tooltip(hover_data, ts_view):
             ], className="pyramid-tt-cohort-row")
 
         pref_row = None
-        if pref_ai is not None:
-            pref_row = ai_row(pref_lbl, f"{pref_ai:.1f}", TIMESERIES_PREF_COLOR)
-
-        provisional_banner = (
-            html.Div("臨時国勢調査  /  Provisional Census", className="tt-provisional-banner")
-            if flag == "1945" else None
-        )
+        if pref_tfr is not None:
+            pref_row = tfr_row(pref_lbl, f"{pref_tfr:.2f}", TIMESERIES_PREF_COLOR)
 
         children = html.Div([
-            provisional_banner,
-            html.Hr(className="tt-divider") if provisional_banner else None,
-            html.Div(str(int(year)),            className="tt-title"),
-            html.Div("高齢化指数 / Aging Index", className="tt-metric-label"),
+            html.Div(str(int(year)),           className="tt-title"),
+            html.Div("合計特殊出生率 / TFR",   className="tt-metric-label"),
             html.Hr(className="tt-divider"),
-            ai_row("全国", f"{national_ai:.1f}", COLOR_TEXT_MID),
+            tfr_row("全国", f"{national_tfr:.2f}", COLOR_TEXT_MID),
             pref_row,
+            html.Div("replacement: 2.10", className="tt-hint"),
         ], className="tt-card arrow-bottom", style={
             "--arrow-y-offset": f"{TS_TOOLTIP_OFFSET_Y}px",
             "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",

@@ -540,6 +540,11 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
         opacity=OPACITY_YEAR_VLINE,
     )
 
+    all_totals = list(national_df["total"] / M) + list(proj["medium"]["total_population"] / M)
+    all_mins = list(national_df["male"] / M) + list(national_df["female"] / M)
+    y_min = floor(min(all_mins) * 10) / 10 / 1.4
+    y_max = round(max(all_totals) * 1.2, 1)
+
     fig.update_layout(
         margin=dict(l=TIMESERIES_MARGIN_L, r=TIMESERIES_MARGIN_R, t=TIMESERIES_MARGIN_T, b=TIMESERIES_MARGIN_B),
         autosize=True,
@@ -567,6 +572,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
                 text="百万人 / Millions",
                 font=dict(color=COLOR_TEXT_HI, size=FONT_SIZE_AXIS_TITLE),
             ),
+            range=[y_min, y_max],
             zeroline=False,
             ticklabelstandoff=YAXIS_TICK_STANDOFF,
             automargin=False,
