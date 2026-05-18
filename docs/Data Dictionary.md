@@ -50,6 +50,14 @@ erDiagram
 
 ## Views
 
+| View | Built from | Purpose |
+|---|---|---|
+| `v_census` | `f_census` + all dims | Primary app query surface — census data pre-joined to all dimension tables |
+| `v_map_metrics` | `v_census` + `f_tfr` + `f_migration` | Pre-aggregated choropleth metrics with period deltas; one row per prefecture per year |
+| `v_tfr` | `f_tfr` + `d_prefectures` | TFR joined to prefecture names; convenience view for AI queries |
+| `v_migration` | `f_migration` + `d_prefectures` | Migration joined to prefecture names; convenience view for AI queries |
+| `v_projections` | `f_projections` + all dims | Prefectural projections pre-joined to dimension tables; mirrors `v_census` structure |
+
 ### `v_census`
 
 Pre-joined view across all dimension tables. **This is the primary query surface for the app** — do not re-join dimension tables manually.
