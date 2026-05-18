@@ -21,9 +21,9 @@ Japan has the most advanced aging crisis of any major economy. Every prefecture 
 
 **Map of Japan** - Prefecture-level map switchable between total population, aging index, population change, and working-age share. Click a prefecture to filter the pyramid and overlay it on the time series.
 
-**Time Series** - National trend across all 21 census years, switchable between raw population, aging index, and the youth/working-age/elderly share breakdown.
+**Time Series** - National trend across all 21 census years, switchable between raw population, total fertility rate (TFR), and the youth/working-age/elderly share breakdown. Population and share views include IPSS projection overlays from 2020, with high/low confidence bands.
 
-**KPI Cards** - Six headline figures for the selected year: population, change, aging index, children's share, and the most- and least-aged prefectures.
+**KPI Cards** - Six headline figures for the selected year: national population, period change, aging index, working-age share, TFR, and the most migrated-to prefecture.
 
 The Gemini AI panel can answer questions across all four datasets — including historical birth rates and TFR trends by prefecture, internal migration patterns, and IPSS population projections through 2045.
 
@@ -31,9 +31,9 @@ The Gemini AI panel can answer questions across all four datasets — including 
 
 ## The Pipeline
 
-Four government sources (e-Stat census API, MHLW vital statistics, IPSS regional projections, e-Stat migration reports)  
+Five government sources (e-Stat census API, MHLW vital statistics, IPSS prefectural projections, IPSS national projections, e-Stat migration reports)  
 → per-source ETL scripts with validation, deduplication, and schema alignment  
-→ DuckDB star schema (4 fact tables · 4 dimension tables · 5 pre-aggregated views)  
+→ DuckDB star schema (5 fact tables · 4 dimension tables · 5 pre-aggregated views)  
 → two-layer figure cache (in-memory dict + disk store with DB fingerprint invalidation)  
 → Dash/Plotly frontend with a CSS custom property token pipeline for theming  
 → Gemini Flash AI side panel grounded in a structured domain knowledge base  
@@ -53,7 +53,7 @@ Python · JavaScript · Dash 4 · Plotly 6 · DuckDB · GeoPandas
 
 **TFR data** - Ministry of Health, Labour and Welfare, Vital Statistics (人口動態統計). Prefecture-level, 1960–2024, via [e-Stat](https://www.e-stat.go.jp/).
 
-**Population projections** - National Institute of Population and Social Security Research (国立社会保障・人口問題研究所), 2018 edition. Prefecture-level projections, 2015–2045, from [ipss.go.jp](https://www.ipss.go.jp/pp-shicyoson/e/shicyoson18/t-page.asp).
+**Population projections** - National Institute of Population and Social Security Research (国立社会保障・人口問題研究所). Prefecture-level: 2018 edition, 2015–2045, from [ipss.go.jp](https://www.ipss.go.jp/pp-shicyoson/e/shicyoson18/t-page.asp). National: 2017 edition, 2015–2065 (medium/high/low variants), from [ipss.go.jp](https://www.ipss.go.jp/pp-zenkoku/e/zenkoku_e2017/pp_zenkoku2017e.asp).
 
 **Internal migration** - Statistics Bureau of Japan, 住民基本台帳人口移動報告. Prefecture-level net migration, 1985–2020, via [e-Stat](https://www.e-stat.go.jp/).
 
