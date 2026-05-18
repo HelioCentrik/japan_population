@@ -3,7 +3,7 @@ from dash import html, Input, Output, State, no_update
 
 from dash_app import app
 from app.aesthetics.config import (
-    COLOR_WARNING, COLOR_TEXT_MID, COLOR_TEXT_HI,
+    COLOR_PRIMARY, COLOR_WARNING, COLOR_TEXT_MID, COLOR_TEXT_HI,
     TOOLTIP_TEXT_MID, TOOLTIP_TEXT_HI,
     MAP_METRICS, MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y, OKINAWA_AREA_ESTAT,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
@@ -36,6 +36,13 @@ def _render_delta(delta_str: str):
         html.Span(f" {value}",        style={"color": TOOLTIP_TEXT_HI}),
         html.Span(f"  since {suffix}", style={"color": TOOLTIP_TEXT_MID}),
     ]
+
+def _metric_value_style(metric: str, value_str: str) -> dict:
+    """Conditional color for metrics where sign carries directional meaning."""
+    if metric == "net_migration" and value_str not in ("—", ""):
+        color = ACCENT_DANKAI_JR if value_str.startswith("+") else COLOR_PRIMARY
+        return {"color": color}
+    return {}
 
 
 @app.callback(
@@ -101,7 +108,7 @@ def show_map_tooltip(hover_data, metric):
                 html.Span(f"{int(population):,}", className="tt-value"),
             ])
         )
-    if show_aging:
+    if show_aging and aging_index is not None:
         secondary.append(
             html.Div([
                 html.Span("高齢化指数  ", className="tt-label"),
@@ -115,7 +122,13 @@ def show_map_tooltip(hover_data, metric):
             html.Span(f"  {name_en}", className="tt-name-en"),
         ], className="tt-title"),
         html.Div(meta["label"], className="tt-metric-label"),
-        html.Div(metric_str,    className="tt-metric-value"),
+        html.Div(className="tt-metric-value", children=[
+            html.Span(metric_str, style=(
+                {"color": ACCENT_DANKAI_JR if metric_str.startswith("+") else COLOR_PRIMARY}
+                if metric in ("net_migration", "pop_delta") and metric_str not in ("—", "")
+                else {}
+            )),
+        ]),
         html.Div(_render_delta(delta_str), className="tt-delta"),
         html.Hr(className="tt-divider") if secondary else None,
         *secondary,

@@ -7,6 +7,7 @@ app/data/db.py (in-memory singleton) and scripts/build_db.py (file DB build).
 Keeping definitions here ensures both consumers always run identical SQL.
 """
 
+
 # v_census: row-level census data joined to all dimension tables.
 #
 # Two branches via UNION ALL:
@@ -73,6 +74,55 @@ WHERE f.year            = 1945
   AND a_b.source_scheme = 'scheme_b'
 """
 
+V_TFR = """
+CREATE OR REPLACE VIEW v_tfr AS
+SELECT
+    t.area_estat,
+    p.prefecture_name,
+    p.prefecture_name_ja,
+    t.year,
+    t.tfr
+FROM f_tfr t
+JOIN d_prefectures p ON p.area_estat = t.area_estat
+ORDER BY t.year, t.area_estat
+"""
+
+V_MIGRATION = """
+CREATE OR REPLACE VIEW v_migration AS
+SELECT
+    m.area_estat,
+    p.prefecture_name,
+    p.prefecture_name_ja,
+    m.census_year,
+    m.net_migration
+FROM f_migration m
+JOIN d_prefectures p ON p.area_estat = m.area_estat
+ORDER BY m.census_year, m.area_estat
+"""
+
+V_PROJECTIONS = """
+CREATE OR REPLACE VIEW v_projections AS
+SELECT
+    pr.area_estat,
+    p.prefecture_name,
+    p.prefecture_name_ja,
+    pr.projection_year,
+    pr.age_group_id,
+    a.age_group,
+    a.age_start,
+    a.age_end,
+    a.is_open_ended,
+    pr.sex_id,
+    s.sex,
+    s.sex_ja,
+    pr.population
+FROM f_projections pr
+JOIN d_prefectures p ON p.area_estat  = pr.area_estat
+JOIN d_age_groups  a ON a.age_group_id = pr.age_group_id
+JOIN d_sex         s ON s.sex_id       = pr.sex_id
+ORDER BY pr.projection_year, pr.area_estat
+"""
+
 # v_map_metrics: one row per prefecture × year with pre-computed demographic
 # metrics and period-over-period deltas via LAG() window functions.
 #
@@ -119,20 +169,24 @@ with_prev AS (
     FROM metrics m
 )
 SELECT
-    area_estat,
-    prefecture_name,
-    prefecture_name_ja,
-    year,
-    population,
-    aging_index,
-    old_age_dep,
-    working_age_share,
-    (population   - prev_population)                     AS pop_delta,
-    ROUND(aging_index       - prev_aging_index,       1) AS aging_index_delta,
-    ROUND(old_age_dep       - prev_old_age_dep,       1) AS old_age_dep_delta,
-    ROUND(working_age_share - prev_working_age_share, 1) AS working_age_share_delta,
-    prev_year,
-    (year - prev_year) AS year_gap
-FROM with_prev
-ORDER BY year, area_estat
+    wp.area_estat,
+    wp.prefecture_name,
+    wp.prefecture_name_ja,
+    wp.year,
+    wp.population,
+    wp.aging_index,
+    wp.old_age_dep,
+    wp.working_age_share,
+    (wp.population        - wp.prev_population)                     AS pop_delta,
+    ROUND(wp.aging_index       - wp.prev_aging_index,            1) AS aging_index_delta,
+    ROUND(wp.old_age_dep       - wp.prev_old_age_dep,            1) AS old_age_dep_delta,
+    ROUND(wp.working_age_share - wp.prev_working_age_share,      1) AS working_age_share_delta,
+    wp.prev_year,
+    (wp.year - wp.prev_year)                                        AS year_gap,
+    t.tfr,
+    m.net_migration
+FROM with_prev wp
+LEFT JOIN f_tfr       t ON t.area_estat = wp.area_estat AND t.year        = wp.year
+LEFT JOIN f_migration m ON m.area_estat = wp.area_estat AND m.census_year = wp.year
+ORDER BY wp.year, wp.area_estat
 """

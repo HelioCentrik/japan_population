@@ -257,10 +257,12 @@ KPI_SUB_H   = 14   # px — sub row
 # ── Map configuration ──────────────────────────────────────────────────────
 # Structural values — these don't vary by theme.
 
+POP_DELTA_SIGMA     = 2.0
+NET_MIGRATION_SIGMA = 2.0   # sigma multiplier for net_migration diverging bounds
+
 MAP_MARGINS              = 4
 MAP_BORDER_WIDTH         = 0.8
 
-POP_DELTA_SIGMA          = 2.0
 MAP_CENTER_LAT           = 35.5
 MAP_CENTER_LON           = 135.5
 
@@ -274,6 +276,20 @@ MAP_HIGHLIGHT_LINE_WIDTH = 2.5
 MAP_TOOLTIP_OFFSET_X     = 28   # px rightward from hovered point
 MAP_TOOLTIP_OFFSET_Y     = 40   # px upward from hovered point
 
+MAP_NO_DATA_COLOR   = "rgba(100, 100, 100, 0.45)"   # grey fill when metric has no data for year
+
+MAP_TFR_COLORSCALE = [
+    [0.00, "#d73027"],   # red   — very low fertility
+    [0.50, "#fee08b"],   # amber — replacement-level zone
+    [1.00, "#1a9641"],   # green — high fertility
+]
+
+MAP_NET_MIGRATION_COLORSCALE = [
+    [0.00, "#c0392b"],   # red        — heavy outflow
+    [0.50, "#f5f5f5"],   # near-white — net zero
+    [1.00, "#2166ac"],   # blue       — heavy inflow
+]
+
 # ── Metric selector ───────────────────────────────────────────────────────
 
 OKINAWA_AREA_ESTAT = "47000"
@@ -281,41 +297,49 @@ OKINAWA_AREA_ESTAT = "47000"
 MAP_METRICS = {
     "population": {
         "label":      "人口  Population",
-        "colorscale": MAP_COLORSCALE,   # theme-aware
+        "colorscale": MAP_COLORSCALE,
         "diverging":  False,
         "midpoint":   None,
-        "fmt":        lambda v: f"{int(v):,}" if v == v else "—",
+        "fmt":        lambda v: f"{int(v):,}"  if v == v else "—",
         "delta_fmt":  lambda v: f"{int(v):+,}" if v == v else "—",
-    },
-    "aging_index": {
-        "label":      "高齢化指数  Aging Index",
-        "colorscale": [[0, "#4575b4"], [0.5, "#ffffbf"], [1, "#d73027"]],
-        "diverging":  True,
-        "midpoint":   100.0,
-        "fmt":        lambda v: f"{v:.1f}" if v == v else "—",
-        "delta_fmt":  lambda v: f"{v:+.1f}" if v == v else "—",
+        "min_year":   1920,
+        "max_year":   None,
     },
     "pop_delta": {
         "label":      "人口増減  Population Change",
         "colorscale": [
-            [0.00, "#c0392b"],  # red    — heavy loss
-            [0.25, "#f5c518"],  # yellow — moderate loss
-            [0.50, "#f7f7f7"],  # white  — no change
-            [0.75, "#4575b4"],  # blue   — moderate gain
-            [1.00, "#5b2c8a"],  # violet — heavy gain
+            [0.00, "#c0392b"],
+            [0.25, "#f5c518"],
+            [0.50, "#f7f7f7"],
+            [0.75, "#4575b4"],
+            [1.00, "#5b2c8a"],
         ],
         "diverging":  True,
         "midpoint":   0.0,
         "fmt":        lambda v: f"{int(v):+,}" if v == v else "—",
         "delta_fmt":  lambda v: f"{int(v):+,}" if v == v else "—",
+        "min_year":   1925,   # 1920 has no prev year → no delta
+        "max_year":   None,
     },
-    "working_age_share": {
-        "label":      "生産年齢人口割合  Working-Age Share",
-        "colorscale": "YlGnBu",
+    "tfr": {
+        "label":      "合計特殊出生率  TFR",
+        "colorscale": MAP_TFR_COLORSCALE,
         "diverging":  False,
         "midpoint":   None,
-        "fmt":        lambda v: f"{v:.1f}%" if v == v else "—",
-        "delta_fmt":  lambda v: f"{v:+.1f}%" if v == v else "—",
+        "fmt":        lambda v: f"{v:.2f}" if v == v else "—",
+        "delta_fmt":  lambda v: "",   # no delta column — suppressed in tooltip
+        "min_year":   1960,
+        "max_year":   None,
+    },
+    "net_migration": {
+        "label":      "純移動数  Net Migration",
+        "colorscale": MAP_NET_MIGRATION_COLORSCALE,
+        "diverging":  True,
+        "midpoint":   0.0,
+        "fmt":        lambda v: f"{int(v):+,}" if v == v else "—",
+        "delta_fmt":  lambda v: "",   # no delta column — suppressed in tooltip
+        "min_year":   1985,
+        "max_year":   2020,
     },
 }
 
@@ -347,11 +371,11 @@ TS_TOOLTIP_OFFSET_X  = 32
 TS_TOOLTIP_OFFSET_Y  = 20
 
 TS_VIEWS = {
-    "population": "人口 Population",
-    "aging_index": "高齢化指数 Aging Index",
     "pop_share":   "人口割合 Population Share",
+    "population":  "人口 Population",
+    "aging_index": "高齢化指数 Aging Index",
 }
-TS_VIEW_DEFAULT = "population"
+TS_VIEW_DEFAULT = "pop_share"
 
 
 # ── Play button ──────────────────────────────────────────────────────────

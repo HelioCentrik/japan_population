@@ -15,7 +15,7 @@ from app.aesthetics.config import (
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
     FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
-    MAX_YEAR, POP_DELTA_SIGMA,
+    MAX_YEAR, POP_DELTA_SIGMA, NET_MIGRATION_SIGMA, MAP_NO_DATA_COLOR,
 )
 from app.data import figure_cache
 
@@ -29,41 +29,55 @@ _OKINAWA_GREY_LINE  = "rgba(180, 180, 180, 0.7)"
 @lru_cache(maxsize=1)
 def _get_global_metric_bounds() -> dict:
     """
-    Queries global min/max for each metric across all years and prefectures.
+    Queries global min/max for each map metric across all years and prefectures.
     Cached once — bounds are fixed for the lifetime of the process.
     Pins colorscale ranges so the map scale stays stable while scrubbing years.
+
+    pop_delta and net_migration use sigma-clipping to prevent outliers from
+    compressing the diverging scale. tfr uses raw min/max — values are
+    naturally bounded (~0.8–3.0) and well-behaved across the full dataset.
     """
-    con = get_con()  # shared in-memory singleton — do NOT close
+    con = get_con()
+
     row = con.execute("""
         SELECT
-            MIN(population),        MAX(population),
-            MIN(aging_index),       MAX(aging_index),
-            MIN(pop_delta),         MAX(pop_delta),
-            MIN(working_age_share), MAX(working_age_share)
+            MIN(population), MAX(population),
+            MIN(pop_delta),  MAX(pop_delta),
+            MIN(tfr),        MAX(tfr)
         FROM v_map_metrics
     """).fetchone()
+
     delta_row = con.execute("""
-        SELECT
-            AVG(pop_delta),
-            STDDEV(pop_delta)
+        SELECT AVG(pop_delta), STDDEV(pop_delta)
         FROM v_map_metrics
         WHERE pop_delta IS NOT NULL
     """).fetchone()
 
-    aging_mid     = 100.0
-    aging_max_dev = max(abs(row[3] - aging_mid), abs(row[2] - aging_mid))
-    delta_mean  = delta_row[0]
-    delta_sigma = delta_row[1]
+    mig_row = con.execute("""
+        SELECT AVG(net_migration), STDDEV(net_migration)
+        FROM v_map_metrics
+        WHERE net_migration IS NOT NULL
+    """).fetchone()
+
+    # pop_delta — symmetric diverging bounds via sigma-clip
+    delta_mean, delta_sigma = delta_row
     delta_bound = delta_sigma * POP_DELTA_SIGMA
-    delta_lo    = delta_mean - delta_bound
-    delta_hi    = delta_mean + delta_bound
-    delta_dev = ceil_half_magnitude(max(abs(delta_lo), abs(delta_hi)))
+    delta_dev   = ceil_half_magnitude(
+        max(abs(delta_mean - delta_bound), abs(delta_mean + delta_bound))
+    )
+
+    # net_migration — same approach, own sigma constant
+    mig_mean, mig_sigma = mig_row
+    mig_bound = mig_sigma * NET_MIGRATION_SIGMA
+    mig_dev   = ceil_half_magnitude(
+        max(abs(mig_mean - mig_bound), abs(mig_mean + mig_bound))
+    )
 
     return {
-        "population":        (float(np.log1p(row[0])), float(np.log1p(row[1]))),
-        "aging_index":       (max(0.0, aging_mid - aging_max_dev), aging_mid + aging_max_dev),
-        "pop_delta":         (-delta_dev, delta_dev),
-        "working_age_share": (float(row[6]), float(row[7])),
+        "population":    (float(np.log1p(row[0])), float(np.log1p(row[1]))),
+        "pop_delta":     (-delta_dev, delta_dev),
+        "tfr":           (float(row[4]), float(row[5])),
+        "net_migration": (-mig_dev, mig_dev),
     }
 
 
@@ -81,9 +95,12 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
         SELECT
             area_estat,
             prefecture_name,
-            population, aging_index, working_age_share,
-            pop_delta, aging_index_delta, working_age_share_delta,
-            prev_year, year_gap
+            population,
+            aging_index,
+            pop_delta,
+            prev_year, year_gap,
+            tfr,
+            net_migration
         FROM v_map_metrics
         WHERE year = {year}
     """).df()
@@ -93,10 +110,10 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
 
     # ── Delta strings ─────────────────────────────────────────────────────────
     _delta_cols = {
-        "population":        "pop_delta",
-        "aging_index":       "aging_index_delta",
-        "pop_delta":         None,
-        "working_age_share": "working_age_share_delta",
+        "population":    "pop_delta",
+        "pop_delta":     None,
+        "tfr":           None,
+        "net_migration": None,
     }
 
     def _fmt_delta(row, col):
@@ -112,22 +129,37 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
     prefectures["metric_value_str"] = prefectures[metric].apply(meta["fmt"])
     prefectures["metric_delta_str"] = prefectures.apply(lambda r: _fmt_delta(r, metric), axis=1)
 
+
+    # ── Null-coverage check ───────────────────────────────────────────────────
+    # Primary guard is the year-snap callback in callbacks/selection.py.
+    # This fallback renders a grey map with a notice rather than crashing or
+    # showing an empty choropleth if the snap somehow doesn't fire.
+    all_null = prefectures[metric].isna().all()
+    colorscale_override = None
+
     # ── Z column + colorscale bounds ──────────────────────────────────────────
-    if metric == "population":
+    if all_null:
+        prefectures["_z"] = 0.0
+        zmin, zmax         = 0.0, 1.0
+        colorscale_override = [[0, MAP_NO_DATA_COLOR], [1, MAP_NO_DATA_COLOR]]
+        colorbar_label      = meta["label"].split("  ")[0]
+    elif metric == "population":
         prefectures["_z"] = np.log1p(prefectures["population"])
         colorbar_label    = "人口 (log)"
-    elif metric == "pop_delta":
-        zmin, zmax = _get_global_metric_bounds()["pop_delta"]
-        prefectures["_z"] = prefectures["pop_delta"].clip(lower=zmin, upper=zmax)
-        colorbar_label = "人口増減"
+        zmin, zmax        = _get_global_metric_bounds()["population"]
+    elif metric in ("pop_delta", "net_migration"):
+        zmin, zmax        = _get_global_metric_bounds()[metric]
+        prefectures["_z"] = prefectures[metric].clip(lower=zmin, upper=zmax)
+        colorbar_label    = meta["label"].split("  ")[0]
     else:
+        # tfr — raw bounds, no clipping needed
         prefectures["_z"] = prefectures[metric]
+        zmin, zmax        = _get_global_metric_bounds()[metric]
         colorbar_label    = meta["label"].split("  ")[0]
 
-    zmin, zmax = _get_global_metric_bounds()[metric]
 
     colorbar_extra = {}
-    if metric == "pop_delta":
+    if metric in ("pop_delta", "net_migration"):
         half = int(zmax / 2)
         colorbar_extra = dict(
             tickvals=[zmin, -half, 0, half, zmax],
@@ -149,7 +181,7 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
         z=prefectures["_z"],
         zmin=zmin, zmax=zmax,
         featureidkey="properties.area_estat",
-        colorscale=meta["colorscale"],
+        colorscale=colorscale_override or meta["colorscale"],
         marker_line_width=MAP_BORDER_WIDTH,
         marker_line_color=MAP_GEO.get("line_color"),
         customdata=prefectures[[
@@ -223,6 +255,16 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
         margin=dict(l=MAP_MARGINS, r=MAP_MARGINS, t=MAP_MARGINS, b=MAP_MARGINS),
         autosize=True,
     )
+
+    if all_null:
+        fig.add_annotation(
+            text="この年はデータなし  /  No data for this year",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5,
+            showarrow=False,
+            font=dict(color=COLOR_TEXT_MID, size=14),
+            bgcolor="rgba(0,0,0,0)",
+        )
 
     figure_cache.put(_key, fig)
     return fig

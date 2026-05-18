@@ -2,7 +2,12 @@
 from dash import Input, Output, State, Patch, ctx, no_update
 
 from dash_app import app
-from app.aesthetics.config import MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM
+from startup import CENSUS_YEARS
+from app.aesthetics.config import (
+    MAP_ZOOM_MIN, MAP_ZOOM_MAX, MAP_REF_HEIGHT, MAP_REF_ZOOM,
+    MAP_METRICS, COLOR_PRIMARY, COLOR_TEXT_MID, FONT_SIZE_AXIS_TITLE,
+)
+
 
 
 app.clientside_callback(
@@ -48,6 +53,7 @@ def apply_initial_map_zoom(zoom):
     patched["layout"]["map"]["zoom"] = zoom
     return patched
 
+
 @app.callback(
     Output("selected-prefecture", "data"),
     Output("map-graph", "clickData"),
@@ -74,3 +80,46 @@ def update_selected_prefecture(click_data, reset_clicks, current_area):
 )
 def toggle_reset_button(area_estat):
     return {"display": "block" if area_estat else "none"}
+
+
+@app.callback(
+    Output("year-slider", "value", allow_duplicate=True),
+    Output("year-slider", "min"),
+    Output("year-slider", "max"),
+    Output("year-slider", "marks"),
+    Input("metric-selector", "value"),
+    State("year-slider", "value"),
+    prevent_initial_call=True,
+)
+def snap_year_to_metric_coverage(metric, current_year):
+    """
+    On metric change: constrains the slider to the metric's valid census years.
+    Updates min, max, and marks so the slider physically can't land outside
+    coverage. Value snaps to nearest valid year if needed.
+    """
+    meta     = MAP_METRICS.get(metric, {})
+    min_year = meta.get("min_year") or CENSUS_YEARS[0]
+    max_year = meta.get("max_year") or CENSUS_YEARS[-1]
+
+    valid_years = [yr for yr in CENSUS_YEARS if min_year <= yr <= max_year]
+
+    if current_year < valid_years[0]:
+        new_value = valid_years[0]
+    elif current_year > valid_years[-1]:
+        new_value = valid_years[-1]
+    else:
+        new_value = no_update
+
+    new_marks = {
+        yr: {
+            "label": str(yr),
+            "style": {
+                "color":      COLOR_PRIMARY if yr == 1945 else COLOR_TEXT_MID,
+                "fontSize":   f"{FONT_SIZE_AXIS_TITLE}px",
+                "fontWeight": "bold" if yr == 1945 else "normal",
+            },
+        }
+        for yr in valid_years
+    }
+
+    return new_value, valid_years[0], valid_years[-1], new_marks
