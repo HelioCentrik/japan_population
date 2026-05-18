@@ -371,11 +371,12 @@ TS_TOOLTIP_OFFSET_X  = 32
 TS_TOOLTIP_OFFSET_Y  = 20
 
 TS_VIEWS = {
-    "pop_share":   "人口割合 Population Share",
-    "population":  "人口 Population",
-    "aging_index": "高齢化指数 Aging Index",
+    "pop_share":  "人口割合 Population Share",
+    "population": "人口 Population",
+    "tfr":        "合計特殊出生率 TFR",
 }
 TS_VIEW_DEFAULT = "pop_share"
+TS_VIEW_TFR = "tfr"
 
 TFR_REPLACEMENT_RATE  = 2.1
 TFR_CUTOFF_YEAR       = 1960   # f_tfr coverage begins

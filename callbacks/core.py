@@ -8,7 +8,7 @@ from app.aesthetics.config import (
 )
 from app.viz.maps import build_japan_map_fig
 from app.viz.pyramid import build_pyramid_fig, get_pyramid_axis_max
-from app.viz.timeseries import build_ts_population_fig, build_ts_aging_index_fig, build_ts_pop_share_fig
+from app.viz.timeseries import build_ts_pop_share_fig, build_ts_population_fig, build_ts_tfr_fig
 from app.viz.kpi import build_kpi_data, render_kpi_cards
 
 
@@ -61,12 +61,12 @@ def update_charts(year, area_estat, metric, ts_view):
         patched["data"][1]["z"]          = fd["data"][1]["z"]
         map_fig = patched
 
-    if ts_view == "population":
-        ts_fig = build_ts_population_fig(selected_year=y, area_estat=area_estat)
-    elif ts_view == "aging_index":
-        ts_fig = build_ts_aging_index_fig(selected_year=y, area_estat=area_estat)
-    else:
+    if ts_view == "pop_share":
         ts_fig = build_ts_pop_share_fig(selected_year=y, area_estat=area_estat)
+    elif ts_view == "population":
+        ts_fig = build_ts_population_fig(selected_year=y, area_estat=area_estat)
+    else:
+        ts_fig = build_ts_tfr_fig(selected_year=y, area_estat=area_estat)
 
     return (
         map_fig,

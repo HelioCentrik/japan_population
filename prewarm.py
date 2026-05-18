@@ -2,7 +2,7 @@
 from app.data import figure_cache
 from app.viz.maps import build_japan_map_fig
 from app.viz.pyramid import build_pyramid_fig, get_pyramid_axis_max
-from app.viz.timeseries import build_ts_population_fig, build_ts_aging_index_fig, build_ts_pop_share_fig
+from app.viz.timeseries import build_ts_pop_share_fig, build_ts_population_fig, build_ts_tfr_fig
 from app.viz.kpi import build_kpi_data
 from app.aesthetics.config import MAP_METRICS, MAP_METRIC_DEFAULT
 from startup import CENSUS_YEARS
@@ -37,14 +37,14 @@ else:
         fig = build_pyramid_fig(year=_yr, area_estat=None, axis_max=_prewarm_axis_max)
         figure_cache.save(figure_cache.make_key("pyramid", _yr, None, _prewarm_axis_max), fig)
 
+        fig = build_ts_pop_share_fig(selected_year=_yr, area_estat=None)
+        figure_cache.save(figure_cache.make_key("pop_share", _yr, None), fig)
+
         fig = build_ts_population_fig(selected_year=_yr, area_estat=None)
         figure_cache.save(figure_cache.make_key("population", _yr, None), fig)
 
-        fig = build_ts_aging_index_fig(selected_year=_yr, area_estat=None)
-        figure_cache.save(figure_cache.make_key("timeseries", _yr, None), fig)
-
-        fig = build_ts_pop_share_fig(selected_year=_yr, area_estat=None)
-        figure_cache.save(figure_cache.make_key("pop_share", _yr, None), fig)
+        fig = build_ts_tfr_fig(selected_year=_yr, area_estat=None)
+        figure_cache.save(figure_cache.make_key("tfr", _yr, None), fig)
 
     # ── Secondary pass: remaining map metrics, valid years only ──────────────
     _extra_metrics = [m for m in MAP_METRICS if m != MAP_METRIC_DEFAULT]

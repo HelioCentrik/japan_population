@@ -1,11 +1,12 @@
 # app/viz/timeseries.py
 from functools import lru_cache
+from math import floor
 
 import plotly.graph_objects as go
 
 from app.aesthetics.config import (
     FONT_SIZE_AXIS_TICK, FONT_SIZE_AXIS_TITLE, FONT_SIZE_CHART_TITLE,
-    COLOR_PRIMARY, COLOR_TEXT_MID, COLOR_TEXT_HI, CHART_PLOT_COLOR,
+    COLOR_PRIMARY, COLOR_WARNING, COLOR_TEXT_MID, COLOR_TEXT_HI, CHART_PLOT_COLOR, ACCENT_DANKAI_JR,
     PANEL_BORDER, ACCENT_THRESHOLD, TIMESERIES_PREF_COLOR,
     LINE_WIDTH_MAIN, LINE_WIDTH_PREF, LINE_WIDTH_1945,
     LINE_WIDTH_THRESHOLD, LINE_WIDTH_YEAR_MARKER,
@@ -14,6 +15,7 @@ from app.aesthetics.config import (
     YAXIS_TICK_STANDOFF,
     TIMESERIES_MARGIN_L, TIMESERIES_MARGIN_R, TIMESERIES_MARGIN_T, TIMESERIES_MARGIN_B,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
+    TFR_REPLACEMENT_RATE, TFR_CUTOFF_YEAR,
 )
 from app.data.db import get_con
 from app.data import figure_cache
@@ -213,218 +215,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     return fig
 
 
-# Aging index crossed 100 between the 1995 and 2000 census years.
-# Annotated at ~1997 — the midpoint, not a data point.
 _CROSSOVER_YEAR = 1997
-
-@lru_cache(maxsize=8)
-def _get_aging_index_data(area_estat: str | None) -> tuple:
-    """
-    Returns (national_df, pref_df_or_None, pref_label_or_None).
-    Cached on area_estat only — year is not a factor in the underlying data.
-    """
-    con = get_con()
-
-    national_df = con.execute("""
-        WITH age_buckets AS (
-            SELECT year,
-                SUM(CASE WHEN age_start >= 65 THEN population ELSE 0 END)                   AS pop_65_plus,
-                SUM(CASE WHEN age_start <= 10 AND age_end <= 14 THEN population ELSE 0 END)  AS pop_0_14
-            FROM v_census
-            WHERE age_scheme = 'scheme_a'
-              AND age_group  != 'Total'
-              AND sex         = 'total'
-              AND area_level  = 2
-            GROUP BY year
-        )
-        SELECT year,
-            ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14, 0), 1) AS aging_index
-        FROM age_buckets
-        ORDER BY year
-    """).df()
-
-    pref_df    = None
-    pref_label = None
-
-    if area_estat is not None:
-        name_row = con.execute(
-            "SELECT prefecture_name_ja, prefecture_name FROM d_prefectures WHERE area_estat = ?",
-            [area_estat]
-        ).fetchone()
-        pref_label = f"{name_row[0]}  {name_row[1]}" if name_row else area_estat
-
-        pref_df = con.execute("""
-            WITH age_buckets AS (
-                SELECT year,
-                    SUM(CASE WHEN age_start >= 65 THEN population ELSE 0 END)                   AS pop_65_plus,
-                    SUM(CASE WHEN age_start <= 10 AND age_end <= 14 THEN population ELSE 0 END)  AS pop_0_14
-                FROM v_census
-                WHERE age_scheme = 'scheme_a'
-                  AND age_group  != 'Total'
-                  AND sex         = 'total'
-                  AND area_estat  = ?
-                GROUP BY year
-            )
-            SELECT year,
-                ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14, 0), 1) AS aging_index
-            FROM age_buckets
-            ORDER BY year
-        """, [area_estat]).df()
-
-    return national_df, pref_df, pref_label
-
-
-def build_ts_aging_index_fig(selected_year: int, area_estat: str | None = None) -> go.Figure:
-    _key = figure_cache.make_key("timeseries", selected_year, area_estat)
-    if (fig := figure_cache.get(_key)) is not None:
-        return fig
-
-    national_df, pref_df, pref_label = _get_aging_index_data(area_estat)
-
-    df_non_1945 = national_df[national_df["year"] != 1945]
-    df_1945     = national_df[national_df["year"] == 1945]
-
-    # ── Shared customdata — all traces carry full year snapshot ───────────────
-    # Shape per point: [year, national_ai, pref_ai_or_None, pref_label, flag]
-    if pref_df is not None and not pref_df.empty:
-        merged = national_df.merge(
-            pref_df[["year", "aging_index"]].rename(columns={"aging_index": "pref_ai"}),
-            on="year",
-            how="left",
-        )
-    else:
-        merged = national_df.copy()
-        merged["pref_ai"] = float("nan")
-
-    pl = pref_label or ""
-
-    cd_by_year = {
-        int(row.year): [
-            int(row.year),
-            float(row.aging_index),
-            None if row.pref_ai != row.pref_ai else float(row.pref_ai),  # NaN → None
-            pl,
-            "1945" if row.year == 1945 else "",
-        ]
-        for row in merged.itertuples()
-    }
-
-    traces = []
-
-    # ── National line (connects all years including 1945) ─────────────────────
-    traces.append(go.Scatter(
-        x=national_df["year"],
-        y=national_df["aging_index"],
-        mode="lines",
-        name="全国 National",
-        line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN),
-        hoverinfo="none",
-        customdata=[cd_by_year[yr] for yr in national_df["year"]],
-    ))
-
-    # Regular census year dots (non-1945 only) — visual overlay, no hover
-    traces.append(go.Scatter(
-        x=df_non_1945["year"],
-        y=df_non_1945["aging_index"],
-        mode="markers",
-        showlegend=False,
-        marker=dict(color=COLOR_TEXT_MID, size=MARKER_SIZE_DOT),
-        hoverinfo="skip",
-    ))
-
-    # 1945 — filled dot, COLOR_PRIMARY to match slider mark
-    if not df_1945.empty:
-        traces.append(go.Scatter(
-            x=df_1945["year"],
-            y=df_1945["aging_index"],
-            mode="markers",
-            name="1945 臨時国勢調査",
-            marker=dict(color=COLOR_PRIMARY, size=MARKER_SIZE_DOT + 2),
-            hoverinfo="none",
-            customdata=[cd_by_year[1945]],
-        ))
-
-    # ── Prefecture overlay ────────────────────────────────────────────────────
-    if pref_df is not None and not pref_df.empty:
-        traces.append(go.Scatter(
-            x=pref_df["year"],
-            y=pref_df["aging_index"],
-            mode="lines+markers",
-            name=pref_label,
-            line=dict(color=TIMESERIES_PREF_COLOR, width=LINE_WIDTH_PREF, dash="dot"),
-            marker=dict(size=4, color=TIMESERIES_PREF_COLOR),
-            hoverinfo="none",
-            customdata=[cd_by_year[yr] for yr in pref_df["year"]],
-        ))
-
-    fig = go.Figure(data=traces)
-
-    # ── Reference line at aging index = 100 ───────────────────────────────────
-    fig.add_hline(
-        y=100,
-        line_dash="dash",
-        line_color=ACCENT_THRESHOLD,
-        line_width=LINE_WIDTH_THRESHOLD,
-        opacity=OPACITY_THRESHOLD_LINE,
-    )
-
-    # ── Crossover annotation ──────────────────────────────────────────────────
-    fig.add_annotation(
-        x=_CROSSOVER_YEAR,
-        y=100,
-        text="高齢化指数 > 100  ↑",
-        showarrow=False,
-        xanchor="left",
-        yanchor="bottom",
-        font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
-        bgcolor="rgba(0,0,0,0)",
-    )
-
-    # ── Selected year indicator ───────────────────────────────────────────────
-    fig.add_vline(
-        x=selected_year,
-        line_color=COLOR_TEXT_MID,
-        line_width=LINE_WIDTH_YEAR_MARKER,
-        line_dash="dot",
-        opacity=OPACITY_YEAR_VLINE,
-    )
-
-    fig.update_layout(
-        margin=dict(l=TIMESERIES_MARGIN_L, r=TIMESERIES_MARGIN_R, t=TIMESERIES_MARGIN_T, b=TIMESERIES_MARGIN_B),
-        autosize=True,
-        plot_bgcolor=CHART_PLOT_COLOR,
-        legend=dict(
-            orientation="h",
-            x=0.195, xanchor="left",
-            y=0.98, yanchor="top",
-            font=dict(color=COLOR_TEXT_HI),
-        ),
-        xaxis=dict(
-            showline=True,
-            linecolor=PANEL_BORDER,
-            linewidth=2,
-            mirror=True,
-            dtick=10,
-            automargin=False,
-        ),
-        yaxis=dict(
-            showline=True,
-            linecolor=PANEL_BORDER,
-            linewidth=1,
-            mirror=True,
-            title=dict(
-                text="高齢化指数",
-                font=dict(color=COLOR_TEXT_HI, size=FONT_SIZE_AXIS_TITLE),
-            ),
-            zeroline=False,
-            ticklabelstandoff=YAXIS_TICK_STANDOFF,
-            automargin=False
-        ),
-    )
-
-    figure_cache.put(_key, fig)
-    return fig
-
 
 @lru_cache(maxsize=8)
 def _get_pop_share_data(area_estat: str | None) -> tuple:
@@ -683,6 +474,175 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
             tickformat=".0f",
             ticksuffix="%",
             range=[0, 100],
+            ticklabelstandoff=YAXIS_TICK_STANDOFF,
+            automargin=False,
+        ),
+    )
+
+    figure_cache.put(_key, fig)
+    return fig
+
+
+# TFR crossed 2.1 replacement rate between 1973 and 1974 census-adjacent years.
+_TFR_CROSSOVER_YEAR = 1974
+
+@lru_cache(maxsize=8)
+def _get_tfr_data(area_estat: str | None) -> tuple:
+    """
+    Returns (national_df, pref_df_or_None, pref_label_or_None).
+    national_df columns: year, tfr  (national average across all prefectures)
+    pref_df columns:     year, tfr  (single prefecture)
+    Cached on area_estat — year doesn't affect underlying series.
+    """
+    con = get_con()
+
+    national_df = con.execute("""
+        SELECT year, ROUND(AVG(tfr), 2) AS tfr
+        FROM f_tfr
+        GROUP BY year
+        ORDER BY year
+    """).df()
+
+    pref_df    = None
+    pref_label = None
+
+    if area_estat is not None:
+        name_row = con.execute(
+            "SELECT prefecture_name_ja, prefecture_name FROM d_prefectures WHERE area_estat = ?",
+            [area_estat],
+        ).fetchone()
+        pref_label = f"{name_row[0]}  {name_row[1]}" if name_row else area_estat
+
+        pref_df = con.execute("""
+            SELECT year, tfr
+            FROM f_tfr
+            WHERE area_estat = ?
+            ORDER BY year
+        """, [area_estat]).df()
+
+    return national_df, pref_df, pref_label
+
+
+def build_ts_tfr_fig(selected_year: int, area_estat: str | None = None) -> go.Figure:
+    _key = figure_cache.make_key("tfr", selected_year, area_estat)
+    if (fig := figure_cache.get(_key)) is not None:
+        return fig
+
+    national_df, pref_df, pref_label = _get_tfr_data(area_estat)
+
+    # ── Customdata: [year, national_tfr, pref_tfr_or_None, pref_label] ───────
+    if pref_df is not None and not pref_df.empty:
+        merged = national_df.merge(
+            pref_df[["year", "tfr"]].rename(columns={"tfr": "pref_tfr"}),
+            on="year", how="left",
+        )
+    else:
+        merged = national_df.copy()
+        merged["pref_tfr"] = float("nan")
+
+    pl = pref_label or ""
+    cd_by_year = {
+        int(row.year): [
+            int(row.year),
+            float(row.tfr),
+            None if row.pref_tfr != row.pref_tfr else float(row.pref_tfr),
+            pl,
+        ]
+        for row in merged.itertuples()
+    }
+
+    traces = []
+
+    # ── National TFR line ─────────────────────────────────────────────────────
+    traces.append(go.Scatter(
+        x=national_df["year"],
+        y=national_df["tfr"],
+        mode="lines+markers",
+        name="全国 National",
+        line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN),
+        marker=dict(color=COLOR_TEXT_HI, size=MARKER_SIZE_DOT),
+        hoverinfo="none",
+        customdata=[cd_by_year[yr] for yr in national_df["year"]],
+    ))
+
+    # ── Prefecture overlay ────────────────────────────────────────────────────
+    if pref_df is not None and not pref_df.empty:
+        traces.append(go.Scatter(
+            x=pref_df["year"],
+            y=pref_df["tfr"],
+            mode="lines+markers",
+            name=pref_label,
+            line=dict(color=ACCENT_DANKAI_JR, width=LINE_WIDTH_PREF, dash="dot"),
+            marker=dict(color=ACCENT_DANKAI_JR, size=MARKER_SIZE_DOT),
+            hoverinfo="none",
+            customdata=[cd_by_year.get(yr, [yr, None, None, pl]) for yr in pref_df["year"]],
+        ))
+
+    # ── 2.1 replacement rate reference line ───────────────────────────────────
+    traces.append(go.Scatter(
+        x=[national_df["year"].min(), national_df["year"].max()],
+        y=[TFR_REPLACEMENT_RATE, TFR_REPLACEMENT_RATE],
+        mode="lines",
+        name="replacement rate 2.10",
+        line=dict(color=COLOR_WARNING, width=LINE_WIDTH_THRESHOLD, dash="dash"),
+        hoverinfo="none",
+        showlegend=True,
+    ))
+
+    fig = go.Figure(data=traces)
+
+    # ── Crossover annotation (~1974) ──────────────────────────────────────────
+    fig.add_annotation(
+        x=_TFR_CROSSOVER_YEAR,
+        y=TFR_REPLACEMENT_RATE,
+        text="出生率 < 2.10  ↓",
+        showarrow=False,
+        xanchor="left",
+        yanchor="top",
+        font=dict(color=COLOR_TEXT_MID, size=FONT_SIZE_AXIS_TITLE),
+        bgcolor="rgba(0,0,0,0)",
+    )
+
+    # ── Selected year indicator ───────────────────────────────────────────────
+    tfr_min_year = int(national_df["year"].min())
+    clamped_year = max(selected_year, tfr_min_year)
+    fig.add_vline(
+        x=clamped_year,
+        line_color=COLOR_TEXT_MID,
+        line_width=LINE_WIDTH_YEAR_MARKER,
+        line_dash="dot",
+        opacity=OPACITY_YEAR_VLINE,
+    )
+
+    fig.update_layout(
+        margin=dict(l=TIMESERIES_MARGIN_L, r=TIMESERIES_MARGIN_R, t=TIMESERIES_MARGIN_T, b=TIMESERIES_MARGIN_B),
+        autosize=True,
+        plot_bgcolor=CHART_PLOT_COLOR,
+        legend=dict(
+            orientation="h",
+            x=0.195, xanchor="left",
+            y=0.98, yanchor="top",
+            font=dict(color=COLOR_TEXT_HI),
+        ),
+        xaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=2,
+            mirror=True,
+            dtick=10,
+            automargin=False,
+        ),
+        yaxis=dict(
+            showline=True,
+            linecolor=PANEL_BORDER,
+            linewidth=0.8,
+            mirror=True,
+            title=dict(
+                text="合計特殊出生率 TFR",
+                font=dict(color=COLOR_TEXT_HI, size=FONT_SIZE_AXIS_TITLE),
+            ),
+            range=[floor(national_df["tfr"].min() * 10) / 10 / 1.25, round(national_df["tfr"].max() * 1.25, 1)],
+            zeroline=False,
             ticklabelstandoff=YAXIS_TICK_STANDOFF,
             automargin=False,
         ),
