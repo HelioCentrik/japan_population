@@ -91,10 +91,13 @@ A single-page application with four linked panels driven by a shared year contro
 
 Three supplementary datasets are included in the database and available to the AI panel:
 
+Four supplementary datasets are included in the database and available to the AI panel:
+
 | Dataset | Source | Coverage |
 |---|---|---|
 | Prefecture TFR (`f_tfr`) | Ministry of Health, Labour and Welfare, Vital Statistics | 1960–2024, annual |
-| IPSS population projections (`f_projections`) | National Institute of Population and Social Security Research, 2018 edition | 2015–2045, 5-year intervals |
+| IPSS prefectural projections (`f_projections`) | National Institute of Population and Social Security Research, 2018 edition | 2015–2045, 5-year intervals |
+| IPSS national projections (`f_national_projections`) | National Institute of Population and Social Security Research, 2017 edition | 2015–2065, annual, medium/high/low variants |
 | Net internal migration (`f_migration`) | e-Stat, Basic Resident Register Migration Report | Census years 1985–2020 |
 
 ### 1945 Provisional Census (臨時国勢調査)
@@ -113,7 +116,9 @@ The three supplementary datasets do not share the census's 1920–2020 span:
 
 **Migration** (`f_migration`) — Census years 1985–2020 only. No prefecture-level source data exists prior to 1982. The 1985 entry covers a 4-year window (1982–1985) rather than the standard 5-year census interval.
 
-**IPSS projections** (`f_projections`) — 2015–2045, 5-year intervals. The 2015 baseline figures are ~1–2% above `f_census` 2015 — IPSS uses imputed census counts to supplement unknowns, producing a slightly higher starting population than the raw census figures. The 2015 projection rows are inputs to the forecast, not census observations.
+**IPSS prefectural projections** (`f_projections`) — 2015–2045, 5-year intervals. The 2015 baseline figures are ~1–2% above `f_census` 2015 — IPSS uses imputed census counts to supplement unknowns, producing a slightly higher starting population than the raw census figures. The 2015 projection rows are inputs to the forecast, not census observations.
+
+**IPSS national projections** (`f_national_projections`) — 2015–2065, annual, three fertility variants (medium/high/low). Used for the projection confidence band on the population and population share timeseries views, bolted on from 2020. The 2020 census confirmed the medium variant was slightly optimistic on the pace of decline (~126.1M actual vs. ~127.1M projected 2015 baseline). The 2015 baseline diverges ~1–2% from `f_census` 2015 for the same reason as `f_projections` above.
 
 ### Sources
 
