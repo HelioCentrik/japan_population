@@ -118,8 +118,19 @@ def serve_layout():
                         ],
                     ),
 
-                    # KPI Cards
-                    html.Div(id="kpi-row", className="kpi-row", children=[]),
+                    # KPI Cards — skeleton shells reserve row height before update_charts fires
+                    html.Div(
+                        id="kpi-row",
+                        className="kpi-row",
+                        children=[
+                            html.Div([
+                                html.Div(className="kpi-label"),
+                                html.Div(className="kpi-value"),
+                                html.Div(className="kpi-sub"),
+                            ], className="card kpi-skeleton")
+                            for _ in range(6)
+                        ],
+                    ),
 
                     # Play Button + Year Slider
                     html.Div(

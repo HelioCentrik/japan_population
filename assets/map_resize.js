@@ -42,8 +42,10 @@
 
         let zoomApplied = false;
 
+        let _catchUpTimer = null;
+
         plotDiv.on('plotly_afterplot', function () {
-            const zoom    = plotDiv._fullLayout?.map?.zoom;
+            clearTimeout(_catchUpTimer);
             const hasData = plotDiv.data && plotDiv.data.length > 0;
             if (revealed) return;
             if (!plotDiv._fullLayout?.map) return;
@@ -55,6 +57,19 @@
                 reveal();
             }
         });
+
+        // Catch-up: if choropleth already rendered before we registered,
+        // afterplot won't fire again. Wait 300ms to let it arrive naturally —
+        // if it does, clearTimeout above cancels this. If it doesn't, we
+        // intervene; by 300ms post-render GL layers are fully initialized.
+        if (plotDiv.data && plotDiv.data.length > 0 && !zoomApplied) {
+            _catchUpTimer = setTimeout(function () {
+                if (!zoomApplied && !revealed) {
+                    zoomApplied = true;
+                    window.refitMap();
+                }
+            }, 300);
+        }
 
         setTimeout(reveal, 3000);
 
