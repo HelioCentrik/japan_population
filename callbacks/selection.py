@@ -44,10 +44,11 @@ app.clientside_callback(
 @app.callback(
     Output("map-graph", "figure", allow_duplicate=True),
     Input("map-init-zoom", "data"),
+    Input("charts-ready-trigger", "data"),
     prevent_initial_call=True,
 )
-def apply_initial_map_zoom(zoom):
-    if zoom is None:
+def apply_initial_map_zoom(zoom, charts_ready):
+    if zoom is None or not charts_ready:
         return no_update
     patched = Patch()
     patched["layout"]["map"]["zoom"] = zoom

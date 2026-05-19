@@ -43,28 +43,26 @@ def update_charts(year, area_estat, metric, ts_view, charts_ready, show_projecti
     trigger = ctx.triggered_id
 
     if trigger == "selected-prefecture":
-        # Patch only the highlight trace (data[2]) — viewport is untouched.
         patched = Patch()
         patched["data"][2]["locations"] = [area_estat] if area_estat else []
         patched["data"][2]["z"] = [1] if area_estat else []
         map_fig = patched
+    elif trigger == "charts-ready-trigger":
+        # Initial load — base figure is {}, nothing to patch into.
+        # Return full figure; zoom preservation doesn't apply yet.
+        map_fig = build_japan_map_fig(year=y, metric=metric)
     else:
-        # Year or metric changed — update data traces only, never layout.
-        # Leaving layout.mapbox.zoom out of the payload means Plotly keeps
-        # whatever zoom is currently set (initial-load Patch or ResizeObserver).
         fig = build_japan_map_fig(year=y, metric=metric)
-        fd  = fig.to_dict()
+        fd = fig.to_dict()
         patched = Patch()
-        # Base choropleth (data[0])
-        patched["data"][0]["z"]          = fd["data"][0]["z"]
+        patched["data"][0]["z"] = fd["data"][0]["z"]
         patched["data"][0]["customdata"] = fd["data"][0]["customdata"]
         patched["data"][0]["colorscale"] = fd["data"][0]["colorscale"]
-        patched["data"][0]["zmin"]       = fd["data"][0]["zmin"]
-        patched["data"][0]["zmax"]       = fd["data"][0]["zmax"]
-        patched["data"][0]["colorbar"]   = fd["data"][0]["colorbar"]
-        # Okinawa overlay (data[1]) — active for 1950/1955, empty otherwise
-        patched["data"][1]["locations"]  = fd["data"][1]["locations"]
-        patched["data"][1]["z"]          = fd["data"][1]["z"]
+        patched["data"][0]["zmin"] = fd["data"][0]["zmin"]
+        patched["data"][0]["zmax"] = fd["data"][0]["zmax"]
+        patched["data"][0]["colorbar"] = fd["data"][0]["colorbar"]
+        patched["data"][1]["locations"] = fd["data"][1]["locations"]
+        patched["data"][1]["z"] = fd["data"][1]["z"]
         map_fig = patched
 
     if ts_view == "pop_share":
