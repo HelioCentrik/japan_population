@@ -204,7 +204,6 @@ html, body {
 
 .kpi-skeleton {
     background-color : var(--panel-bg);
-    opacity: 0.3;
 }
 
 /* Play / Pause Button */
