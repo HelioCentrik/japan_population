@@ -4,7 +4,7 @@ from dash import html, dcc
 from dash_app import app
 from startup import CENSUS_YEARS, YEAR_LABELS
 from app.aesthetics.config import (
-    PAGE_BG, COLOR_PRIMARY, COLOR_TEXT_MID,
+    PAGE_BG, PANEL_BG, COLOR_PRIMARY, COLOR_TEXT_MID,
     PLAY_INTERVAL_MS, LAYOUT_GAP,
     MAP_METRICS, MAP_METRIC_DEFAULT,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
@@ -16,6 +16,13 @@ from app.aesthetics.config import (
 from app.data import figure_cache
 
 
+
+_DARK_PLACEHOLDER = {
+    "layout": {
+        "paper_bgcolor": PANEL_BG,
+        "plot_bgcolor":  PANEL_BG,
+    }
+}
 
 def serve_layout():
     _cache_valid = figure_cache.is_valid()
@@ -35,7 +42,7 @@ def serve_layout():
                     "overflow-y": "visible",
                 },
                 children=[
-                    dcc.Store(id="charts-ready-trigger", data=None),
+                    dcc.Store(id="charts-ready-trigger", data=True if _cache_valid else None),
                     dcc.Store(id="selected-prefecture", data=None),
                     dcc.Store(id="resume-year", data=None),
                     dcc.Store(id="map-init-zoom", data=None),
@@ -218,7 +225,7 @@ def serve_layout():
                                                                 id="pyramid-chart",
                                                                 className="pyramid-graph",
                                                                 clear_on_unhover=True,
-                                                                figure={},
+                                                                figure=_DARK_PLACEHOLDER,
                                                                 config={"displayModeBar": False, "responsive": True},
                                                                 style={"height": "100%"},
                                                             ),
@@ -267,7 +274,7 @@ def serve_layout():
                                     dcc.Graph(
                                         id="timeseries-chart",
                                         clear_on_unhover=True,
-                                        figure={},
+                                        figure=_DARK_PLACEHOLDER,
                                         config={"displayModeBar": False, "responsive": True},
                                         style={"height": "100%"},
                                     ),
