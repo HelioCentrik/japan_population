@@ -47,7 +47,10 @@
         plotDiv.on('plotly_afterplot', function () {
             clearTimeout(_catchUpTimer);
             const hasData = plotDiv.data && plotDiv.data.length > 0;
-            if (revealed) return;
+            if (revealed) {
+                applyResizeZoom(plotDiv, panel.getBoundingClientRect().height);
+                return;
+            }
             if (!plotDiv._fullLayout?.map) return;
             if (!hasData) return;
             if (!zoomApplied) {
