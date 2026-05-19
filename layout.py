@@ -1,4 +1,6 @@
 # layout.py
+from pathlib import Path
+
 from dash import html, dcc
 
 from dash_app import app
@@ -17,6 +19,8 @@ from app.aesthetics.config import (
 from app.data import figure_cache
 
 
+
+_PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")
 
 _DARK_PLACEHOLDER = {
     "layout": {
@@ -326,7 +330,7 @@ def serve_layout():
             html.Div(
                 className="side-panel-controls",
                 children=[
-                    html.Button("‹", id="side-panel-toggle-btn", className="side-panel-btn",
+                    html.Button("›", id="side-panel-toggle-btn", className="side-panel-btn active",
                                 n_clicks=0, title="Project info"),
                     html.Button(
                         html.Img(src="/assets/gemini-color.png", style={"width": "28px", "height": "28px"}),
@@ -339,13 +343,16 @@ def serve_layout():
             # ── Side panel ──────────────────────────────────────────
             html.Div(
                 id="side-panel",
-                className="side-panel",
+                className="side-panel open",
                 children=[
                     html.Div(
                         id="side-panel-inner",
                         className="side-panel-inner",
                         children=[
-                            html.Div(id="side-panel-content"),
+                            html.Div(
+                                id="side-panel-content",
+                                children=dcc.Markdown(_PROJECT_MD, link_target="_blank"),
+                            ),
                             html.Div(
                                 id="ai-panel",
                                 className="ai-panel",
