@@ -5,7 +5,6 @@ from app.viz.pyramid import build_pyramid_fig, get_pyramid_axis_max
 from app.viz.timeseries import build_ts_pop_share_fig, build_ts_population_fig, build_ts_tfr_fig
 from app.viz.kpi import build_kpi_data
 from app.aesthetics.config import MAP_METRICS, MAP_METRIC_DEFAULT
-from app.state import mark_ready
 from startup import CENSUS_YEARS
 
 
@@ -65,6 +64,3 @@ def run() -> None:
         figure_cache.write_fingerprint()
         n_extra = sum(len(_valid_years(m)) for m in _extra_metrics)
         print(f"  Cache built — {len(CENSUS_YEARS)} years × primary + {n_extra} extra metric figures.")
-
-    mark_ready()
-    print("  App ready.")
