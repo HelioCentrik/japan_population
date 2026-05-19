@@ -27,6 +27,7 @@ app.clientside_callback(
     prevent_initial_call=True,
 )
 
+
 app.clientside_callback(
     """
     function(n_clicks) {
@@ -39,20 +40,6 @@ app.clientside_callback(
     Input("map-resize-btn", "n_clicks"),
     prevent_initial_call=True,
 )
-
-
-@app.callback(
-    Output("map-graph", "figure", allow_duplicate=True),
-    Input("map-init-zoom", "data"),
-    Input("charts-ready-trigger", "data"),
-    prevent_initial_call=True,
-)
-def apply_initial_map_zoom(zoom, charts_ready):
-    if zoom is None or not charts_ready:
-        return no_update
-    patched = Patch()
-    patched["layout"]["map"]["zoom"] = zoom
-    return patched
 
 
 @app.callback(

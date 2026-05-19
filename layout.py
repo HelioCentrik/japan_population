@@ -42,7 +42,7 @@ def serve_layout():
                     "overflow-y": "visible",
                 },
                 children=[
-                    dcc.Store(id="charts-ready-trigger", data=True if _cache_valid else None),
+                    dcc.Store(id="charts-ready-trigger", data=None),
                     dcc.Store(id="selected-prefecture", data=None),
                     dcc.Store(id="resume-year", data=None),
                     dcc.Store(id="map-init-zoom", data=None),
@@ -58,8 +58,8 @@ def serve_layout():
                     ),
                     dcc.Interval(
                         id="ready-poll",
-                        interval=1000,        # check every 1s
-                        max_intervals=120,    # run for 2 mins (should take less than 30 sec)
+                        interval=150,         # fast enough to feel instant after Plotly init
+                        max_intervals=800,    # 150ms × 800 = 120s cold-cache coverage
                         n_intervals=0,
                     ),
 

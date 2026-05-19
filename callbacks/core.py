@@ -47,9 +47,9 @@ def update_charts(year, area_estat, metric, ts_view, charts_ready, show_projecti
         patched["data"][2]["locations"] = [area_estat] if area_estat else []
         patched["data"][2]["z"] = [1] if area_estat else []
         map_fig = patched
-    elif trigger == "charts-ready-trigger":
-        # Initial load — base figure is {}, nothing to patch into.
-        # Return full figure; zoom preservation doesn't apply yet.
+    elif trigger is None or trigger == "charts-ready-trigger":
+        # Initial render (warm cache trigger=None) or post-prewarm (cold cache).
+        # Base figure is {} — can't patch, must return full figure.
         map_fig = build_japan_map_fig(year=y, metric=metric)
     else:
         fig = build_japan_map_fig(year=y, metric=metric)

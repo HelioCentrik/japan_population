@@ -39,17 +39,20 @@
         const plotDiv = getPlotlyDiv();
         if (!panel || !plotDiv) return false;
 
-        // Reveal once the initial-zoom Patch has landed (layout zoom rises above the
-        // figure default). Does not attempt its own correction before that point.
+        // Don't attach until a real map figure has rendered. An empty figure {}
+        // creates the Plotly div but has no _fullLayout.map — retry until the
+        // full choropleth is set by update_charts.
+        if (!plotDiv._fullLayout?.map) return false;
+
+        // Reveal on the first plotly_afterplot that fires after attach().
+        // By this point refitMap() has fired Plotly.relayout which triggers this
+        // event — no zoom threshold needed, the map is at the correct zoom.
         plotDiv.on('plotly_afterplot', function () {
             if (revealed) return;
-            const layoutZoom = plotDiv._fullLayout?.map?.zoom ?? DEFAULT_ZOOM;
-            if (layoutZoom > DEFAULT_ZOOM + 0.1) {
-                reveal();
-            }
+            reveal();
         });
 
-        // Fallback: reveal anyway if the Patch never lands.
+        // Fallback: reveal anyway if plotly_afterplot never fires for some reason.
         setTimeout(reveal, 3000);
 
         // On window resize: first tell Plotly about the new container size, then
@@ -66,6 +69,11 @@
                 });
             }, 150);
         });
+
+        // Use refitMap() rather than applyResizeZoom() here — refitMap always fires
+        // Plotly.relayout (no skip guard), guaranteeing plotly_afterplot fires and
+        // triggering reveal(). Also sets center, not just zoom.
+        window.refitMap();
 
         return true;
     }

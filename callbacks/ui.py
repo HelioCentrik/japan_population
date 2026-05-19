@@ -30,8 +30,9 @@ PROJECT_MD = Path("PROJECT.md").read_text(encoding="utf-8")
 @app.callback(
     Output("loading-overlay", "className"),
     Output("ready-poll", "disabled"),
-    Output("charts-ready-trigger", "data"),   # ← new
+    Output("charts-ready-trigger", "data"),
     Input("ready-poll", "n_intervals"),
+    prevent_initial_call=True,
 )
 def dismiss_loading_overlay(n):
     if is_ready():
