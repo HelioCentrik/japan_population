@@ -13,7 +13,11 @@ from app.aesthetics.config import (
     HEADER_TITLE_JA, HEADER_TITLE_EN,
     MAX_YEAR,
 )
+from app.data import figure_cache as _figure_cache
 
+
+
+_cache_valid = _figure_cache.is_valid()
 
 app.layout = html.Div(
     className="page-root",
@@ -47,8 +51,8 @@ app.layout = html.Div(
                 ),
                 dcc.Interval(
                     id="ready-poll",
-                    interval=300,        # check every 300ms
-                    max_intervals=60,    # give up after 18s (shouldn't take that long)
+                    interval=1000,        # check every 1s
+                    max_intervals=120,    # run for 2 mins (should take less than 30 sec)
                     n_intervals=0,
                 ),
 
@@ -356,7 +360,7 @@ app.layout = html.Div(
         ),
         html.Div(
             id="loading-overlay",
-            className="loading-overlay",
+            className="loading-overlay" if not _cache_valid else "loading-overlay hidden",
             children=[
                 html.Div(
                     className="loading-overlay-content",
