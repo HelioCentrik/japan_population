@@ -46,7 +46,6 @@ def dismiss_loading_overlay(n):
     Input("side-panel-ai-btn", "n_clicks"),
     State("panel-mode", "data"),
     State("last-panel-mode", "data"),
-    prevent_initial_call=True,
 )
 def update_panel_mode(toggle_clicks, ai_clicks, current_mode, last_mode):
     trigger = ctx.triggered_id

@@ -1,16 +1,15 @@
 # app/state.py
 """Shared runtime state flags for the orchestration layer."""
 
-import threading
+from app.data import figure_cache
 
-# Set by prewarm.run() when the figure cache is fully loaded.
-# Checked by the readiness callback to dismiss the loading overlay.
-_app_ready = threading.Event()
 
 
 def is_ready() -> bool:
-    return _app_ready.is_set()
+    """True when the figure cache fingerprint is valid.
 
-
-def mark_ready() -> None:
-    _app_ready.set()
+    Uses figure_cache.is_valid() rather than a threading.Event so this works
+    correctly across all Gunicorn worker processes — every worker reads the
+    same fingerprint file on disk.
+    """
+    return figure_cache.is_valid()
