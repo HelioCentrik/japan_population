@@ -65,19 +65,19 @@ def update_charts(year, area_estat, metric, ts_view, charts_ready, show_projecti
         patched["data"][1]["z"] = fd["data"][1]["z"]
         map_fig = patched
 
-    if ts_view == "pop_share":
-        ts_fig = build_ts_pop_share_fig(selected_year=y, area_estat=area_estat)
-    elif ts_view == "population":
-        ts_fig = build_ts_population_fig(selected_year=y, area_estat=area_estat)
+    # --- build figure from cache as usual ---
+    if ts_view == TS_VIEW_TFR:
+        ts_fig = build_ts_tfr_fig(y, area_estat or None)
+    elif ts_view == "pop_share":
+        ts_fig = build_ts_pop_share_fig(y, area_estat or None)
     else:
-        ts_fig = build_ts_tfr_fig(selected_year=y, area_estat=area_estat)
+        ts_fig = build_ts_population_fig(y, area_estat or None)
 
     if not show_projections and ts_view != TS_VIEW_TFR:
-        fig_dict = ts_fig.to_dict()
-        for i, trace_dict in enumerate(fig_dict["data"]):
-            if trace_dict.get("uid", "").startswith("proj_"):
-                fig_dict["data"][i]["visible"] = False
-        ts_fig = go.Figure(fig_dict)
+        ts_fig = ts_fig.to_dict()
+        for trace in ts_fig["data"]:
+            if trace.get("meta", {}).get("role") == "projection":
+                trace["visible"] = False
 
     return (
         map_fig,

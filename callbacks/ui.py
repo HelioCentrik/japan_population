@@ -125,7 +125,7 @@ def toggle_projection_traces(show, figure, ts_view):
 
     p = Patch()
     for i, trace in enumerate(figure["data"]):
-        if trace.get("uid", "").startswith("proj_"):
+        if trace.get("meta", {}).get("role") == "projection":   # <-- was uid startswith
             p["data"][i]["visible"] = show
 
     return p

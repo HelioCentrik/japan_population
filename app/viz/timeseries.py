@@ -225,6 +225,7 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
         traces.append(go.Scatter(
             x=med_p["year"], y=med_p[col],
             uid=f"proj_pop_share_med_{col}",
+            meta={"role": "projection"},
             mode="lines",
             name=label,
             line=dict(color=color, width=LINE_WIDTH_MAIN, dash="dash"),
@@ -244,12 +245,14 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
         traces.append(go.Scatter(
             x=lo_p["year"], y=lo_p[col],
             uid=f"proj_pop_share_lo_{col}",
+            meta={"role": "projection"},
             mode="lines", line=dict(width=0),
             showlegend=False, hoverinfo="skip",
         ))
         traces.append(go.Scatter(
             x=hi_p["year"], y=hi_p[col],
             uid=f"proj_pop_share_hi_{col}",
+            meta={"role": "projection"},
             mode="lines", line=dict(width=0),
             fill="tonexty", fillcolor=band_color,
             showlegend=False, hoverinfo="skip",
@@ -464,6 +467,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     traces.append(go.Scatter(
         x=lo["year"], y=lo["total_population"] / M,
         uid="proj_pop_lo",
+        meta={"role": "projection"},
         mode="lines",
         line=dict(width=0),
         showlegend=False,
@@ -473,6 +477,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     traces.append(go.Scatter(
         x=hi["year"], y=hi["total_population"] / M,
         uid="proj_pop_hi",
+        meta={"role": "projection"},
         mode="lines",
         line=dict(width=0),
         fill="tonexty",
@@ -484,6 +489,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     traces.append(go.Scatter(
         x=med["year"], y=med["total_population"] / M,
         uid="proj_pop_med",
+        meta={"role": "projection"},
         mode="lines",
         name="IPSS 中位推計 Medium",
         line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN, dash="dash"),
