@@ -99,7 +99,6 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --font-sans        : {FONT_STACK_SANS};
                 --font-serif       : {FONT_STACK_SERIF};
                 --font-mono        : {FONT_STACK_MONO};
-                --font-main        : {COLOR_TEXT_MID};   /* legacy alias for --color-text-mid */
 
                 /* Font sizes */
                 --font-size-axis-tick     : {FONT_SIZE_AXIS_TICK}px;

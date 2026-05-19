@@ -105,7 +105,7 @@ html, body {
 
 .loading-overlay-title {
     font-size: 1.1rem;
-    color: var(--font-dim);
+    color: var(--color-secondary);
     letter-spacing: 0.15em;
 }
 
@@ -114,14 +114,14 @@ html, body {
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    color: var(--font-main);
+    color: var(--color-text-mid);
     font-size: 1.4rem;
     font-weight: 500;
 }
 
 .loading-overlay-en {
     font-size: 0.85rem;
-    color: var(--font-dim);
+    color: var(--color-text-hint);
     letter-spacing: 0.05em;
 }
 
