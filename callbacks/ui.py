@@ -103,6 +103,16 @@ def toggle_projections_store(n_clicks, currently_showing):
 
 
 @app.callback(
+    Output("proj-toggle-btn", "style"),
+    Input("ts-view-selector", "value"),
+)
+def toggle_proj_btn_visibility(ts_view):
+    if ts_view == TS_VIEW_TFR:
+        return {"display": "none"}
+    return {"display": "flex"}
+
+
+@app.callback(
     Output("timeseries-chart", "figure", allow_duplicate=True),
     Input("show-projections", "data"),
     State("timeseries-chart", "figure"),
