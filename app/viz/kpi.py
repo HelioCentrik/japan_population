@@ -19,7 +19,7 @@ def build_kpi_data(year: int) -> dict:
     prev_row = con.execute(f"""
         SELECT MAX(year) FROM d_years WHERE year < {year}
     """).fetchone()
-    prev_year = int(prev_row[0]) if prev_row[0] is not None else None
+    prev_year = int(prev_row[0]) if prev_row is not None and prev_row[0] is not None else None
 
     # ── National population (Total row) ──────────────────────────────────────
     pop_row = con.execute(f"""
