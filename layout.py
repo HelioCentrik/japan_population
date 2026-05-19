@@ -7,6 +7,7 @@ from app.aesthetics.config import (
     PAGE_BG, PANEL_BG, COLOR_PRIMARY, COLOR_TEXT_MID,
     PLAY_INTERVAL_MS, LAYOUT_GAP,
     MAP_METRICS, MAP_METRIC_DEFAULT,
+    MAP_DEFAULT_ZOOM, MAP_CENTER_LAT, MAP_CENTER_LON,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
     TS_VIEWS, TS_VIEW_DEFAULT,
     FONT_SIZE_AXIS_TITLE,
@@ -21,7 +22,28 @@ _DARK_PLACEHOLDER = {
     "layout": {
         "paper_bgcolor": PANEL_BG,
         "plot_bgcolor":  PANEL_BG,
+        "xaxis": {"visible": False},
+        "yaxis": {"visible": False},
     }
+}
+
+# Initializes the MapLibre GL context during newPlot so Plotly.react
+# (called 150ms later with the real choropleth) is a data update on an
+# already-running GL instance — not a from-scratch GL init. Prevents the
+# "can't read layers" crash that happens when react tries to create GL async
+# and plotly_afterplot fires before it finishes.
+_DARK_MAP_PLACEHOLDER = {
+    "data": [],
+    "layout": {
+        "paper_bgcolor": PANEL_BG,
+        "plot_bgcolor":  PANEL_BG,
+        "map": {
+            "style":  "carto-darkmatter",
+            "zoom":   MAP_DEFAULT_ZOOM,
+            "center": {"lat": MAP_CENTER_LAT, "lon": MAP_CENTER_LON},
+        },
+        "margin": {"t": 0, "b": 0, "l": 0, "r": 0},
+    },
 }
 
 def serve_layout():
@@ -189,7 +211,7 @@ def serve_layout():
                                                     dcc.Graph(
                                                         id="map-graph",
                                                         clear_on_unhover=True,
-                                                        figure={},
+                                                        figure=_DARK_MAP_PLACEHOLDER,
                                                         config={"displayModeBar": False, "responsive": False},
                                                         style={"height": "100%"},
                                                     ),

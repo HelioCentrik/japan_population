@@ -38,25 +38,26 @@
         const panel   = document.querySelector('.map-panel');
         const plotDiv = getPlotlyDiv();
         if (!panel || !plotDiv) return false;
-
-        // Don't attach until a real map figure has rendered. An empty figure {}
-        // creates the Plotly div but has no _fullLayout.map — retry until the
-        // full choropleth is set by update_charts.
         if (!plotDiv._fullLayout?.map) return false;
 
-        // Reveal on the first plotly_afterplot that fires after attach().
-        // By this point refitMap() has fired Plotly.relayout which triggers this
-        // event — no zoom threshold needed, the map is at the correct zoom.
+        let zoomApplied = false;
+
         plotDiv.on('plotly_afterplot', function () {
+            const zoom    = plotDiv._fullLayout?.map?.zoom;
+            const hasData = plotDiv.data && plotDiv.data.length > 0;
             if (revealed) return;
-            reveal();
+            if (!plotDiv._fullLayout?.map) return;
+            if (!hasData) return;
+            if (!zoomApplied) {
+                zoomApplied = true;
+                setTimeout(function () { window.refitMap(); }, 0);
+            } else {
+                reveal();
+            }
         });
 
-        // Fallback: reveal anyway if plotly_afterplot never fires for some reason.
         setTimeout(reveal, 3000);
 
-        // On window resize: first tell Plotly about the new container size, then
-        // set the correct zoom through Plotly so _fullLayout stays authoritative.
         let _resizeTimer = null;
         window.addEventListener('resize', function () {
             if (!revealed) return;
@@ -70,13 +71,23 @@
             }, 150);
         });
 
-        // Use refitMap() rather than applyResizeZoom() here — refitMap always fires
-        // Plotly.relayout (no skip guard), guaranteeing plotly_afterplot fires and
-        // triggering reveal(). Also sets center, not just zoom.
-        window.refitMap();
-
         return true;
     }
+
+    window.refitMap = function () {
+        const panel   = document.querySelector('.map-panel');
+        const plotDiv = getPlotlyDiv();
+        if (!panel || !plotDiv) return window.dash_clientside.no_update;
+        const height = panel.getBoundingClientRect().height;
+        const zoom   = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
+            REF_ZOOM + Math.log2(height / REF_HEIGHT)));
+        Plotly.relayout(plotDiv, {
+            'map.zoom':       zoom,
+            'map.center.lat': CENTER_LAT,
+            'map.center.lon': CENTER_LON,
+        });
+        return window.dash_clientside.no_update;
+    };
 
     const interval = setInterval(() => {
         if (attach()) clearInterval(interval);
