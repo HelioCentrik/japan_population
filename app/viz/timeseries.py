@@ -455,47 +455,48 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
             ))
 
     # ── IPSS national projection bolt-on (total line only — no M/F split) ─────
-    proj = _get_national_projection_data()
-    med  = proj["medium"]
-    hi   = proj["high"]
-    lo   = proj["low"]
+    if area_estat is None:
+        proj = _get_national_projection_data()
+        med  = proj["medium"]
+        hi   = proj["high"]
+        lo   = proj["low"]
 
-    r, g, b = hex_to_rgb(COLOR_TEXT_HI)
-    band_color = f"rgba({r},{g},{b},{PROJECTION_BAND_ALPHA})"
+        r, g, b = hex_to_rgb(COLOR_TEXT_HI)
+        band_color = f"rgba({r},{g},{b},{PROJECTION_BAND_ALPHA})"
 
-    # Low bound — invisible line, anchors the fill
-    traces.append(go.Scatter(
-        x=lo["year"], y=lo["total_population"] / M,
-        uid="proj_pop_lo",
-        meta={"role": "projection"},
-        mode="lines",
-        line=dict(width=0),
-        showlegend=False,
-        hoverinfo="skip",
-    ))
-    # High bound — fills down to low
-    traces.append(go.Scatter(
-        x=hi["year"], y=hi["total_population"] / M,
-        uid="proj_pop_hi",
-        meta={"role": "projection"},
-        mode="lines",
-        line=dict(width=0),
-        fill="tonexty",
-        fillcolor=band_color,
-        showlegend=False,
-        hoverinfo="skip",
-    ))
-    # Medium — dashed continuation of total line
-    traces.append(go.Scatter(
-        x=med["year"], y=med["total_population"] / M,
-        uid="proj_pop_med",
-        meta={"role": "projection"},
-        mode="lines",
-        name="IPSS 中位推計 Medium",
-        line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN, dash="dash"),
-        showlegend=True,
-        hoverinfo="none",
-    ))
+        # Low bound — invisible line, anchors the fill
+        traces.append(go.Scatter(
+            x=lo["year"], y=lo["total_population"] / M,
+            uid="proj_pop_lo",
+            meta={"role": "projection"},
+            mode="lines",
+            line=dict(width=0),
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        # High bound — fills down to low
+        traces.append(go.Scatter(
+            x=hi["year"], y=hi["total_population"] / M,
+            uid="proj_pop_hi",
+            meta={"role": "projection"},
+            mode="lines",
+            line=dict(width=0),
+            fill="tonexty",
+            fillcolor=band_color,
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        # Medium — dashed continuation of total line
+        traces.append(go.Scatter(
+            x=med["year"], y=med["total_population"] / M,
+            uid="proj_pop_med",
+            meta={"role": "projection"},
+            mode="lines",
+            name="IPSS 中位推計 Medium",
+            line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN, dash="dash"),
+            showlegend=True,
+            hoverinfo="none",
+        ))
 
     # ── Prefecture projection overlay ─────────────────────────────────────────
     if area_estat is not None:
@@ -504,9 +505,10 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
             traces.append(go.Scatter(
                 x=pref_proj["year"], y=pref_proj["total"] / M,
                 uid="proj_pop_pref",
+                meta={"role": "projection"},
                 mode="lines",
                 name=f"{pref_label} 推計",
-                line=dict(color=ACCENT_DANKAI_JR, width=LINE_WIDTH_PREF, dash="dash"),
+                line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_PREF, dash="dash"),
                 showlegend=True,
                 hoverinfo="none",
             ))
@@ -522,8 +524,15 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
         opacity=OPACITY_YEAR_VLINE,
     )
 
-    all_totals = list(national_df["total"] / M) + list(proj["medium"]["total_population"] / M)
-    all_mins = list(national_df["male"] / M) + list(national_df["female"] / M)
+    if area_estat is not None and pref_df is not None and not pref_df.empty:
+        proj_totals = list(pref_proj["total"] / M) if not pref_proj.empty else []
+        all_totals = list(pref_df["total"] / M) + proj_totals
+        all_mins = list(pref_df["male"] / M) + list(pref_df["female"] / M)
+    else:
+        proj = _get_national_projection_data()
+        all_totals = list(national_df["total"] / M) + list(proj["medium"]["total_population"] / M)
+        all_mins = list(national_df["male"] / M) + list(national_df["female"] / M)
+
     y_min = floor(min(all_mins) * 10) / 10 / 1.4
     y_max = round(max(all_totals) * 1.2, 1)
 
@@ -777,6 +786,7 @@ def _get_ipss_prefecture_data(area_estat: str) -> "pd.DataFrame":
         SELECT projection_year AS year, SUM(population) AS total
         FROM f_projections
         WHERE area_estat = '{area_estat}'
+          AND sex_id = 0
           AND projection_year >= {IPSS_HANDOFF_YEAR}
         GROUP BY projection_year
         ORDER BY projection_year
