@@ -9,7 +9,7 @@ from app.aesthetics.config import (
     PAGE_BG, PANEL_BG, COLOR_PRIMARY, COLOR_TEXT_MID,
     PLAY_INTERVAL_MS, LAYOUT_GAP,
     MAP_METRICS, MAP_METRIC_DEFAULT,
-    MAP_DEFAULT_ZOOM, MAP_CENTER_LAT, MAP_CENTER_LON,
+    MAP_REF_ZOOM, MAP_CENTER_LAT, MAP_CENTER_LON,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
     TS_VIEWS, TS_VIEW_DEFAULT,
     FONT_SIZE_AXIS_TITLE,
@@ -43,7 +43,7 @@ _DARK_MAP_PLACEHOLDER = {
         "plot_bgcolor":  PANEL_BG,
         "map": {
             "style":  "carto-darkmatter",
-            "zoom":   MAP_DEFAULT_ZOOM,
+            "zoom":   MAP_REF_ZOOM,
             "center": {"lat": MAP_CENTER_LAT, "lon": MAP_CENTER_LON},
         },
         "margin": {"t": 0, "b": 0, "l": 0, "r": 0},

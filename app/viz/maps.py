@@ -11,7 +11,7 @@ from app.utils import ceil_half_magnitude
 from app.aesthetics.config import (
     COLOR_TEXT_HI, COLOR_TEXT_MID, MAP_GEO,
     MAP_MARGINS, MAP_TILE_STYLE,
-    MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_BORDER_WIDTH,
+    MAP_CENTER_LAT, MAP_CENTER_LON, MAP_DEFAULT_ZOOM, MAP_REF_ZOOM, MAP_BORDER_WIDTH,
     MAP_HIGHLIGHT_LINE_COLOR, MAP_HIGHLIGHT_LINE_WIDTH, MAP_HIGHLIGHT_FILL,
     FONT_SIZE_COLORBAR, FONT_SIZE_COLORBAR_TICK,
     MAP_METRICS, MAP_METRIC_DEFAULT, OKINAWA_AREA_ESTAT,
@@ -251,6 +251,7 @@ def build_japan_map_fig(year: int, metric: str = MAP_METRIC_DEFAULT) -> go.Figur
         map=dict(
             style=MAP_TILE_STYLE,
             center=dict(lat=MAP_CENTER_LAT, lon=MAP_CENTER_LON),
+            zoom=MAP_REF_ZOOM,
         ),
         margin=dict(l=MAP_MARGINS, r=MAP_MARGINS, t=MAP_MARGINS, b=MAP_MARGINS),
         autosize=True,
