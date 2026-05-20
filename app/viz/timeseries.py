@@ -211,52 +211,53 @@ def build_ts_pop_share_fig(selected_year: int, area_estat: str | None = None) ->
             ))
 
     # ── IPSS national projection bolt-on ──────────────────────────────────────
-    proj    = _get_national_projection_data()
-    med_p   = proj["medium"]
-    hi_p    = proj["high"]
-    lo_p    = proj["low"]
+    if area_estat is None:
+        proj    = _get_national_projection_data()
+        med_p   = proj["medium"]
+        hi_p    = proj["high"]
+        lo_p    = proj["low"]
 
-    # Medium dashed continuations of all three share lines
-    for col, label, color in [
-        ("youth_share",   "年少 Youth 推計",   PYRAMID_FEMALE_COLOR),
-        ("working_share", "生産 Working 推計", COLOR_TEXT_HI),
-        ("old_share",     "老年 Old 推計",     PYRAMID_MALE_COLOR),
-    ]:
-        traces.append(go.Scatter(
-            x=med_p["year"], y=med_p[col],
-            uid=f"proj_pop_share_med_{col}",
-            meta={"role": "projection"},
-            mode="lines",
-            name=label,
-            line=dict(color=color, width=LINE_WIDTH_MAIN, dash="dash"),
-            showlegend=False,   # don't clutter legend — lines are visually continuous
-            hoverinfo="none",
-        ))
+        # Medium dashed continuations of all three share lines
+        for col, label, color in [
+            ("youth_share",   "年少 Youth 推計",   PYRAMID_FEMALE_COLOR),
+            ("working_share", "生産 Working 推計", COLOR_TEXT_HI),
+            ("old_share",     "老年 Old 推計",     PYRAMID_MALE_COLOR),
+        ]:
+            traces.append(go.Scatter(
+                x=med_p["year"], y=med_p[col],
+                uid=f"proj_pop_share_med_{col}",
+                meta={"role": "projection"},
+                mode="lines",
+                name=label,
+                line=dict(color=color, width=LINE_WIDTH_MAIN, dash="dash"),
+                showlegend=False,   # don't clutter legend — lines are visually continuous
+                hoverinfo="none",
+            ))
 
-    # Old-share high/low band — the headline story
-    for col, color in [
-        ("youth_share",   PYRAMID_FEMALE_COLOR),
-        ("working_share", COLOR_TEXT_HI),
-        ("old_share",     PYRAMID_MALE_COLOR),
-    ]:
-        r, g, b = hex_to_rgb(color)
-        band_color = f"rgba({r},{g},{b},{PROJECTION_BAND_ALPHA})"
+        # Old-share high/low band — the headline story
+        for col, color in [
+            ("youth_share",   PYRAMID_FEMALE_COLOR),
+            ("working_share", COLOR_TEXT_HI),
+            ("old_share",     PYRAMID_MALE_COLOR),
+        ]:
+            r, g, b = hex_to_rgb(color)
+            band_color = f"rgba({r},{g},{b},{PROJECTION_BAND_ALPHA})"
 
-        traces.append(go.Scatter(
-            x=lo_p["year"], y=lo_p[col],
-            uid=f"proj_pop_share_lo_{col}",
-            meta={"role": "projection"},
-            mode="lines", line=dict(width=0),
-            showlegend=False, hoverinfo="skip",
-        ))
-        traces.append(go.Scatter(
-            x=hi_p["year"], y=hi_p[col],
-            uid=f"proj_pop_share_hi_{col}",
-            meta={"role": "projection"},
-            mode="lines", line=dict(width=0),
-            fill="tonexty", fillcolor=band_color,
-            showlegend=False, hoverinfo="skip",
-        ))
+            traces.append(go.Scatter(
+                x=lo_p["year"], y=lo_p[col],
+                uid=f"proj_pop_share_lo_{col}",
+                meta={"role": "projection"},
+                mode="lines", line=dict(width=0),
+                showlegend=False, hoverinfo="skip",
+            ))
+            traces.append(go.Scatter(
+                x=hi_p["year"], y=hi_p[col],
+                uid=f"proj_pop_share_hi_{col}",
+                meta={"role": "projection"},
+                mode="lines", line=dict(width=0),
+                fill="tonexty", fillcolor=band_color,
+                showlegend=False, hoverinfo="skip",
+            ))
 
     fig = go.Figure(data=traces)
 
@@ -498,21 +499,6 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
             hoverinfo="none",
         ))
 
-    # ── Prefecture projection overlay ─────────────────────────────────────────
-    if area_estat is not None:
-        pref_proj = _get_ipss_prefecture_data(area_estat)
-        if not pref_proj.empty:
-            traces.append(go.Scatter(
-                x=pref_proj["year"], y=pref_proj["total"] / M,
-                uid="proj_pop_pref",
-                meta={"role": "projection"},
-                mode="lines",
-                name=f"{pref_label} 推計",
-                line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_PREF, dash="dash"),
-                showlegend=True,
-                hoverinfo="none",
-            ))
-
     fig = go.Figure(data=traces)
 
     # ── Selected year indicator ───────────────────────────────────────────────
@@ -525,8 +511,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     )
 
     if area_estat is not None and pref_df is not None and not pref_df.empty:
-        proj_totals = list(pref_proj["total"] / M) if not pref_proj.empty else []
-        all_totals = list(pref_df["total"] / M) + proj_totals
+        all_totals = list(pref_df["total"] / M)
         all_mins = list(pref_df["male"] / M) + list(pref_df["female"] / M)
     else:
         proj = _get_national_projection_data()
@@ -772,22 +757,3 @@ def _get_national_projection_data() -> dict:
         """).df()
         result[variant] = df
     return result
-
-
-@lru_cache(maxsize=8)
-def _get_ipss_prefecture_data(area_estat: str) -> "pd.DataFrame":
-    """
-    Sums f_projections across all age groups and sexes for a single prefecture.
-    Returns df with columns: year, total.
-    Covers projection_year >= IPSS_HANDOFF_YEAR.
-    """
-    con = get_con()
-    return con.execute(f"""
-        SELECT projection_year AS year, SUM(population) AS total
-        FROM f_projections
-        WHERE area_estat = '{area_estat}'
-          AND sex_id = 0
-          AND projection_year >= {IPSS_HANDOFF_YEAR}
-        GROUP BY projection_year
-        ORDER BY projection_year
-    """).df()
