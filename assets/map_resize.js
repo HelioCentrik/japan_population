@@ -13,7 +13,7 @@
     }
 
     let revealed        = false;
-    let lastPanelHeight = 0;    // ← track height so afterplot only fires on real resize
+    let lastPanelHeight = 0;
 
     function reveal() {
         if (revealed) return;
@@ -29,7 +29,10 @@
     // Plotly internals to detect GL readiness.
     function safeRelayout(plotDiv, update, attempt) {
         attempt = attempt || 0;
-        if (attempt > 4) return;
+        if (attempt > 4) {
+            console.warn('[map_resize] safeRelayout gave up after 5 attempts');
+            return;
+        }
         try {
             Plotly.relayout(plotDiv, update);
         } catch (e) {
@@ -39,7 +42,7 @@
     }
 
     function applyResizeZoom(plotDiv, height) {
-        const target = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
+        const target  = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
             REF_ZOOM + Math.log2(height / REF_HEIGHT)));
         const current = plotDiv._fullLayout?.map?.zoom ?? DEFAULT_ZOOM;
         if (Math.abs(current - target) >= 0.05) {
@@ -53,19 +56,17 @@
         if (!panel || !plotDiv) return false;
         if (!plotDiv._fullLayout?.map) return false;
 
-        let zoomApplied = false;
+        let zoomApplied   = false;
         let _catchUpTimer = null;
 
-        // Capture baseline height at attach time so afterplot comparisons are valid.
         lastPanelHeight = panel.getBoundingClientRect().height;
 
         plotDiv.on('plotly_afterplot', function () {
             clearTimeout(_catchUpTimer);
             const hasData = plotDiv.data && plotDiv.data.length > 0;
             if (revealed) {
-                // Only re-zoom if the panel actually changed size.
-                // afterplot fires on every data update (year change, metric switch,
-                // prefecture click) — without this guard we'd reset zoom on each one.
+                // Only re-zoom on genuine panel resize — afterplot fires on every
+                // data update (year change, metric switch, prefecture click).
                 const h = panel.getBoundingClientRect().height;
                 if (Math.abs(h - lastPanelHeight) > 2) {
                     lastPanelHeight = h;
@@ -80,6 +81,11 @@
                 setTimeout(function () { window.refitMap(); }, 0);
             } else {
                 reveal();
+                // Belt-and-suspenders: Plotly can fire an internal re-render after
+                // our relayout that resets the viewport. Re-apply zoom 250ms post-reveal
+                // to correct it. applyResizeZoom's tolerance guard makes this a no-op
+                // if zoom is already correct, so no visible flash.
+                setTimeout(window.refitMap, 250);
             }
         });
 
@@ -92,7 +98,14 @@
             }, 300);
         }
 
-        setTimeout(reveal, 3000);
+        // Fallback reveal in case the second afterplot never fires.
+        // Also calls refitMap so the viewport is correct even via this path.
+        setTimeout(function () {
+            if (!revealed) {
+                reveal();
+                window.refitMap();
+            }
+        }, 3000);
 
         let _resizeTimer = null;
         window.addEventListener('resize', function () {
@@ -103,7 +116,7 @@
                 if (!pDiv || !panel) return;
                 Plotly.Plots.resize(pDiv).then(function () {
                     const h = panel.getBoundingClientRect().height;
-                    lastPanelHeight = h;    // ← keep in sync after window resize too
+                    lastPanelHeight = h;
                     applyResizeZoom(pDiv, h);
                 });
             }, 150);
@@ -124,7 +137,7 @@
         const h    = panel.getBoundingClientRect().height;
         const zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
             REF_ZOOM + Math.log2(h / REF_HEIGHT)));
-        lastPanelHeight = h;    // ← keep in sync when button forces a refit
+        lastPanelHeight = h;
         safeRelayout(plotDiv, {
             'map.zoom':       zoom,
             'map.center.lat': CENTER_LAT,
