@@ -46,6 +46,7 @@ def restore_chat_on_load(history):
     Output("ai-pending-question", "data"),
     Output("ai-input", "value"),
     Output("ai-chat-output", "children", allow_duplicate=True),
+    Output("ai-input-icon", "className", allow_duplicate=True),   # ← replaces thinking indicator
     Input("ai-submit-btn", "n_clicks"),
     State("ai-input", "value"),
     State("ai-chat-history", "data"),
@@ -53,30 +54,30 @@ def restore_chat_on_load(history):
 )
 def submit_question(n_clicks, question, history):
     if not question or not question.strip():
-        return no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update
     q = question.strip()
     preview = history + [{"role": "user", "parts": [q]}]
-    return q, "", _render_conversation(preview)
+    return q, "", _render_conversation(preview), "ai-input-icon thinking"
 
 
 @app.callback(
     Output("ai-chat-output", "children"),
     Output("ai-chat-history", "data"),
     Output("ai-thinking-indicator", "children"),
+    Output("ai-input-icon", "className"),    # ← add
     Input("ai-pending-question", "data"),
     State("ai-chat-history", "data"),
     prevent_initial_call=True,
 )
 def fetch_ai_response(question, history):
     if not question:
-        return no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update   # ← add no_update
 
     response = ask_gemini(question, history)
-
     new_history = history + [
         {"role": "user",  "parts": [question]},
         {"role": "model", "parts": [response]},
     ]
     new_history = new_history[-AI_HISTORY_LIMIT:]
 
-    return _render_conversation(new_history), new_history, None
+    return _render_conversation(new_history), new_history, None, "ai-input-icon"  # ← add reset

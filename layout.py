@@ -363,12 +363,7 @@ def serve_layout():
                                         children=[
                                             html.Div(id="ai-chat-output", className="ai-chat-output"),
                                             html.Div(
-                                                dcc.Loading(
-                                                    id="ai-loading",
-                                                    type="circle",
-                                                    color=COLOR_PRIMARY,
-                                                    children=html.Div(id="ai-thinking-indicator"),
-                                                ),
+                                                html.Div(id="ai-thinking-indicator"),
                                                 className="ai-thinking-wrapper",
                                             ),
                                         ]
@@ -381,6 +376,7 @@ def serve_layout():
                                                 children=[
                                                     html.Img(
                                                         src="/assets/gemini-color.png",
+                                                        id="ai-input-icon",
                                                         className="ai-input-icon",
                                                     ),
                                                     dcc.Textarea(

@@ -580,12 +580,34 @@ body.slider-thinner
     flex           : 0 0 auto;
 }
 
-#ai-loading {
-    flex           : 0 0 auto;
-}
-
 #ai-thinking-indicator {
     min-height     : 0;
+}
+
+/* AI thinking — animates the input icon while waiting for response */
+
+.ai-input-icon.thinking {
+    animation        : gemini-thinking 5s ease-in-out infinite;
+    transform-origin : center center;
+    opacity          : 1;              /* override the idle 0.6 */
+}
+
+@keyframes gemini-thinking {
+    /* Pulse phase */
+    0%   { opacity: 0.6; transform: translateY(-50%) scale(1)    rotate(0deg);  }
+    8%   { opacity: 1;   transform: translateY(-50%) scale(1.18) rotate(0deg);  }
+    18%  { opacity: 0.6; transform: translateY(-50%) scale(1)    rotate(0deg);  }
+    28%  { opacity: 1;   transform: translateY(-50%) scale(1.18) rotate(0deg);  }
+    38%  { opacity: 0.6; transform: translateY(-50%) scale(1)    rotate(0deg);  }
+    /* Rotation burst */
+    46%  { opacity: 0.8; transform: translateY(-50%) scale(1.05) rotate(0deg);  }
+    52%  { opacity: 1;   transform: translateY(-50%) scale(1.12) rotate(90deg); }
+    60%  { opacity: 0.6; transform: translateY(-50%) scale(1)    rotate(0deg);  }
+    /* Pulse phase two */
+    70%  { opacity: 1;   transform: translateY(-50%) scale(1.18) rotate(0deg);  }
+    82%  { opacity: 0.6; transform: translateY(-50%) scale(1)    rotate(0deg);  }
+    92%  { opacity: 1;   transform: translateY(-50%) scale(1.18) rotate(0deg);  }
+    100% { opacity: 0.6; transform: translateY(-50%) scale(1)    rotate(0deg);  }
 }
 
 /* Chat output area */
