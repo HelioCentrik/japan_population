@@ -672,7 +672,7 @@ body.slider-thinner
     display        : flex;
     flex-shrink    : 0;
     gap            : 0.5rem;
-    padding-bottom : 0.5rem;
+    padding-bottom : 1rem;
     align-items    : flex-center;
 }
 
