@@ -49,7 +49,7 @@ are the relevant diagnostic signals for extinction risk at the prefecture level.
 ### Prefectures That Consistently Appear at High Risk
 
 Akita, Shimane, Kochi, Iwate. These prefectures show the highest aging index, lowest
-working-age share, and highest projected elderly share in `f_projections` across
+working-age share, and highest projected elderly share in historical census data across
 multiple census years. Their appearance on the Masuda high-risk list is directly
 reflected in what the dashboard's map displays.
 

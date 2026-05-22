@@ -251,14 +251,12 @@ p code, li code, td code {
     <a href="#v-map-metrics" class="nav-link">v_map_metrics<span class="nav-sub">choropleth — pre-aggregated</span></a>
     <a href="#v-tfr" class="nav-link">v_tfr</a>
     <a href="#v-migration" class="nav-link">v_migration</a>
-    <a href="#v-projections" class="nav-link">v_projections</a>
   </div>
   <div class="nav-group">
     <span class="nav-group-label">Fact Tables</span>
     <a href="#f-census" class="nav-link">f_census<span class="nav-sub">core population fact</span></a>
     <a href="#f-tfr" class="nav-link">f_tfr</a>
     <a href="#f-migration" class="nav-link">f_migration</a>
-    <a href="#f-projections" class="nav-link">f_projections</a>
     <a href="#f-national" class="nav-link">f_national_projections</a>
   </div>
   <div class="nav-group">
@@ -287,8 +285,9 @@ p code, li code, td code {
     <p class="section-lead">
       All tables, views, and fields in <code>japan_population.duckdb</code>. The database is a star
       schema centered on <code>f_census</code> — one row per prefecture × year × age group × sex combination.
-      Four dimension tables normalize the key attributes. Three additional fact tables (TFR, migration,
-      IPSS projections) share the same dimensional spine. All app queries run through pre-joined views.
+      Four dimension tables normalize the key attributes. Two additional fact tables (TFR, migration) share
+      the same dimensional spine. A standalone national projections table (<code>f_national_projections</code>)
+      sits outside the star. All app queries run through pre-joined views.
     </p>
 
     <!-- ERD -->
@@ -305,14 +304,14 @@ p code, li code, td code {
 
 <!-- ════════════════════════ ERD SVG ════════════════════════
      Layout (top-left of each box):
-     LEFT  (x=20,  w=188): f_tfr, f_migration, f_projections, f_national_projections
+     LEFT  (x=20,  w=188): f_tfr, f_migration, f_national_projections
      CENTER(x=315, w=200): f_census  ← star center
      RIGHT (x=588, w=238): d_years, d_prefectures, d_age_groups, d_sex
 
      Dim alignment mirrors f_census FK field positions so
      connections are nearly horizontal.
 ══════════════════════════════════════════════════════════ -->
-<svg viewBox="0 0 840 645" xmlns="http://www.w3.org/2000/svg"
+<svg viewBox="0 0 840 610" xmlns="http://www.w3.org/2000/svg"
      style="width:100%;height:auto;display:block;overflow:visible;"
      font-family="'JetBrains Mono', monospace">
 <defs>
@@ -371,21 +370,6 @@ p code, li code, td code {
       fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
       marker-end="url(#arr)"/>
 
-<!-- f_projections → d_prefectures (area_estat, y=341) to d_prefectures (y=196) -->
-<path d="M 208 341 C 398 341 398 196 588 196"
-      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
-      marker-end="url(#arr)"/>
-
-<!-- f_projections → d_age_groups (age_group_id, y=381) to d_age_groups (y=351) -->
-<path d="M 208 381 C 398 381 398 351 588 351"
-      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
-      marker-end="url(#arr)"/>
-
-<!-- f_projections → d_sex    (sex_id, y=401) to d_sex (y=511) -->
-<path d="M 208 401 C 398 401 398 511 588 511"
-      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
-      marker-end="url(#arr)"/>
-
 
 <!-- ─── LEFT COLUMN: secondary fact tables ─────────────── -->
 
@@ -418,27 +402,9 @@ p code, li code, td code {
   <text x="9" y="80"  fill="#9a8f83" font-size="11">net_migration</text><text x="178" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">int</text>
 </g>
 
-<!-- f_projections (x=20, y=305, w=188, h=126) -->
+<!-- f_national_projections (x=20, y=305, w=188, standalone) -->
 <g transform="translate(20,305)">
-  <rect width="188" height="126" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
-  <rect width="188" height="26" rx="5" fill="#2e1e1b"/>
-  <rect y="21" width="188" height="5" fill="#2e1e1b"/>
-  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">f_projections</text>
-  <text x="179" y="17" fill="#c0483a" font-size="9" text-anchor="end">FACT</text>
-  <line x1="0" y1="46"  x2="188" y2="46"  stroke="#2c2520" stroke-width="1"/>
-  <text x="9" y="40"  fill="#c0483a" font-size="11">area_estat</text><text x="178" y="40"  fill="#6a5f58" font-size="9" text-anchor="end">str FK</text>
-  <line x1="0" y1="66"  x2="188" y2="66"  stroke="#2c2520" stroke-width="1"/>
-  <text x="9" y="60"  fill="#9a8f83" font-size="11">projection_year</text><text x="178" y="60"  fill="#6a5f58" font-size="9" text-anchor="end">int</text>
-  <line x1="0" y1="86"  x2="188" y2="86"  stroke="#2c2520" stroke-width="1"/>
-  <text x="9" y="80"  fill="#c0483a" font-size="11">age_group_id</text><text x="178" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
-  <line x1="0" y1="106" x2="188" y2="106" stroke="#2c2520" stroke-width="1"/>
-  <text x="9" y="100" fill="#c0483a" font-size="11">sex_id</text><text x="178" y="100" fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
-  <text x="9" y="120" fill="#9a8f83" font-size="11">population</text><text x="178" y="120" fill="#6a5f58" font-size="9" text-anchor="end">int</text>
-</g>
-
-<!-- f_national_projections (x=20, y=488, w=188, standalone) -->
-<g transform="translate(20,488)">
-  <rect width="188" height="126" rx="5" fill="#1e1b17" stroke="#4d4039" stroke-width="1" stroke-dasharray="5 3"/>
+  <rect width="188" height="166" rx="5" fill="#1e1b17" stroke="#4d4039" stroke-width="1" stroke-dasharray="5 3"/>
   <rect width="188" height="26" rx="5" fill="#252118"/>
   <rect y="21" width="188" height="5" fill="#252118"/>
   <text x="9" y="13" fill="#e0d7ca" font-size="10.5" font-weight="bold">f_national_projections</text>
@@ -451,7 +417,11 @@ p code, li code, td code {
   <text x="9" y="80"  fill="#9a8f83" font-size="11">total_population</text><text x="178" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">bigint</text>
   <line x1="0" y1="106" x2="188" y2="106" stroke="#2c2520" stroke-width="1"/>
   <text x="9" y="100" fill="#9a8f83" font-size="11">pop_0_14</text><text x="178" y="100" fill="#6a5f58" font-size="9" text-anchor="end">bigint</text>
+  <line x1="0" y1="126" x2="188" y2="126" stroke="#2c2520" stroke-width="1"/>
   <text x="9" y="120" fill="#9a8f83" font-size="10.5">pop_15_64 · pop_65_plus</text>
+  <line x1="0" y1="146" x2="188" y2="146" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="140" fill="#9a8f83" font-size="10.5">male_population</text><text x="178" y="140" fill="#6a5f58" font-size="9" text-anchor="end">bigint</text>
+  <text x="9" y="160" fill="#9a8f83" font-size="10.5">female_population</text>
 </g>
 
 
@@ -753,33 +723,6 @@ p code, li code, td code {
         </tbody>
       </table>
     </div>
-
-    <!-- v_projections -->
-    <div class="table-card" id="v-projections">
-      <div class="table-card-head">
-        <div>
-          <div class="table-name">v_projections</div>
-          <div class="table-grain">Grain: one row per area_estat × projection_year × age_group_id × sex_id. 17,766 rows total.</div>
-        </div>
-        <div class="table-badges"><span class="tbadge view">VIEW</span></div>
-      </div>
-      <div class="callout info" style="margin:12px 16px 0;">
-        <strong>Mirrors <code>v_census</code> structure</strong> for projection years (2015–2045). Use for
-        prefecture-level projection overlays. 2015 baseline figures are IPSS-adjusted — ~1–2% above the raw
-        <code>f_census</code> 2015 figure due to IPSS undercounting adjustment. This is expected.
-      </div>
-      <table class="fields-table" style="margin-top:1px;">
-        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="fn pk">area_estat <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat code.</td></tr>
-          <tr><td class="fn regular">prefecture_name · prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">English and Japanese names.</td></tr>
-          <tr><td class="fn pk">projection_year <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">2015–2045 in 5-year steps. Not a FK to <code>d_years</code> — future years only.</td></tr>
-          <tr><td class="fn regular">age_group · age_group_id · age_start · age_end · is_open_ended</td><td class="ftype">—</td><td class="fdesc">Same structure as <code>v_census</code>. scheme_a only.</td></tr>
-          <tr><td class="fn regular">sex · sex_ja · sex_id</td><td class="ftype">—</td><td class="fdesc">Same as <code>v_census</code>.</td></tr>
-          <tr><td class="fn regular">population</td><td class="ftype">int</td><td class="fdesc">Projected headcount. No NULLs.</td></tr>
-        </tbody>
-      </table>
-    </div>
   </section>
 
   <!-- ════════════════════════════════════════════════════
@@ -860,57 +803,32 @@ p code, li code, td code {
       </table>
     </div>
 
-    <!-- f_projections -->
-    <div class="table-card" id="f-projections">
-      <div class="table-card-head">
-        <div>
-          <div class="table-name">f_projections</div>
-          <div class="table-grain">Grain: area_estat × projection_year × age_group_id × sex_id. 17,766 rows.</div>
-        </div>
-        <div class="table-badges"><span class="tbadge fact">FACT</span></div>
-      </div>
-      <div class="callout note" style="margin:12px 16px 0;">
-        <strong>Source:</strong> IPSS 日本の地域別将来推計人口（平成30（2018）年推計）. Coverage: 2015–2045, 5-year intervals,
-        47 prefectures, 18 age bands (scheme_a), 3 sex values. IPSS publishes 85–89 and 90+ separately;
-        both are summed into the <code>85+</code> group to match <code>d_age_groups</code>.
-        ETL is idempotent (<code>DROP TABLE IF EXISTS</code> before write).
-      </div>
-      <table class="fields-table" style="margin-top:1px;">
-        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="fn fk">area_estat <span class="badge-fk">FK</span></td><td class="ftype">str</td><td class="fdesc">→ <code>d_prefectures</code></td></tr>
-          <tr><td class="fn regular">projection_year</td><td class="ftype">int</td><td class="fdesc">Not a FK to <code>d_years</code> — future years only. 2015, 2020, 2025 … 2045.</td></tr>
-          <tr><td class="fn fk">age_group_id <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_age_groups</code> (scheme_a only).</td></tr>
-          <tr><td class="fn fk">sex_id <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_sex</code></td></tr>
-          <tr><td class="fn regular">population</td><td class="ftype">int</td><td class="fdesc">Projected headcount. No NULLs.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
     <!-- f_national_projections -->
     <div class="table-card" id="f-national">
       <div class="table-card-head">
         <div>
           <div class="table-name">f_national_projections</div>
-          <div class="table-grain">Grain: one row per projection_year × variant. 153 rows (51 years × 3 variants). Standalone — no FK relationships.</div>
+          <div class="table-grain">Grain: one row per projection_year × variant. 150 rows (50 years × 3 variants). Standalone — no FK relationships.</div>
         </div>
         <div class="table-badges"><span class="tbadge fact">FACT</span></div>
       </div>
       <div class="callout note" style="margin:12px 16px 0;">
-        <strong>Source:</strong> IPSS 2017 national projections (平成29年推計), Tables 1-1 (medium), 1-2 (high), 1-3 (low).
-        Coverage: 2015–2065, annual. Variants differ only in fertility assumption — mortality is held at medium in all three.
+        <strong>Source:</strong> IPSS 2023 national projections (令和5年推計).
+        Coverage: 2021–2070, annual. Variants differ only in fertility assumption — mortality is held at medium in all three.
         Use <em>high</em> as upper bound and <em>low</em> as lower bound for the confidence band visualization.
-        All three variants share the same 2015 starting population (~127.1M).
+        <code>male_population</code> and <code>female_population</code> are linearly interpolated from 5-year IPSS snapshots — do not treat annual M/F figures as independently published data.
       </div>
       <table class="fields-table" style="margin-top:1px;">
         <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td class="fn regular">projection_year</td><td class="ftype">int</td><td class="fdesc">2015–2065, annual. Not a FK to <code>d_years</code>.</td></tr>
+          <tr><td class="fn regular">projection_year</td><td class="ftype">int</td><td class="fdesc">2021–2070, annual. Not a FK to <code>d_years</code>.</td></tr>
           <tr><td class="fn regular">variant</td><td class="ftype">varchar</td><td class="fdesc"><code>'medium'</code>, <code>'high'</code>, or <code>'low'</code>.</td></tr>
           <tr><td class="fn regular">total_population</td><td class="ftype">bigint</td><td class="fdesc">Projected national headcount (raw, not thousands).</td></tr>
           <tr><td class="fn regular">pop_0_14</td><td class="ftype">bigint</td><td class="fdesc">Population aged 0–14.</td></tr>
           <tr><td class="fn regular">pop_15_64</td><td class="ftype">bigint</td><td class="fdesc">Population aged 15–64.</td></tr>
           <tr><td class="fn regular">pop_65_plus</td><td class="ftype">bigint</td><td class="fdesc">Population aged 65 and over.</td></tr>
+          <tr><td class="fn regular">male_population</td><td class="ftype">bigint</td><td class="fdesc">Projected male headcount. Linearly interpolated from 5-year IPSS snapshots.</td></tr>
+          <tr><td class="fn regular">female_population</td><td class="ftype">bigint</td><td class="fdesc">Projected female headcount. Linearly interpolated from 5-year IPSS snapshots.</td></tr>
         </tbody>
       </table>
     </div>
@@ -1061,7 +979,7 @@ p code, li code, td code {
   <span>Japan Population Dashboard</span>
   <a href="https://japan-population.deanallton.com" class="footer-link" target="_blank">japan-population.deanallton.com</a>
   <a href="https://deanallton.com" class="footer-link" target="_blank">deanallton.com</a>
-  <span class="footer-right">Data: 総務省統計局 e-Stat · IPSS · 地球地図日本 · 1920–2065</span>
+  <span class="footer-right">Data: 総務省統計局 e-Stat · IPSS · 地球地図日本 · 1920–2070</span>
 </footer>
 
 <script>
@@ -1075,11 +993,9 @@ const idToHref = {
   'v-map-metrics': '#v-map-metrics',
   'v-tfr':         '#v-tfr',
   'v-migration':   '#v-migration',
-  'v-projections': '#v-projections',
   'f-census':      '#f-census',
   'f-tfr':         '#f-tfr',
   'f-migration':   '#f-migration',
-  'f-projections': '#f-projections',
   'f-national':    '#f-national',
   'd-prefectures': '#d-prefectures',
   'd-age-groups':  '#d-age-groups',

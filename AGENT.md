@@ -23,7 +23,7 @@ decennial/quinquennial census via the e-Stat government statistics API.
 - **Prefer concrete over abstract.** Name the year, the metric, the prefecture. Avoid
   vague qualifiers like "significantly" or "dramatically" unless the magnitude warrants it.
 - If a question can't be answered from census, projections, TFR, or migration data — such as 
-  economics, post-2045 forecasts, individual-level data — say so briefly and stop.
+  economics, post-2070 forecasts, individual-level data — say so briefly and stop.
 
 ---
 
@@ -134,7 +134,7 @@ automated playback.
 
 **TFR replacement rate line:** A horizontal dashed line at 2.1 marks the replacement-rate threshold — the level at which a population exactly replaces itself. Japan's national average TFR fell below 2.1 around 1974 and has not returned above it. The crossover is annotated on the chart.
 
-**IPSS projection band:** On Population and Population Share views, the IPSS medium-variant projection continues the census lines as a dashed line from 2020 onward. A shaded band between the high and low variants represents the forecast uncertainty range. Source: IPSS 2017 national projections (`f_national_projections`, coverage 2015–2065). The 2015 projection baseline diverges ~1–2% from the 2015 census observation — this is expected and is not a data error.
+**IPSS projection band:** On Population and Population Share views, the IPSS medium-variant projection continues the census lines as a dashed line from 2020 onward. A shaded band between the high and low variants represents the forecast uncertainty range. Source: IPSS 2023 national projections (`f_national_projections`, coverage 2021–2070).
 
 ---
 
@@ -207,14 +207,6 @@ data quirks.
 
 ## Supplementary Data
 
-### `f_projections` — IPSS Prefectural Projections
-Grain: `projection_year × area_estat × age_group_id × sex_id`. Join to `d_prefectures`
-on `area_estat`; join to `d_age_groups` on `age_group_id` (scheme_a, 18 bands).
-Coverage: 2015–2045, 5-year intervals, 47 prefectures. 2015 rows are projection
-baseline — not census observations. Do not extrapolate beyond 2045.
-
-See `knowledge/ipss_findings.md`.
-
 ### `f_tfr` — Prefecture-Level Total Fertility Rate
 Grain: `area_estat × year` (annual). Join to `d_prefectures` on `area_estat`.
 Coverage: 1960–2024. No data pre-1960. Filter to census years when joining to `f_census`.
@@ -255,54 +247,53 @@ See `knowledge/masuda_report.md`.
 
 ## Synonyms & Terminology
 
-| Term the user might use | Resolves to |
-|---|---|
-| Elderly population | pop_65_plus / age_start >= 65 |
-| Children / youth / young population | pop_0_14 / age_start <= 14 |
-| Working age / economically active | pop_15_64 / age_start 15–64 |
-| Aging rate / aging ratio | aging_index (高齢化指数) |
-| Dependency burden | old_age_dep or total_dep depending on context |
-| Prefecture | area_estat / prefecture_name |
-| Population change | pop_delta (in v_map_metrics) |
-| Youth share / 年少割合 | youth_share — pop_0_14 / classified pop × 100 |
-| Working-age share / 生産割合 | working_share — pop_15_64 / classified pop × 100 |
-| Elderly share / 老年割合 | old_share — pop_65_plus / classified pop × 100 |
-| Old-age dependency ratio / 老年従属比 | old_share / working_share × 100 |
-| Baby boomers / boomers | 団塊の世代 (Dankai), born 1947–1949 |
-| Orange band / outline on pyramid | 団塊の世代 (Dankai) cohort |
-| Green band / outline on pyramid | 団塊ジュニア (Dankai Junior) cohort |
-| Amber / orange diamonds on pyramid | 戦中世代 (Wartime Generation) markers |
-| Blue / sky blue diamonds on pyramid | 少子化世代 (Shoushika) markers |
-| Red dot / marker on time series | 1945 provisional data point |
-| Dashed line on TFR chart | 2.1 replacement rate reference line (TFR_REPLACEMENT_RATE) |
-| Dashed line / dotted line on time series | Prefecture overlay in all views; also the medium-variant IPSS projection continuation post-2020 |
-| Shaded band / confidence band on time series | High/low IPSS variant fill between 2020–2065 (PROJECTION_BAND_ALPHA); visible on population and pop share views |
-| Grey prefecture on map | Okinawa 1950 or 1955 (suspect data; US administration period) |
-| Projection year / forecast year | projection_year (field in f_projections / f_national_projections) |
-| TFR / fertility rate / birth rate / 合計特殊出生率 | f_tfr.tfr (prefecture-level grain); national average = AVG(tfr) across prefectures for a given year |
-| Replacement rate / replacement level / 2.1 | TFR_REPLACEMENT_RATE = 2.1; reference line on TFR timeseries view |
-| Fertility crossover / TFR crossover | ~1974; the year national average TFR fell below 2.1 — annotated on TFR chart |
+| Term the user might use | Resolves to                                                                                                                        |
+|---|------------------------------------------------------------------------------------------------------------------------------------|
+| Elderly population | pop_65_plus / age_start >= 65                                                                                                      |
+| Children / youth / young population | pop_0_14 / age_start <= 14                                                                                                         |
+| Working age / economically active | pop_15_64 / age_start 15–64                                                                                                        |
+| Aging rate / aging ratio | aging_index (高齢化指数)                                                                                                                |
+| Dependency burden | old_age_dep or total_dep depending on context                                                                                      |
+| Prefecture | area_estat / prefecture_name                                                                                                       |
+| Population change | pop_delta (in v_map_metrics)                                                                                                       |
+| Youth share / 年少割合 | youth_share — pop_0_14 / classified pop × 100                                                                                      |
+| Working-age share / 生産割合 | working_share — pop_15_64 / classified pop × 100                                                                                   |
+| Elderly share / 老年割合 | old_share — pop_65_plus / classified pop × 100                                                                                     |
+| Old-age dependency ratio / 老年従属比 | old_share / working_share × 100                                                                                                    |
+| Baby boomers / boomers | 団塊の世代 (Dankai), born 1947–1949                                                                                                     |
+| Orange band / outline on pyramid | 団塊の世代 (Dankai) cohort                                                                                                              |
+| Green band / outline on pyramid | 団塊ジュニア (Dankai Junior) cohort                                                                                                      |
+| Amber / orange diamonds on pyramid | 戦中世代 (Wartime Generation) markers                                                                                                  |
+| Blue / sky blue diamonds on pyramid | 少子化世代 (Shoushika) markers                                                                                                          |
+| Red dot / marker on time series | 1945 provisional data point                                                                                                        |
+| Dashed line on TFR chart | 2.1 replacement rate reference line (TFR_REPLACEMENT_RATE)                                                                         |
+| Dashed line / dotted line on time series | Prefecture overlay in all views; also the medium-variant IPSS projection continuation post-2020                                    |
+| Shaded band / confidence band on time series | High/low IPSS variant fill between 2020–2070 (PROJECTION_BAND_ALPHA); visible on population and pop share views                    |
+| Grey prefecture on map | Okinawa 1950 or 1955 (suspect data; US administration period)                                                                      |
+| Projection year / forecast year | projection_year (field f_national_projections)                                                                                     |
+| TFR / fertility rate / birth rate / 合計特殊出生率 | f_tfr.tfr (prefecture-level grain); national average = AVG(tfr) across prefectures for a given year                                |
+| Replacement rate / replacement level / 2.1 | TFR_REPLACEMENT_RATE = 2.1; reference line on TFR timeseries view                                                                  |
+| Fertility crossover / TFR crossover | ~1974; the year national average TFR fell below 2.1 — annotated on TFR chart                                                       |
 | Declining birthrate / 少子化 (structural) | The long-run fertility decline phenomenon; distinct from 少子化世代, which is a specific birth cohort (1986–1990) marked on the pyramid |
-| Most migrated-to / 転入超過 / net inflow prefecture | f_migration.net_migration (highest value); KPI card 6; returns "—" pre-1985 |
-| Internal migration / domestic migration / population flow | f_migration — 5-year cumulative net migration by prefecture, census_year grain |
-| Net outflow / population loss to migration | f_migration.net_migration < 0; red tones on net migration map |
-| IPSS / National Institute of Population and Social Security Research | Source of projection data; f_projections (prefectural) and f_national_projections (national) |
-| National projection / national forecast | f_national_projections — annual, 2015–2065, medium/high/low variants; built by fetch_ipss_national.py |
-| Prefectural projection / prefecture forecast | f_projections — 5-year intervals, 2015–2045, 47 prefectures |
-| Medium variant / high variant / low variant / projection scenario | variant field in f_national_projections and f_projections; medium is the primary line, high/low form the band |
-| Projection handoff / handoff year | IPSS_HANDOFF_YEAR = 2020; point where census solid lines end and projection dashed lines begin |
-| Dankai Junior / second baby boom / 団塊ジュニア | Born 1971–1974; green outlined band on the pyramid (no fill, outline only) — distinct from 団塊の世代 (orange) |
-| Population peak / peak population | ~2010 nationally; Japan's total population peaked between the 2005 and 2010 censuses |
-| Demographic dividend / dividend window | Working-age share peak ~1990–1995; total dependency ratio minimum ~43.5 in 1990 — Japan's highest-productivity window |
-| Depopulation / population decline / 過疎化 | pop_delta < 0; red tones on population change choropleth; structural feature from ~2010 onward nationally |
-| Kazoedoshi / 数え年 / traditional age counting | Age convention used in the 1945 census (scheme_b); a −1 label shift is applied to align with standard 5-year bands |
-| Wartime census / provisional census / 臨時国勢調査 | 1945 census; scheme_b age data, 0–4 band absent, excluded from automated playback; red marker on all timeseries views |
-| Era / imperial era / 元号 / gengō | era_name in d_years — Meiji, Taisho, Showa, Heisei, Reiwa; displayed as sub-label on National Population KPI card |
-| Playback / autoplay / animation | Automated year progression via dcc.Interval; 1945 excluded (PLAYBACK_YEARS) |
-| National level / national total | area_level = 1; never derive by summing area_level = 2 rows |
-| Prefecture level / prefectural data | area_level = 2; 47 prefectures, joined on area_estat |
-| Scheme A / age scheme / standardized bands | age_scheme = 'scheme_a'; 18 standard 5-year bands, used for all derived metrics across all census years |
-| Scheme B | 1945-only kazoedoshi age mapping; used internally in the v_census UNION branch; never use for derived metrics |
+| Most migrated-to / 転入超過 / net inflow prefecture | f_migration.net_migration (highest value); KPI card 6; returns "—" pre-1985                                                        |
+| Internal migration / domestic migration / population flow | f_migration — 5-year cumulative net migration by prefecture, census_year grain                                                     |
+| Net outflow / population loss to migration | f_migration.net_migration < 0; red tones on net migration map                                                                      |
+| IPSS / National Institute of Population and Social Security Research | Source of projection data; f_national_projections                                                                                  |
+| National projection / national forecast | f_national_projections — annual, 2021–2070, medium/high/low variants; built by fetch_ipss_national.py                              |
+| Medium variant / high variant / low variant / projection scenario | variant field in f_national_projections; medium is the primary line, high/low form the band                                        |
+| Projection handoff / handoff year | IPSS_HANDOFF_YEAR = 2020; point where census solid lines end and projection dashed lines begin                                     |
+| Dankai Junior / second baby boom / 団塊ジュニア | Born 1971–1974; green outlined band on the pyramid (no fill, outline only) — distinct from 団塊の世代 (orange)                          |
+| Population peak / peak population | ~2010 nationally; Japan's total population peaked between the 2005 and 2010 censuses                                               |
+| Demographic dividend / dividend window | Working-age share peak ~1990–1995; total dependency ratio minimum ~43.5 in 1990 — Japan's highest-productivity window              |
+| Depopulation / population decline / 過疎化 | pop_delta < 0; red tones on population change choropleth; structural feature from ~2010 onward nationally                          |
+| Kazoedoshi / 数え年 / traditional age counting | Age convention used in the 1945 census (scheme_b); a −1 label shift is applied to align with standard 5-year bands                 |
+| Wartime census / provisional census / 臨時国勢調査 | 1945 census; scheme_b age data, 0–4 band absent, excluded from automated playback; red marker on all timeseries views              |
+| Era / imperial era / 元号 / gengō | era_name in d_years — Meiji, Taisho, Showa, Heisei, Reiwa; displayed as sub-label on National Population KPI card                  |
+| Playback / autoplay / animation | Automated year progression via dcc.Interval; 1945 excluded (PLAYBACK_YEARS)                                                        |
+| National level / national total | area_level = 1; never derive by summing area_level = 2 rows                                                                        |
+| Prefecture level / prefectural data | area_level = 2; 47 prefectures, joined on area_estat                                                                               |
+| Scheme A / age scheme / standardized bands | age_scheme = 'scheme_a'; 18 standard 5-year bands, used for all derived metrics across all census years                            |
+| Scheme B | 1945-only kazoedoshi age mapping; used internally in the v_census UNION branch; never use for derived metrics                      |
 
 ---
 
