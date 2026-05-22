@@ -1,7 +1,9 @@
 # dash_app.py
 import os
+
 import dash
 from flask import send_from_directory
+
 from app.aesthetics.index_string import INDEX_STRING
 from app.aesthetics.plotly_template import register_plotly_template
 
