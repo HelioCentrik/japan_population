@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Dictionary — Japan Population Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:          #17130f;
+  --surface:     #201b17;
+  --surface-2:   #2a2420;
+  --surface-3:   #332d28;
+  --border:      #38302b;
+  --border-mid:  #4d4039;
+  --beni:        #c0483a;
+  --beni-dim:    rgba(192,72,58,0.12);
+  --beni-glow:   rgba(192,72,58,0.25);
+  --kincha:      #c99838;
+  --kincha-dim:  rgba(201,152,56,0.10);
+  --sage:        #6b9e82;
+  --sage-dim:    rgba(107,158,130,0.10);
+  --text:        #e0d7ca;
+  --text-muted:  #9a8f83;
+  --text-dim:    #6a5f58;
+  --code-bg:     #100d0a;
+
+  /* ERD palette — hardcoded for SVG compatibility */
+  --erd-fact-hdr: #2e1e1b;
+  --erd-dim-hdr:  #251f0e;
+  --erd-box:      #201b17;
+  --erd-alt-row:  #1c1713;
+  --erd-line:     #4d4039;
+  --erd-sep:      #2c2520;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── TOPBAR ─────────────────────────────────────────────── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 50px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; z-index: 200; gap: 0;
+}
+.topbar-project {
+  font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 500;
+  color: var(--text-muted); letter-spacing: 0.01em;
+}
+.topbar-sep { color: var(--border-mid); margin: 0 12px; font-weight: 300; }
+.topbar-doc {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--text-dim);
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.topbar-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 9px;
+  border-radius: 3px; border: 1px solid var(--border-mid); color: var(--text-dim);
+}
+.topbar-badge.accent { border-color: var(--kincha); color: var(--kincha); background: var(--kincha-dim); }
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.layout { display: grid; grid-template-columns: 244px 1fr; padding-top: 50px; min-height: 100vh; }
+
+/* ── SIDEBAR ────────────────────────────────────────────── */
+.sidebar {
+  position: sticky; top: 50px; height: calc(100vh - 50px);
+  overflow-y: auto; border-right: 1px solid var(--border);
+  background: var(--surface); padding: 28px 0 40px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.nav-group { margin-bottom: 4px; }
+.nav-group-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--text-dim); padding: 14px 18px 5px; display: block;
+}
+.nav-link {
+  display: block; padding: 5px 18px 5px 16px; font-size: 12.5px; color: var(--text-muted);
+  text-decoration: none; border-left: 2px solid transparent; transition: color 0.12s, background 0.12s, border-color 0.12s; line-height: 1.4;
+}
+.nav-link:hover { color: var(--text); background: var(--surface-2); }
+.nav-link.active { color: var(--kincha); border-left-color: var(--kincha); background: var(--kincha-dim); }
+.nav-link .nav-sub { display: block; font-size: 10.5px; color: var(--text-dim); margin-top: 1px; }
+.nav-link.active .nav-sub { color: rgba(201,152,56,0.6); }
+
+/* ── MAIN ───────────────────────────────────────────────── */
+.main { padding: 52px 60px 80px; min-width: 0; }
+
+/* ── TYPOGRAPHY ─────────────────────────────────────────── */
+.section { margin-bottom: 72px; }
+.section-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--beni); margin-bottom: 10px; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 6px; }
+.section-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0 28px; }
+.section-lead { color: var(--text-muted); font-size: 14px; max-width: 640px; line-height: 1.7; margin-bottom: 32px; }
+p code, li code, td code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.87em;
+  color: var(--kincha); background: var(--kincha-dim); padding: 1px 5px; border-radius: 3px;
+}
+
+/* ── CALLOUTS ───────────────────────────────────────────── */
+.callout { border-radius: 4px; padding: 11px 15px; font-size: 12.5px; line-height: 1.6; color: var(--text-muted); margin: 14px 0; }
+.callout.warn { background: var(--beni-dim); border: 1px solid var(--beni-glow); }
+.callout.info { background: var(--kincha-dim); border: 1px solid rgba(201,152,56,0.25); }
+.callout.note { background: var(--surface-2); border: 1px solid var(--border); }
+.callout strong { font-weight: 600; color: var(--beni); }
+.callout.info strong { color: var(--kincha); }
+.callout.note strong { color: var(--text-muted); }
+
+/* ── SOURCE TABLE ───────────────────────────────────────── */
+.source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.source-card { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 13px 15px; }
+.source-card .label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px; }
+.source-card .value { font-size: 13px; color: var(--text-muted); word-break: break-all; }
+.source-card .value code { font-size: 11.5px; }
+
+/* ── COVERAGE TABLE ─────────────────────────────────────── */
+.coverage-table { width: 100%; border-collapse: collapse; font-size: 13px; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+.coverage-table th { text-align: left; padding: 8px 14px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.coverage-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted); vertical-align: top; }
+.coverage-table tr:last-child td { border-bottom: none; }
+.coverage-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--kincha); white-space: nowrap; }
+
+/* ── ERD ────────────────────────────────────────────────── */
+.erd-wrapper {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+  overflow: hidden; margin-bottom: 16px;
+}
+.erd-bar {
+  display: flex; align-items: center; gap: 14px; padding: 9px 16px;
+  border-bottom: 1px solid var(--border); background: var(--surface);
+}
+.erd-bar-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+.erd-legend { display: flex; gap: 16px; margin-left: auto; }
+.erd-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+.erd-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+.erd-legend-dot.fact { background: #2e1e1b; border: 1px solid #c0483a; }
+.erd-legend-dot.dim  { background: #251f0e; border: 1px solid #c99838; }
+.erd-legend-dot.standalone { background: var(--surface-2); border: 1px dashed var(--border-mid); }
+.erd-svg-container { padding: 20px; overflow-x: auto; }
+
+/* ── TABLE CARDS (field reference) ─────────────────────── */
+.table-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; margin-bottom: 28px; overflow: hidden;
+}
+.table-card:hover { border-color: var(--border-mid); }
+
+.table-card-head {
+  padding: 16px 20px 12px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.table-name {
+  font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 500; color: var(--text);
+}
+.table-grain {
+  font-size: 12px; color: var(--text-dim); margin-top: 4px; line-height: 1.5;
+}
+.table-badges { margin-left: auto; display: flex; gap: 6px; align-items: flex-start; flex-wrap: wrap; justify-content: flex-end; }
+.tbadge {
+  font-family: 'JetBrains Mono', monospace; font-size: 9.5px; padding: 2px 8px;
+  border-radius: 3px; border: 1px solid; white-space: nowrap;
+}
+.tbadge.fact  { color: var(--beni);   border-color: var(--beni);   background: var(--beni-dim); }
+.tbadge.dim   { color: var(--kincha); border-color: var(--kincha); background: var(--kincha-dim); }
+.tbadge.view  { color: var(--sage);   border-color: var(--sage);   background: var(--sage-dim); }
+.tbadge.geo   { color: var(--text-muted); border-color: var(--border-mid); }
+.tbadge.star  { color: var(--beni); border-color: var(--beni); background: var(--beni-dim); }
+
+/* Field table */
+.fields-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.fields-table thead tr { background: var(--code-bg); }
+.fields-table th {
+  text-align: left; padding: 7px 14px; font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+.fields-table td { padding: 8px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+.fields-table tr:last-child td { border-bottom: none; }
+.fields-table tr:nth-child(even) td { background: rgba(0,0,0,0.12); }
+.fields-table .fn { font-family: 'JetBrains Mono', monospace; font-size: 12px; white-space: nowrap; }
+.fields-table .fn.pk { color: var(--kincha); }
+.fields-table .fn.fk { color: var(--beni); }
+.fields-table .fn.regular { color: var(--text-muted); }
+.fields-table .ftype { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+.fields-table .fdesc { color: var(--text-muted); font-size: 12.5px; }
+.fields-table .fdesc em { color: var(--text-dim); font-style: normal; }
+.badge-pk { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; background: rgba(201,152,56,0.15); color: var(--kincha); border: 1px solid rgba(201,152,56,0.4); border-radius: 2px; padding: 0 4px; margin-left: 5px; vertical-align: 1px; }
+.badge-fk { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; background: rgba(192,72,58,0.15); color: var(--beni); border: 1px solid rgba(192,72,58,0.35); border-radius: 2px; padding: 0 4px; margin-left: 5px; vertical-align: 1px; }
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+.page-footer {
+  border-top: 1px solid var(--border); padding: 32px 60px;
+  display: flex; align-items: center; gap: 32px; font-size: 12px; color: var(--text-dim);
+}
+.footer-link { color: var(--text-dim); text-decoration: none; transition: color 0.12s; }
+.footer-link:hover { color: var(--kincha); }
+.footer-right { margin-left: auto; }
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; display: flex; flex-wrap: wrap; padding: 12px; gap: 2px; border-right: none; border-bottom: 1px solid var(--border); }
+  .nav-group-label { display: none; }
+  .nav-link { padding: 4px 10px; border-left: none; border-radius: 3px; font-size: 12px; }
+  .nav-link .nav-sub { display: none; }
+  .main { padding: 32px 20px 60px; }
+  .source-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     TOPBAR
+═══════════════════════════════════════════════════════ -->
+<header class="topbar">
+  <span class="topbar-project">日本の人口ダッシュボード</span>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-doc">Data Dictionary</span>
+  <div class="topbar-right">
+    <span class="topbar-badge">DuckDB</span>
+    <span class="topbar-badge">star schema</span>
+    <span class="topbar-badge accent">japan_population.duckdb</span>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ══════════════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="nav-group">
+    <span class="nav-group-label">Overview</span>
+    <a href="#overview" class="nav-link active">Schema &amp; ERD</a>
+    <a href="#source" class="nav-link">Source &amp; Coverage</a>
+  </div>
+  <div class="nav-group">
+    <span class="nav-group-label">Views</span>
+    <a href="#v-census" class="nav-link">v_census<span class="nav-sub">primary query surface</span></a>
+    <a href="#v-map-metrics" class="nav-link">v_map_metrics<span class="nav-sub">choropleth — pre-aggregated</span></a>
+    <a href="#v-tfr" class="nav-link">v_tfr</a>
+    <a href="#v-migration" class="nav-link">v_migration</a>
+    <a href="#v-projections" class="nav-link">v_projections</a>
+  </div>
+  <div class="nav-group">
+    <span class="nav-group-label">Fact Tables</span>
+    <a href="#f-census" class="nav-link">f_census<span class="nav-sub">core population fact</span></a>
+    <a href="#f-tfr" class="nav-link">f_tfr</a>
+    <a href="#f-migration" class="nav-link">f_migration</a>
+    <a href="#f-projections" class="nav-link">f_projections</a>
+    <a href="#f-national" class="nav-link">f_national_projections</a>
+  </div>
+  <div class="nav-group">
+    <span class="nav-group-label">Dimension Tables</span>
+    <a href="#d-prefectures" class="nav-link">d_prefectures</a>
+    <a href="#d-age-groups" class="nav-link">d_age_groups<span class="nav-sub">scheme_a / scheme_b</span></a>
+    <a href="#d-sex" class="nav-link">d_sex</a>
+    <a href="#d-years" class="nav-link">d_years</a>
+  </div>
+  <div class="nav-group">
+    <span class="nav-group-label">Geometry</span>
+    <a href="#geometry" class="nav-link">Prefecture Boundaries</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── OVERVIEW ──────────────────────────────────────── -->
+  <section id="overview" class="section">
+    <div class="section-eyebrow">Reference Document</div>
+    <h1 class="section-title">Data Dictionary</h1>
+    <hr class="section-divider">
+    <p class="section-lead">
+      All tables, views, and fields in <code>japan_population.duckdb</code>. The database is a star
+      schema centered on <code>f_census</code> — one row per prefecture × year × age group × sex combination.
+      Four dimension tables normalize the key attributes. Three additional fact tables (TFR, migration,
+      IPSS projections) share the same dimensional spine. All app queries run through pre-joined views.
+    </p>
+
+    <!-- ERD -->
+    <div class="erd-wrapper">
+      <div class="erd-bar">
+        <span class="erd-bar-label">Entity-Relationship Diagram</span>
+        <div class="erd-legend">
+          <div class="erd-legend-item"><div class="erd-legend-dot fact"></div>Fact table</div>
+          <div class="erd-legend-item"><div class="erd-legend-dot dim"></div>Dimension table</div>
+          <div class="erd-legend-item"><div class="erd-legend-dot standalone"></div>Standalone (no FK)</div>
+        </div>
+      </div>
+      <div class="erd-svg-container">
+
+<!-- ════════════════════════ ERD SVG ════════════════════════
+     Layout (top-left of each box):
+     LEFT  (x=20,  w=188): f_tfr, f_migration, f_projections, f_national_projections
+     CENTER(x=315, w=200): f_census  ← star center
+     RIGHT (x=588, w=238): d_years, d_prefectures, d_age_groups, d_sex
+
+     Dim alignment mirrors f_census FK field positions so
+     connections are nearly horizontal.
+══════════════════════════════════════════════════════════ -->
+<svg viewBox="0 0 840 645" xmlns="http://www.w3.org/2000/svg"
+     style="width:100%;height:auto;display:block;overflow:visible;"
+     font-family="'JetBrains Mono', monospace">
+<defs>
+  <!-- Arrowhead pointing RIGHT (toward dim table) -->
+  <marker id="arr" markerWidth="8" markerHeight="6" refX="7.5" refY="3" orient="auto">
+    <polygon points="0 0, 8 3, 0 6" fill="#4d4039"/>
+  </marker>
+  <!-- Open circle (many / FK end) -->
+  <marker id="circ" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto">
+    <circle cx="4" cy="4" r="2.5" fill="none" stroke="#4d4039" stroke-width="1.5"/>
+  </marker>
+</defs>
+
+<!-- ─── CONNECTION LINES (drawn behind boxes) ─────────────
+     Each path: M fact_right_x fact_field_y C cx fact_field_y cx dim_field_y dim_left_x dim_field_y
+     cx = midpoint between fact right edge and dim left edge
+
+     f_census right edge: x=515    dim left edge: x=588    cx=551
+     left-facts right edge: x=208  dim left edge: x=588    cx=398
+     (lines from left facts pass behind f_census — intentional: they
+      share the same dimensional spine so the visual "pass-through" is accurate)
+──────────────────────────────────────────────────────── -->
+
+<!-- f_census → d_years      (year field, row 0, y=186) to d_years center (y=66) -->
+<path d="M 515 186 C 551 186 551 66 588 66"
+      fill="none" stroke="#4d4039" stroke-width="1.5"
+      marker-start="url(#circ)" marker-end="url(#arr)"/>
+
+<!-- f_census → d_prefectures (area_estat, row 1, y=206) to d_prefectures center (y=196) -->
+<path d="M 515 206 C 551 206 551 196 588 196"
+      fill="none" stroke="#4d4039" stroke-width="1.5"
+      marker-start="url(#circ)" marker-end="url(#arr)"/>
+
+<!-- f_census → d_age_groups  (age_group_id, row 2, y=226) to d_age_groups center (y=351) -->
+<path d="M 515 226 C 551 226 551 351 588 351"
+      fill="none" stroke="#4d4039" stroke-width="1.5"
+      marker-start="url(#circ)" marker-end="url(#arr)"/>
+
+<!-- f_census → d_sex         (sex_id, row 3, y=246) to d_sex center (y=511) -->
+<path d="M 515 246 C 551 246 551 511 588 511"
+      fill="none" stroke="#4d4039" stroke-width="1.5"
+      marker-start="url(#circ)" marker-end="url(#arr)"/>
+
+<!-- f_tfr → d_prefectures    (area_estat, y=76) to d_prefectures (y=196) -->
+<path d="M 208 76 C 398 76 398 196 588 196"
+      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
+      marker-end="url(#arr)"/>
+
+<!-- f_migration → d_prefectures (area_estat, y=211) to d_prefectures (y=196) -->
+<path d="M 208 211 C 398 211 398 196 588 196"
+      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
+      marker-end="url(#arr)"/>
+
+<!-- f_migration → d_years    (census_year, y=231) to d_years (y=66) -->
+<path d="M 208 231 C 398 231 398 66 588 66"
+      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
+      marker-end="url(#arr)"/>
+
+<!-- f_projections → d_prefectures (area_estat, y=341) to d_prefectures (y=196) -->
+<path d="M 208 341 C 398 341 398 196 588 196"
+      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
+      marker-end="url(#arr)"/>
+
+<!-- f_projections → d_age_groups (age_group_id, y=381) to d_age_groups (y=351) -->
+<path d="M 208 381 C 398 381 398 351 588 351"
+      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
+      marker-end="url(#arr)"/>
+
+<!-- f_projections → d_sex    (sex_id, y=401) to d_sex (y=511) -->
+<path d="M 208 401 C 398 401 398 511 588 511"
+      fill="none" stroke="#38302b" stroke-width="1.2" stroke-dasharray="4 3"
+      marker-end="url(#arr)"/>
+
+
+<!-- ─── LEFT COLUMN: secondary fact tables ─────────────── -->
+
+<!-- f_tfr  (x=20, y=40, w=188, h=86) -->
+<g transform="translate(20,40)">
+  <rect width="188" height="86" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
+  <rect width="188" height="26" rx="5" fill="#2e1e1b"/>
+  <rect y="21" width="188" height="5" fill="#2e1e1b"/>
+  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">f_tfr</text>
+  <text x="179" y="17" fill="#c0483a" font-size="9" text-anchor="end">FACT</text>
+  <!-- fields -->
+  <line x1="0" y1="46" x2="188" y2="46" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c0483a" font-size="11">area_estat</text><text x="178" y="40"  fill="#6a5f58" font-size="9" text-anchor="end">str FK</text>
+  <line x1="0" y1="66" x2="188" y2="66" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#9a8f83" font-size="11">year</text><text x="178" y="60"  fill="#6a5f58" font-size="9" text-anchor="end">int</text>
+  <text x="9" y="80"  fill="#9a8f83" font-size="11">tfr</text><text x="178" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">double</text>
+</g>
+
+<!-- f_migration  (x=20, y=175, w=188, h=86) -->
+<g transform="translate(20,175)">
+  <rect width="188" height="86" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
+  <rect width="188" height="26" rx="5" fill="#2e1e1b"/>
+  <rect y="21" width="188" height="5" fill="#2e1e1b"/>
+  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">f_migration</text>
+  <text x="179" y="17" fill="#c0483a" font-size="9" text-anchor="end">FACT</text>
+  <line x1="0" y1="46" x2="188" y2="46" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c0483a" font-size="11">area_estat</text><text x="178" y="40"  fill="#6a5f58" font-size="9" text-anchor="end">str FK</text>
+  <line x1="0" y1="66" x2="188" y2="66" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#c0483a" font-size="11">census_year</text><text x="178" y="60"  fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
+  <text x="9" y="80"  fill="#9a8f83" font-size="11">net_migration</text><text x="178" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">int</text>
+</g>
+
+<!-- f_projections (x=20, y=305, w=188, h=126) -->
+<g transform="translate(20,305)">
+  <rect width="188" height="126" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
+  <rect width="188" height="26" rx="5" fill="#2e1e1b"/>
+  <rect y="21" width="188" height="5" fill="#2e1e1b"/>
+  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">f_projections</text>
+  <text x="179" y="17" fill="#c0483a" font-size="9" text-anchor="end">FACT</text>
+  <line x1="0" y1="46"  x2="188" y2="46"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c0483a" font-size="11">area_estat</text><text x="178" y="40"  fill="#6a5f58" font-size="9" text-anchor="end">str FK</text>
+  <line x1="0" y1="66"  x2="188" y2="66"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#9a8f83" font-size="11">projection_year</text><text x="178" y="60"  fill="#6a5f58" font-size="9" text-anchor="end">int</text>
+  <line x1="0" y1="86"  x2="188" y2="86"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="80"  fill="#c0483a" font-size="11">age_group_id</text><text x="178" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
+  <line x1="0" y1="106" x2="188" y2="106" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="100" fill="#c0483a" font-size="11">sex_id</text><text x="178" y="100" fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
+  <text x="9" y="120" fill="#9a8f83" font-size="11">population</text><text x="178" y="120" fill="#6a5f58" font-size="9" text-anchor="end">int</text>
+</g>
+
+<!-- f_national_projections (x=20, y=488, w=188, standalone) -->
+<g transform="translate(20,488)">
+  <rect width="188" height="126" rx="5" fill="#1e1b17" stroke="#4d4039" stroke-width="1" stroke-dasharray="5 3"/>
+  <rect width="188" height="26" rx="5" fill="#252118"/>
+  <rect y="21" width="188" height="5" fill="#252118"/>
+  <text x="9" y="13" fill="#e0d7ca" font-size="10.5" font-weight="bold">f_national_projections</text>
+  <text x="179" y="17" fill="#6a5f58" font-size="9" text-anchor="end">standalone</text>
+  <line x1="0" y1="46"  x2="188" y2="46"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#9a8f83" font-size="11">projection_year</text><text x="178" y="40"  fill="#6a5f58" font-size="9" text-anchor="end">int</text>
+  <line x1="0" y1="66"  x2="188" y2="66"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#9a8f83" font-size="11">variant</text><text x="178" y="60"  fill="#6a5f58" font-size="9" text-anchor="end">varchar</text>
+  <line x1="0" y1="86"  x2="188" y2="86"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="80"  fill="#9a8f83" font-size="11">total_population</text><text x="178" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">bigint</text>
+  <line x1="0" y1="106" x2="188" y2="106" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="100" fill="#9a8f83" font-size="11">pop_0_14</text><text x="178" y="100" fill="#6a5f58" font-size="9" text-anchor="end">bigint</text>
+  <text x="9" y="120" fill="#9a8f83" font-size="10.5">pop_15_64 · pop_65_plus</text>
+</g>
+
+
+<!-- ─── CENTER: f_census (star) ────────────────────────── -->
+<!-- Slightly larger, brighter border to signal centrality -->
+<g transform="translate(315,150)">
+  <rect width="200" height="126" rx="5" fill="#201b17" stroke="#c0483a" stroke-width="1.5"/>
+  <rect width="200" height="26" rx="5" fill="#3a1f1b"/>
+  <rect y="21" width="200" height="5" fill="#3a1f1b"/>
+  <text x="9" y="17" fill="#e8d8d2" font-size="12" font-weight="bold">f_census</text>
+  <text x="191" y="17" fill="#c0483a" font-size="9.5" text-anchor="end" font-weight="bold">★ CORE</text>
+  <!-- FK fields (beni) + population (muted) -->
+  <line x1="0" y1="46"  x2="200" y2="46"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c99838" font-size="11.5">year</text>
+  <text x="9" y="40.5" fill="none" font-size="0">placeholder</text>
+  <text x="191" y="40"  fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
+  <line x1="0" y1="66"  x2="200" y2="66"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#c99838" font-size="11.5">area_estat</text><text x="191" y="60"  fill="#6a5f58" font-size="9" text-anchor="end">str FK</text>
+  <line x1="0" y1="86"  x2="200" y2="86"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="80"  fill="#c99838" font-size="11.5">age_group_id</text><text x="191" y="80"  fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
+  <line x1="0" y1="106" x2="200" y2="106" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="100" fill="#c99838" font-size="11.5">sex_id</text><text x="191" y="100" fill="#6a5f58" font-size="9" text-anchor="end">int FK</text>
+  <text x="9" y="120" fill="#9a8f83" font-size="11.5">population</text><text x="191" y="120" fill="#6a5f58" font-size="9" text-anchor="end">int</text>
+</g>
+
+<!-- "all FK fields connect →" label near center -->
+<text x="415" y="144" fill="#6a5f58" font-size="9" text-anchor="middle">4 × FK →</text>
+
+
+<!-- ─── RIGHT COLUMN: dimension tables ─────────────────── -->
+
+<!-- d_years  (x=588, y=30, w=238, h=86)
+     Target y for connections: row-0 center = 30+36 = 66 -->
+<g transform="translate(588,30)">
+  <rect width="238" height="86" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
+  <rect width="238" height="26" rx="5" fill="#251f0e"/>
+  <rect y="21" width="238" height="5" fill="#251f0e"/>
+  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">d_years</text>
+  <text x="229" y="17" fill="#c99838" font-size="9" text-anchor="end">DIM</text>
+  <line x1="0" y1="46" x2="238" y2="46" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c99838" font-size="11">year</text><text x="20" y="40" fill="none" font-size="0">pk</text>
+  <text x="229" y="40" fill="#6a5f58" font-size="9" text-anchor="end">int PK</text>
+  <line x1="0" y1="66" x2="238" y2="66" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#9a8f83" font-size="11">era_name</text><text x="229" y="60" fill="#6a5f58" font-size="9" text-anchor="end">str</text>
+  <text x="9" y="80"  fill="#9a8f83" font-size="11">era_year</text><text x="229" y="80" fill="#6a5f58" font-size="9" text-anchor="end">int</text>
+</g>
+<text x="594" y="26" fill="#6a5f58" font-size="9">d_years</text>
+
+<!-- d_prefectures  (x=588, y=160, w=238, h=106)
+     Target y: row-0 center = 160+36 = 196 -->
+<g transform="translate(588,160)">
+  <rect width="238" height="106" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
+  <rect width="238" height="26" rx="5" fill="#251f0e"/>
+  <rect y="21" width="238" height="5" fill="#251f0e"/>
+  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">d_prefectures</text>
+  <text x="229" y="17" fill="#c99838" font-size="9" text-anchor="end">DIM</text>
+  <line x1="0" y1="46"  x2="238" y2="46"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c99838" font-size="11">area_estat</text><text x="229" y="40" fill="#6a5f58" font-size="9" text-anchor="end">str PK</text>
+  <line x1="0" y1="66"  x2="238" y2="66"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#9a8f83" font-size="11">prefecture_name</text><text x="229" y="60" fill="#6a5f58" font-size="9" text-anchor="end">str</text>
+  <line x1="0" y1="86"  x2="238" y2="86"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="80"  fill="#9a8f83" font-size="11">prefecture_name_ja</text><text x="229" y="80" fill="#6a5f58" font-size="9" text-anchor="end">str</text>
+  <text x="9" y="100" fill="#9a8f83" font-size="11">level · parent_estat</text>
+</g>
+
+<!-- d_age_groups  (x=588, y=315, w=238, h=106)
+     Target y: row-0 center = 315+36 = 351 -->
+<g transform="translate(588,315)">
+  <rect width="238" height="106" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
+  <rect width="238" height="26" rx="5" fill="#251f0e"/>
+  <rect y="21" width="238" height="5" fill="#251f0e"/>
+  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">d_age_groups</text>
+  <text x="229" y="17" fill="#c99838" font-size="9" text-anchor="end">DIM</text>
+  <line x1="0" y1="46"  x2="238" y2="46"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c99838" font-size="11">age_group_id</text><text x="229" y="40" fill="#6a5f58" font-size="9" text-anchor="end">int PK</text>
+  <line x1="0" y1="66"  x2="238" y2="66"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#9a8f83" font-size="11">age_group · age_start</text>
+  <line x1="0" y1="86"  x2="238" y2="86"  stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="80"  fill="#9a8f83" font-size="11">age_end · is_open_ended</text>
+  <text x="9" y="100" fill="#9a8f83" font-size="11">age_scheme</text><text x="229" y="100" fill="#c99838" font-size="9" text-anchor="end">scheme_a / b</text>
+</g>
+
+<!-- d_sex  (x=588, y=475, w=238, h=86)
+     Target y: row-0 center = 475+36 = 511 -->
+<g transform="translate(588,475)">
+  <rect width="238" height="86" rx="5" fill="#201b17" stroke="#4d4039" stroke-width="1"/>
+  <rect width="238" height="26" rx="5" fill="#251f0e"/>
+  <rect y="21" width="238" height="5" fill="#251f0e"/>
+  <text x="9" y="17" fill="#e0d7ca" font-size="11.5" font-weight="bold">d_sex</text>
+  <text x="229" y="17" fill="#c99838" font-size="9" text-anchor="end">DIM</text>
+  <line x1="0" y1="46" x2="238" y2="46" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="40"  fill="#c99838" font-size="11">sex_id</text><text x="229" y="40" fill="#6a5f58" font-size="9" text-anchor="end">int PK</text>
+  <line x1="0" y1="66" x2="238" y2="66" stroke="#2c2520" stroke-width="1"/>
+  <text x="9" y="60"  fill="#9a8f83" font-size="11">sex</text><text x="229" y="60" fill="#c99838" font-size="9" text-anchor="end">total / male / female</text>
+  <text x="9" y="80"  fill="#9a8f83" font-size="11">sex_ja</text><text x="229" y="80" fill="#6a5f58" font-size="9" text-anchor="end">str</text>
+</g>
+
+<!-- Relationship cardinality labels -->
+<text x="518" y="182" fill="#6a5f58" font-size="9" text-anchor="start">}o——||</text>
+<text x="518" y="202" fill="#6a5f58" font-size="9" text-anchor="start">}o——||</text>
+<text x="518" y="222" fill="#6a5f58" font-size="9" text-anchor="start">}o——||</text>
+<text x="518" y="242" fill="#6a5f58" font-size="9" text-anchor="start">}o——||</text>
+
+</svg>
+
+      </div><!-- /erd-svg-container -->
+    </div><!-- /erd-wrapper -->
+
+    <div class="callout note">
+      <strong>Query surface rule:</strong> Never query fact or dimension tables directly in app code.
+      All reads go through the pre-joined views — <code>v_census</code> for census data,
+      <code>v_map_metrics</code> for choropleth map data. The views exist to enforce this contract.
+    </div>
+  </section>
+
+  <!-- ── SOURCE & COVERAGE ──────────────────────────────── -->
+  <section id="source" class="section">
+    <div class="section-eyebrow">Data Provenance</div>
+    <h2 class="section-title">Source &amp; Coverage</h2>
+    <hr class="section-divider">
+
+    <div class="source-grid">
+      <div class="source-card">
+        <div class="label">Series</div>
+        <div class="value">年齢（５歳階級），男女別人口－都道府県（大正９年～平成27年）</div>
+      </div>
+      <div class="source-card">
+        <div class="label">Stat ID</div>
+        <div class="value"><code>000031523105</code> (1920–2015 CSV) · <code>0003410381</code> (interactive DB, through 2020)</div>
+      </div>
+      <div class="source-card">
+        <div class="label">Publisher</div>
+        <div class="value">Statistics Bureau, Ministry of Internal Affairs — 総務省統計局</div>
+      </div>
+      <div class="source-card">
+        <div class="label">Coverage</div>
+        <div class="value">1920–2020, 5-year census intervals. 21 years × 47 prefectures + national aggregate.</div>
+      </div>
+    </div>
+
+    <table class="coverage-table">
+      <thead><tr><th>Year</th><th>Status</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>1945</td>
+          <td>Included — manual</td>
+          <td>Uses kazoedoshi (数え年) age reckoning — scheme_b bands, offset +1 from completed years. Excluded from autoplay; accessible via manual slider. Displayed with red slider mark and open-circle timeseries marker.</td>
+        </tr>
+        <tr>
+          <td>1950 / 1955 (Okinawa)</td>
+          <td>Included — flagged</td>
+          <td>The 70–74 band actually contains "70+" open-ended values due to US administration methodology. Inflates totals. Displayed with grey-out treatment and tooltip on map.</td>
+        </tr>
+        <tr>
+          <td>2025</td>
+          <td>TBA</td>
+          <td>Expected release May 2026, finalized September 2026. Will require API pull from e-Stat.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════
+       VIEWS
+  ══════════════════════════════════════════════════════ -->
+  <section id="views" class="section">
+    <div class="section-eyebrow">Pre-Joined Query Surfaces</div>
+    <h2 class="section-title">Views</h2>
+    <hr class="section-divider">
+    <p class="section-lead">
+      Views are the app's contract layer — they pre-join dimension tables so callbacks never
+      re-join manually. Each view has a specific purpose; using the wrong one for a given task
+      is a documented anti-pattern.
+    </p>
+
+    <!-- v_census -->
+    <div class="table-card" id="v-census">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">v_census</div>
+          <div class="table-grain">Grain: one row per year × area_estat × age_group × sex. All census years 1920–2020.</div>
+        </div>
+        <div class="table-badges">
+          <span class="tbadge view">VIEW</span>
+          <span class="tbadge star">PRIMARY QUERY SURFACE</span>
+        </div>
+      </div>
+      <div class="callout info" style="margin:12px 16px 0;">
+        <strong>Use this for:</strong> all population queries, pyramid data, time series, KPI cards. Always filter
+        <code>area_level = 2</code> (prefecture) and <code>age_scheme = 'scheme_a'</code> for derived metrics.
+        Never re-join dimension tables manually — they're already here.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">year <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">Census year. Begins 1920.</td></tr>
+          <tr><td class="fn pk">area_estat <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat area code, zero-padded. <em>01000</em> = Hokkaido, <em>13000</em> = Tokyo, <em>00000</em> = national aggregate. Join key for geometry.</td></tr>
+          <tr><td class="fn regular">prefecture_name</td><td class="ftype">str</td><td class="fdesc">English prefecture name.</td></tr>
+          <tr><td class="fn regular">prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">Japanese prefecture name, e.g. <em>北海道</em>, <em>東京都</em>.</td></tr>
+          <tr><td class="fn regular">area_level</td><td class="ftype">int</td><td class="fdesc"><strong>Always filter <code>area_level = 2</code> for prefecture queries.</strong> 1 = national aggregate (00000). 2 = prefecture. Omitting this filter double-counts by including the national row.</td></tr>
+          <tr><td class="fn regular">parent_estat</td><td class="ftype">str</td><td class="fdesc">Parent area code. All prefectures point to <em>00000</em>.</td></tr>
+          <tr><td class="fn pk">age_group <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">Age band label, e.g. <em>0–4 years old</em>. The <em>Total</em> row is a pre-stored aggregate — never use it in arithmetic; sum individual bands instead.</td></tr>
+          <tr><td class="fn regular">age_start</td><td class="ftype">int</td><td class="fdesc">Lower bound of the age band, inclusive.</td></tr>
+          <tr><td class="fn regular">age_end</td><td class="ftype">int / null</td><td class="fdesc">Upper bound, inclusive. NULL for open-ended terminal bands (e.g. 85+). Filter <code>age_start &gt;= 65</code> — not <code>age_end</code> — to safely capture all 65+ regardless of terminal band.</td></tr>
+          <tr><td class="fn regular">is_open_ended</td><td class="ftype">bool</td><td class="fdesc">True if the band has no upper bound.</td></tr>
+          <tr><td class="fn pk">age_scheme <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc"><code>scheme_a</code> = standard 5-year bands, 0–4 through 85+. <code>scheme_b</code> = kazoedoshi offset bands (1–5 through 86+), 1945 only. <strong>Always use <code>scheme_a</code> for derived metrics.</strong></td></tr>
+          <tr><td class="fn pk">sex <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc"><code>total</code>, <code>male</code>, or <code>female</code>. Filter <code>sex = 'total'</code> for all aggregate metrics.</td></tr>
+          <tr><td class="fn regular">sex_ja</td><td class="ftype">str</td><td class="fdesc">Japanese label: 総数, 男, 女.</td></tr>
+          <tr><td class="fn regular">population</td><td class="ftype">int</td><td class="fdesc">Headcount for this combination of year / area / age band / sex.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- v_map_metrics -->
+    <div class="table-card" id="v-map-metrics">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">v_map_metrics</div>
+          <div class="table-grain">Grain: one row per area_estat × year. 47 prefectures per year. No national aggregate row.</div>
+        </div>
+        <div class="table-badges">
+          <span class="tbadge view">VIEW</span>
+          <span class="tbadge star">CHOROPLETH MAP SURFACE</span>
+        </div>
+      </div>
+      <div class="callout warn" style="margin:12px 16px 0;">
+        <strong>Map data comes exclusively from here.</strong> Pre-aggregated with period deltas. Do not query
+        <code>v_census</code> for map data — it defeats the view's purpose and re-derives what's already computed.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">area_estat <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat code.</td></tr>
+          <tr><td class="fn regular">prefecture_name</td><td class="ftype">str</td><td class="fdesc">English name.</td></tr>
+          <tr><td class="fn regular">prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">Japanese name.</td></tr>
+          <tr><td class="fn pk">year <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">Census year.</td></tr>
+          <tr><td class="fn regular">population</td><td class="ftype">int</td><td class="fdesc">Total population for the prefecture in that year.</td></tr>
+          <tr><td class="fn regular">aging_index</td><td class="ftype">float</td><td class="fdesc">Σ(pop 65+) / Σ(pop 0–14) × 100.</td></tr>
+          <tr><td class="fn regular">old_age_dep</td><td class="ftype">float</td><td class="fdesc">Σ(pop 65+) / Σ(pop 15–64) × 100. <em>Computed in view but not a selectable map metric — do not add to MAP_METRICS.</em></td></tr>
+          <tr><td class="fn regular">working_age_share</td><td class="ftype">float</td><td class="fdesc">Σ(pop 15–64) / total pop × 100.</td></tr>
+          <tr><td class="fn regular">pop_delta</td><td class="ftype">int</td><td class="fdesc">Population change since previous census. NULL for 1920.</td></tr>
+          <tr><td class="fn regular">aging_index_delta</td><td class="ftype">float</td><td class="fdesc">Aging index change since previous census. NULL for 1920.</td></tr>
+          <tr><td class="fn regular">old_age_dep_delta</td><td class="ftype">float</td><td class="fdesc">Old-age dependency change since previous census. NULL for 1920.</td></tr>
+          <tr><td class="fn regular">working_age_share_delta</td><td class="ftype">float</td><td class="fdesc">Working-age share change since previous census. NULL for 1920.</td></tr>
+          <tr><td class="fn regular">prev_year</td><td class="ftype">int</td><td class="fdesc">The prior census year used to compute deltas. NULL for 1920.</td></tr>
+          <tr><td class="fn regular">year_gap</td><td class="ftype">int</td><td class="fdesc">Years elapsed since previous census. Not uniform — ranges from 2 to 5. Always use this; never hardcode 5.</td></tr>
+          <tr><td class="fn regular">tfr</td><td class="ftype">float</td><td class="fdesc">Total fertility rate, joined from <code>f_tfr</code>. NULL for census years before 1960 — no source data.</td></tr>
+          <tr><td class="fn regular">net_migration</td><td class="ftype">int</td><td class="fdesc">Cumulative net internal migration for the 5-year window ending on <code>year</code>. NULL for census years outside 1985–2020. 1985 is partial (4 years). Negative = net outflow.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- v_tfr -->
+    <div class="table-card" id="v-tfr">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">v_tfr</div>
+          <div class="table-grain">Grain: one row per area_estat × year (annual). Coverage: 1960–2024, 47 prefectures.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge view">VIEW</span></div>
+      </div>
+      <div class="callout note" style="margin:12px 16px 0;">
+        <strong>Reference use only.</strong> For map queries, use <code>v_map_metrics.tfr</code>. This view's annual
+        grain doesn't align to census years without filtering — use it for full annual TFR time series only.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">area_estat <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat prefecture code.</td></tr>
+          <tr><td class="fn regular">prefecture_name</td><td class="ftype">str</td><td class="fdesc">English name.</td></tr>
+          <tr><td class="fn regular">prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">Japanese name.</td></tr>
+          <tr><td class="fn pk">year <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">Calendar year (annual, 1960–2024). Not census-keyed.</td></tr>
+          <tr><td class="fn regular">tfr</td><td class="ftype">double</td><td class="fdesc">Total fertility rate. No NULLs — 3 suppressed source values excluded at ETL.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- v_migration -->
+    <div class="table-card" id="v-migration">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">v_migration</div>
+          <div class="table-grain">Grain: one row per area_estat × census_year. Coverage: 1985–2020, 47 prefectures.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge view">VIEW</span></div>
+      </div>
+      <div class="callout note" style="margin:12px 16px 0;">
+        <strong>Reference use only.</strong> For map queries, use <code>v_map_metrics.net_migration</code>.
+        Census years 1960–1980 simply have no rows — no source data exists. Do not infer zero.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">area_estat <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat code.</td></tr>
+          <tr><td class="fn regular">prefecture_name</td><td class="ftype">str</td><td class="fdesc">English name.</td></tr>
+          <tr><td class="fn regular">prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">Japanese name.</td></tr>
+          <tr><td class="fn pk">census_year <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">Census year (1985–2020).</td></tr>
+          <tr><td class="fn regular">net_migration</td><td class="ftype">int</td><td class="fdesc">Cumulative net in-migrants for the 5-year window ending on <code>census_year</code>. Negative = net outflow.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- v_projections -->
+    <div class="table-card" id="v-projections">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">v_projections</div>
+          <div class="table-grain">Grain: one row per area_estat × projection_year × age_group_id × sex_id. 17,766 rows total.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge view">VIEW</span></div>
+      </div>
+      <div class="callout info" style="margin:12px 16px 0;">
+        <strong>Mirrors <code>v_census</code> structure</strong> for projection years (2015–2045). Use for
+        prefecture-level projection overlays. 2015 baseline figures are IPSS-adjusted — ~1–2% above the raw
+        <code>f_census</code> 2015 figure due to IPSS undercounting adjustment. This is expected.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">area_estat <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat code.</td></tr>
+          <tr><td class="fn regular">prefecture_name · prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">English and Japanese names.</td></tr>
+          <tr><td class="fn pk">projection_year <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">2015–2045 in 5-year steps. Not a FK to <code>d_years</code> — future years only.</td></tr>
+          <tr><td class="fn regular">age_group · age_group_id · age_start · age_end · is_open_ended</td><td class="ftype">—</td><td class="fdesc">Same structure as <code>v_census</code>. scheme_a only.</td></tr>
+          <tr><td class="fn regular">sex · sex_ja · sex_id</td><td class="ftype">—</td><td class="fdesc">Same as <code>v_census</code>.</td></tr>
+          <tr><td class="fn regular">population</td><td class="ftype">int</td><td class="fdesc">Projected headcount. No NULLs.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════
+       FACT TABLES
+  ══════════════════════════════════════════════════════ -->
+  <section id="facts" class="section">
+    <div class="section-eyebrow">Raw Storage</div>
+    <h2 class="section-title">Fact Tables</h2>
+    <hr class="section-divider">
+
+    <!-- f_census -->
+    <div class="table-card" id="f-census">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">f_census</div>
+          <div class="table-grain">Grain: one row per year × area_estat × age_group_id × sex_id.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge fact">FACT</span><span class="tbadge star">★ STAR CENTER</span></div>
+      </div>
+      <table class="fields-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn fk">year <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_years.year</code></td></tr>
+          <tr><td class="fn fk">area_estat <span class="badge-fk">FK</span></td><td class="ftype">str</td><td class="fdesc">→ <code>d_prefectures.area_estat</code></td></tr>
+          <tr><td class="fn fk">age_group_id <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_age_groups.age_group_id</code></td></tr>
+          <tr><td class="fn fk">sex_id <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_sex.sex_id</code></td></tr>
+          <tr><td class="fn regular">population</td><td class="ftype">int</td><td class="fdesc">Headcount for this combination.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- f_tfr -->
+    <div class="table-card" id="f-tfr">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">f_tfr</div>
+          <div class="table-grain">Grain: one row per area_estat × year (annual). Coverage: 1960–2024, 47 prefectures.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge fact">FACT</span></div>
+      </div>
+      <div class="callout note" style="margin:12px 16px 0;">
+        <strong>Source:</strong> e-Stat statsDataId <code>0003411598</code> — 都道府県別にみた年次別合計特殊出生率.
+        Annual grain vs. census cadence — filter to census years when joining to <code>v_map_metrics</code>.
+        3 suppressed source values excluded at ETL. No data pre-1960.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn fk">area_estat <span class="badge-fk">FK</span></td><td class="ftype">str</td><td class="fdesc">→ <code>d_prefectures.area_estat</code></td></tr>
+          <tr><td class="fn regular">year</td><td class="ftype">int</td><td class="fdesc">Calendar year (annual).</td></tr>
+          <tr><td class="fn regular">tfr</td><td class="ftype">double</td><td class="fdesc">Total fertility rate (avg births per woman lifetime).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- f_migration -->
+    <div class="table-card" id="f-migration">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">f_migration</div>
+          <div class="table-grain">Grain: one row per area_estat × census_year. 47 rows per census year.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge fact">FACT</span></div>
+      </div>
+      <div class="callout note" style="margin:12px 16px 0;">
+        <strong>Source:</strong> e-Stat 住民基本台帳人口移動報告. Stitched from 8 overlapping datasets (1982–2025).
+        No prefecture-level data exists prior to 1982 — census years 1960–1980 are genuinely missing.
+        Rollup window: census year Y = Σ annual net migration for (Y−4) through Y inclusive.
+        1985 is partial (4 of 5 years; data begins 1982).
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn fk">area_estat <span class="badge-fk">FK</span></td><td class="ftype">str</td><td class="fdesc">→ <code>d_prefectures</code>. PK component.</td></tr>
+          <tr><td class="fn fk">census_year <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_years</code>. PK component.</td></tr>
+          <tr><td class="fn regular">net_migration</td><td class="ftype">int</td><td class="fdesc">Sum of annual 転入超過数 for the 5-year window. Negative = net outflow. NULL for 1960–1980 — do not infer zero.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- f_projections -->
+    <div class="table-card" id="f-projections">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">f_projections</div>
+          <div class="table-grain">Grain: area_estat × projection_year × age_group_id × sex_id. 17,766 rows.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge fact">FACT</span></div>
+      </div>
+      <div class="callout note" style="margin:12px 16px 0;">
+        <strong>Source:</strong> IPSS 日本の地域別将来推計人口（平成30（2018）年推計）. Coverage: 2015–2045, 5-year intervals,
+        47 prefectures, 18 age bands (scheme_a), 3 sex values. IPSS publishes 85–89 and 90+ separately;
+        both are summed into the <code>85+</code> group to match <code>d_age_groups</code>.
+        ETL is idempotent (<code>DROP TABLE IF EXISTS</code> before write).
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn fk">area_estat <span class="badge-fk">FK</span></td><td class="ftype">str</td><td class="fdesc">→ <code>d_prefectures</code></td></tr>
+          <tr><td class="fn regular">projection_year</td><td class="ftype">int</td><td class="fdesc">Not a FK to <code>d_years</code> — future years only. 2015, 2020, 2025 … 2045.</td></tr>
+          <tr><td class="fn fk">age_group_id <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_age_groups</code> (scheme_a only).</td></tr>
+          <tr><td class="fn fk">sex_id <span class="badge-fk">FK</span></td><td class="ftype">int</td><td class="fdesc">→ <code>d_sex</code></td></tr>
+          <tr><td class="fn regular">population</td><td class="ftype">int</td><td class="fdesc">Projected headcount. No NULLs.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- f_national_projections -->
+    <div class="table-card" id="f-national">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">f_national_projections</div>
+          <div class="table-grain">Grain: one row per projection_year × variant. 153 rows (51 years × 3 variants). Standalone — no FK relationships.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge fact">FACT</span></div>
+      </div>
+      <div class="callout note" style="margin:12px 16px 0;">
+        <strong>Source:</strong> IPSS 2017 national projections (平成29年推計), Tables 1-1 (medium), 1-2 (high), 1-3 (low).
+        Coverage: 2015–2065, annual. Variants differ only in fertility assumption — mortality is held at medium in all three.
+        Use <em>high</em> as upper bound and <em>low</em> as lower bound for the confidence band visualization.
+        All three variants share the same 2015 starting population (~127.1M).
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn regular">projection_year</td><td class="ftype">int</td><td class="fdesc">2015–2065, annual. Not a FK to <code>d_years</code>.</td></tr>
+          <tr><td class="fn regular">variant</td><td class="ftype">varchar</td><td class="fdesc"><code>'medium'</code>, <code>'high'</code>, or <code>'low'</code>.</td></tr>
+          <tr><td class="fn regular">total_population</td><td class="ftype">bigint</td><td class="fdesc">Projected national headcount (raw, not thousands).</td></tr>
+          <tr><td class="fn regular">pop_0_14</td><td class="ftype">bigint</td><td class="fdesc">Population aged 0–14.</td></tr>
+          <tr><td class="fn regular">pop_15_64</td><td class="ftype">bigint</td><td class="fdesc">Population aged 15–64.</td></tr>
+          <tr><td class="fn regular">pop_65_plus</td><td class="ftype">bigint</td><td class="fdesc">Population aged 65 and over.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════
+       DIMENSION TABLES
+  ══════════════════════════════════════════════════════ -->
+  <section id="dims" class="section">
+    <div class="section-eyebrow">Normalized Attributes</div>
+    <h2 class="section-title">Dimension Tables</h2>
+    <hr class="section-divider">
+
+    <!-- d_prefectures -->
+    <div class="table-card" id="d-prefectures">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">d_prefectures</div>
+          <div class="table-grain">48 rows: 47 prefectures + the national aggregate row (area_estat = 00000).</div>
+        </div>
+        <div class="table-badges"><span class="tbadge dim">DIM</span></div>
+      </div>
+      <table class="fields-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">area_estat <span class="badge-pk">PK</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat code, zero-padded. E.g. <em>01000</em> (Hokkaido), <em>13000</em> (Tokyo), <em>00000</em> (national).</td></tr>
+          <tr><td class="fn regular">prefecture_code</td><td class="ftype">str</td><td class="fdesc">2-digit JIS code, zero-padded. E.g. <em>01</em>, <em>13</em>.</td></tr>
+          <tr><td class="fn regular">prefecture_name</td><td class="ftype">str</td><td class="fdesc">English name.</td></tr>
+          <tr><td class="fn regular">prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">Japanese name.</td></tr>
+          <tr><td class="fn regular">level</td><td class="ftype">int</td><td class="fdesc">1 = national aggregate, 2 = prefecture. Always filter <code>area_level = 2</code> in queries.</td></tr>
+          <tr><td class="fn regular">parent_estat</td><td class="ftype">str</td><td class="fdesc">Parent code. All prefectures point to <em>00000</em>.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout warn" style="margin:0 0 0;">
+        <strong>Okinawa 1950 &amp; 1955:</strong> The 70–74 band contains "70 years and older" open-ended values
+        rather than a true 5-year band (US administration period methodology). This inflates totals and produces
+        an anomalous trajectory. Displayed with grey-out treatment + tooltip on the map. Do not silently show these
+        figures as comparable to other years.
+      </div>
+    </div>
+
+    <!-- d_age_groups -->
+    <div class="table-card" id="d-age-groups">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">d_age_groups</div>
+          <div class="table-grain">Age band definitions across two schemes plus the Total aggregate row.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge dim">DIM</span></div>
+      </div>
+      <table class="fields-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">age_group_id <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">Surrogate key.</td></tr>
+          <tr><td class="fn regular">age_group</td><td class="ftype">str</td><td class="fdesc">English label, e.g. <em>0–4 years old</em>, <em>Total</em>.</td></tr>
+          <tr><td class="fn regular">age_group_ja</td><td class="ftype">str</td><td class="fdesc">Japanese label, e.g. <em>0～4歳</em>, <em>総数</em>.</td></tr>
+          <tr><td class="fn regular">age_start</td><td class="ftype">int</td><td class="fdesc">Lower bound, inclusive.</td></tr>
+          <tr><td class="fn regular">age_end</td><td class="ftype">int / null</td><td class="fdesc">Upper bound, inclusive. NULL for open-ended terminal bands.</td></tr>
+          <tr><td class="fn regular">is_open_ended</td><td class="ftype">bool</td><td class="fdesc">True if no upper bound.</td></tr>
+          <tr><td class="fn regular">source_scheme</td><td class="ftype">str</td><td class="fdesc"><code>scheme_a</code> — standard 5-year bands (0–4 through 85+). Use for all metrics. · <code>scheme_b</code> — kazoedoshi bands (1–5 through 86+), 1945 only; offset +1 from completed years. · <code>base</code> — the Total row only.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- d_sex -->
+    <div class="table-card" id="d-sex">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">d_sex</div>
+          <div class="table-grain">3 rows: total, male, female.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge dim">DIM</span></div>
+      </div>
+      <table class="fields-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">sex_id <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">0 = total, 1 = male, 2 = female.</td></tr>
+          <tr><td class="fn regular">sex</td><td class="ftype">str</td><td class="fdesc"><code>total</code>, <code>male</code>, <code>female</code>.</td></tr>
+          <tr><td class="fn regular">sex_ja</td><td class="ftype">str</td><td class="fdesc">総数, 男, 女.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- d_years -->
+    <div class="table-card" id="d-years">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">d_years</div>
+          <div class="table-grain">One row per census year. 1920–2020, 5-year intervals (with gaps).</div>
+        </div>
+        <div class="table-badges"><span class="tbadge dim">DIM</span></div>
+      </div>
+      <div class="callout info" style="margin:12px 16px 0;">
+        <strong>Growth rate note:</strong> Intervals are not uniform — year gap ranges from 2 to 5.
+        Always compute annualized growth as <code>(pop_b / pop_a) ^ (1 / (year_b - year_a)) - 1</code>.
+        Never hardcode a 5-year denominator.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">year <span class="badge-pk">PK</span></td><td class="ftype">int</td><td class="fdesc">Census year.</td></tr>
+          <tr><td class="fn regular">era_name</td><td class="ftype">str</td><td class="fdesc">Japanese era, e.g. 大正, 昭和, 平成, 令和.</td></tr>
+          <tr><td class="fn regular">era_year</td><td class="ftype">int</td><td class="fdesc">Year within the era. E.g. 27 = 平成27 = 2015.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── GEOMETRY ────────────────────────────────────────── -->
+  <section id="geometry" class="section">
+    <div class="section-eyebrow">Spatial Data</div>
+    <h2 class="section-title">Prefecture Boundaries</h2>
+    <hr class="section-divider">
+
+    <div class="table-card">
+      <div class="table-card-head">
+        <div>
+          <div class="table-name">japan_prefectures_simplified.parquet</div>
+          <div class="table-grain">47 rows — one per prefecture. Not in DuckDB; loaded separately via GeoPandas.</div>
+        </div>
+        <div class="table-badges"><span class="tbadge geo">GEOMETRY</span></div>
+      </div>
+      <div class="callout note" style="margin:12px 16px 0;">
+        <strong>Source:</strong> Derived from <a href="https://github.com/dataofjapan/land" style="color:var(--kincha);">dataofjapan/land</a>,
+        which converted Shapefiles from the Geospatial Information Authority of Japan (国土地理院) — Global Map Japan (地球地図日本).
+        Simplified at <code>tolerance=0.001</code> via Shapely (<code>preserve_topology=True</code>).
+        Non-commercial use requires attribution to 地球地図日本.
+      </div>
+      <table class="fields-table" style="margin-top:1px;">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="fn pk">area_estat <span class="badge-pk">JOIN KEY</span></td><td class="ftype">str</td><td class="fdesc">5-digit e-Stat code. Join to census data on this field. Used as <code>featureidkey="properties.area_estat"</code> in Plotly choropleth.</td></tr>
+          <tr><td class="fn regular">prefecture_name</td><td class="ftype">str</td><td class="fdesc">English name.</td></tr>
+          <tr><td class="fn regular">prefecture_name_ja</td><td class="ftype">str</td><td class="fdesc">Japanese name.</td></tr>
+          <tr><td class="fn regular">geometry</td><td class="ftype">geometry</td><td class="fdesc">Simplified polygon. Tolerance 0.001, topology preserved. EPSG:4326 (WGS 84).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════ -->
+<footer class="page-footer">
+  <span>Japan Population Dashboard</span>
+  <a href="https://japan-population.deanallton.com" class="footer-link" target="_blank">japan-population.deanallton.com</a>
+  <a href="https://deanallton.com" class="footer-link" target="_blank">deanallton.com</a>
+  <span class="footer-right">Data: 総務省統計局 e-Stat · IPSS · 地球地図日本 · 1920–2065</span>
+</footer>
+
+<script>
+// ── ACTIVE NAV via IntersectionObserver ─────────────────
+const navLinks = document.querySelectorAll('.nav-link');
+
+const idToHref = {
+  'overview':      '#overview',
+  'source':        '#source',
+  'v-census':      '#v-census',
+  'v-map-metrics': '#v-map-metrics',
+  'v-tfr':         '#v-tfr',
+  'v-migration':   '#v-migration',
+  'v-projections': '#v-projections',
+  'f-census':      '#f-census',
+  'f-tfr':         '#f-tfr',
+  'f-migration':   '#f-migration',
+  'f-projections': '#f-projections',
+  'f-national':    '#f-national',
+  'd-prefectures': '#d-prefectures',
+  'd-age-groups':  '#d-age-groups',
+  'd-sex':         '#d-sex',
+  'd-years':       '#d-years',
+  'geometry':      '#geometry',
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const href = idToHref[entry.target.id];
+      if (!href) return;
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.nav-link[href="${href}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-50px 0px -60% 0px', threshold: 0 });
+
+document.querySelectorAll('[id]').forEach(el => {
+  if (idToHref[el.id]) observer.observe(el);
+});
+</script>
+</body>
+</html>

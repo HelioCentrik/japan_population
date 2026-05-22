@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metrics &amp; Queries — Japan Population Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<style>
+:root {
+  --bg:         #17130f;
+  --surface:    #201b17;
+  --surface-2:  #2a2420;
+  --surface-3:  #332d28;
+  --border:     #38302b;
+  --border-mid: #4d4039;
+  --beni:       #c0483a;
+  --beni-dim:   rgba(192,72,58,0.12);
+  --beni-glow:  rgba(192,72,58,0.25);
+  --kincha:     #c99838;
+  --kincha-dim: rgba(201,152,56,0.10);
+  --sage:       #6b9e82;
+  --sage-dim:   rgba(107,158,130,0.10);
+  --text:       #e0d7ca;
+  --text-muted: #9a8f83;
+  --text-dim:   #6a5f58;
+  --code-bg:    #100d0a;
+
+  /* hljs color overrides */
+  --hljs-bg:       #100d0a;
+  --hljs-default:  #d4c9bb;
+  --hljs-keyword:  #c99838;
+  --hljs-string:   #6b9e82;
+  --hljs-comment:  #6a5f58;
+  --hljs-number:   #c99838;
+  --hljs-name:     #c0483a;
+  --hljs-attr:     #9a8f83;
+  --hljs-title:    #c0483a;
+  --hljs-variable: #d4c9bb;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HIGHLIGHT.JS OVERRIDES ────────────────────────────────── */
+.hljs                 { background: var(--code-bg) !important; color: var(--hljs-default); padding: 0; }
+.hljs-keyword,
+.hljs-operator        { color: var(--hljs-keyword); font-weight: 500; }
+.hljs-string          { color: var(--hljs-string); }
+.hljs-comment         { color: var(--hljs-comment); font-style: italic; }
+.hljs-number          { color: var(--hljs-number); }
+.hljs-built_in,
+.hljs-type            { color: var(--hljs-name); }
+.hljs-attr,
+.hljs-params          { color: var(--hljs-attr); }
+.hljs-title           { color: var(--hljs-title); }
+.hljs-variable        { color: var(--hljs-variable); }
+
+/* Placeholder tokens like {year} {area_estat} */
+.ph-token { color: var(--beni); font-style: italic; }
+
+/* ── TOPBAR ────────────────────────────────────────────────── */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 50px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 200;
+  gap: 0;
+}
+
+.topbar-project {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+.topbar-sep {
+  color: var(--border-mid);
+  margin: 0 12px;
+  font-weight: 300;
+}
+
+.topbar-doc {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 9px;
+  border-radius: 3px;
+  border: 1px solid var(--border-mid);
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.topbar-badge.accent {
+  border-color: var(--beni);
+  color: var(--beni);
+  background: var(--beni-dim);
+}
+
+/* ── LAYOUT ────────────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 244px 1fr;
+  padding-top: 50px;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ───────────────────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: 50px;
+  height: calc(100vh - 50px);
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  padding: 28px 0 40px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.nav-group { margin-bottom: 4px; }
+
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 14px 18px 5px;
+  display: block;
+}
+
+.nav-link {
+  display: block;
+  padding: 5px 18px 5px 16px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+  line-height: 1.4;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.nav-link.active {
+  color: var(--kincha);
+  border-left-color: var(--kincha);
+  background: var(--kincha-dim);
+}
+
+.nav-link .nav-ja {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+.nav-link.active .nav-ja { color: rgba(201,152,56,0.6); }
+
+/* ── MAIN ──────────────────────────────────────────────────── */
+.main {
+  padding: 52px 60px 80px;
+  min-width: 0;
+}
+
+/* ── INTRO ─────────────────────────────────────────────────── */
+.intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.rule-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 14px 16px;
+}
+
+.rule-card code {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--kincha);
+  margin-bottom: 5px;
+}
+
+.rule-card p {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── SECTIONS ──────────────────────────────────────────────── */
+.section { margin-bottom: 72px; }
+
+.section-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--beni);
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.section-title .ja {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 18px;
+  margin-left: 10px;
+}
+
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0 32px;
+}
+
+.section-lead {
+  color: var(--text-muted);
+  font-size: 14px;
+  max-width: 620px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+/* ── METRIC CARDS ──────────────────────────────────────────── */
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.metric-card:hover { border-color: var(--border-mid); }
+
+.metric-card-head {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.metric-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--border-mid);
+  line-height: 1;
+  padding-top: 3px;
+  min-width: 28px;
+  text-align: right;
+}
+
+.metric-titles { flex: 1; }
+
+.metric-name-en {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.metric-name-ja {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 3px;
+  font-family: 'Inter', sans-serif;
+}
+
+.metric-tag {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border-mid);
+  color: var(--text-dim);
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.metric-tag.kpi-tag {
+  color: var(--kincha);
+  border-color: var(--kincha);
+  background: var(--kincha-dim);
+}
+
+.metric-card-body {
+  display: grid;
+  grid-template-columns: 188px 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.formula-panel {
+  border-right: 1px solid var(--border);
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--code-bg);
+  gap: 0;
+}
+
+.formula-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.formula {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  width: 100%;
+}
+
+.formula-num {
+  color: var(--kincha);
+  font-size: 12.5px;
+  line-height: 1.45;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--border-mid);
+  display: block;
+}
+
+.formula-den {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+  padding-top: 5px;
+  display: block;
+}
+
+.formula-mult {
+  display: block;
+  color: var(--beni);
+  font-size: 11.5px;
+  margin-top: 10px;
+}
+
+.metric-info {
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.metric-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  max-width: 480px;
+}
+
+/* Trajectory strip */
+.trajectory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.traj-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-right: 4px;
+}
+
+.traj-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 7px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.traj-chip.peak {
+  border-color: var(--kincha);
+  color: var(--kincha);
+  background: var(--kincha-dim);
+}
+
+.traj-chip.cross {
+  border-color: var(--beni);
+  color: var(--beni);
+  background: var(--beni-dim);
+}
+
+.traj-arrow {
+  color: var(--text-dim);
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* Warning / note callout */
+.callout {
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.callout.warn {
+  background: var(--beni-dim);
+  border: 1px solid var(--beni-glow);
+}
+
+.callout.info {
+  background: var(--kincha-dim);
+  border: 1px solid rgba(201,152,56,0.25);
+}
+
+.callout strong { font-weight: 600; color: var(--beni); }
+.callout.info strong { color: var(--kincha); }
+
+/* ── SQL BLOCKS ────────────────────────────────────────────── */
+.sql-wrapper { background: var(--code-bg); }
+
+.sql-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+
+.sql-bar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-family: 'Inter', sans-serif;
+}
+
+.sql-view-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: var(--sage-dim);
+  border: 1px solid var(--sage);
+  color: var(--sage);
+}
+
+.copy-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-dim);
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+  letter-spacing: 0.04em;
+}
+
+.copy-btn:hover { color: var(--text); border-color: var(--border-mid); }
+.copy-btn.copied { color: var(--sage); border-color: var(--sage); }
+
+pre {
+  margin: 0;
+  padding: 20px 22px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.75;
+  background: var(--code-bg) !important;
+  tab-size: 4;
+}
+
+pre code { background: none !important; padding: 0 !important; font-size: inherit; }
+
+/* ── QUERY COOKBOOK ────────────────────────────────────────── */
+.cookbook-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.cookbook-group {
+  margin-bottom: 48px;
+}
+
+.cookbook-group-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cookbook-group-title .subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.query-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  transition: border-color 0.12s;
+}
+
+.query-card:hover { border-color: var(--border-mid); }
+
+.query-card-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.query-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.query-name .ja {
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-left: 6px;
+}
+
+.qbadge {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.qbadge.view { color: var(--sage); border-color: var(--sage); background: var(--sage-dim); }
+.qbadge.fact { color: var(--kincha); border-color: var(--kincha); background: var(--kincha-dim); }
+.qbadge.null-risk { color: var(--beni); border-color: var(--beni); background: var(--beni-dim); }
+
+.query-note-bar {
+  padding: 8px 16px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.query-note-bar code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--kincha);
+  background: var(--kincha-dim);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+/* ── CTE SECTION ───────────────────────────────────────────── */
+.cte-desc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.cte-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+.cte-field {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.cte-field:nth-child(even) { border-right: none; }
+
+.cte-field code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--kincha);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.cte-field p {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+/* ── GROWTH RATE ASIDE ─────────────────────────────────────── */
+.growth-aside {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 16px 18px;
+  margin-top: 20px;
+}
+
+.growth-aside h4 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.growth-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--kincha);
+  margin-bottom: 8px;
+}
+
+.growth-aside p {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+/* ── FOOTER ────────────────────────────────────────────────── */
+.page-footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 60px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.footer-link { color: var(--text-dim); text-decoration: none; transition: color 0.12s; }
+.footer-link:hover { color: var(--kincha); }
+
+.footer-right { margin-left: auto; }
+
+/* ── INLINE CODE ───────────────────────────────────────────── */
+p code, li code, td code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.87em;
+  color: var(--kincha);
+  background: var(--kincha-dim);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; display: flex; flex-wrap: wrap; padding: 12px; gap: 2px; border-right: none; border-bottom: 1px solid var(--border); }
+  .nav-group-label { display: none; }
+  .nav-link { padding: 4px 10px; border-left: none; border-radius: 3px; font-size: 12px; }
+  .nav-link .nav-ja { display: none; }
+  .main { padding: 32px 20px 60px; }
+  .metric-card-body { grid-template-columns: 1fr; }
+  .formula-panel { border-right: none; border-bottom: 1px solid var(--border); }
+  .intro-grid, .cte-fields, .cookbook-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOP BAR
+════════════════════════════════════════════════════════════ -->
+<header class="topbar">
+  <span class="topbar-project">日本の人口ダッシュボード</span>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-doc">Metrics &amp; Queries</span>
+  <div class="topbar-right">
+    <span class="topbar-badge">DuckDB</span>
+    <span class="topbar-badge">star schema</span>
+    <span class="topbar-badge accent">v_census</span>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ═══════════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="nav-group">
+    <span class="nav-group-label">Overview</span>
+    <a href="#intro" class="nav-link active">Query Rules</a>
+  </div>
+
+  <div class="nav-group">
+    <span class="nav-group-label">Derived Metrics</span>
+    <a href="#aging-index" class="nav-link">
+      Aging Index
+      <span class="nav-ja">高齢化指数</span>
+    </a>
+    <a href="#old-age-dep" class="nav-link">
+      Old-Age Dependency
+      <span class="nav-ja">老年従属人口指数</span>
+    </a>
+    <a href="#youth-dep" class="nav-link">
+      Youth Dependency
+      <span class="nav-ja">年少従属人口指数</span>
+    </a>
+    <a href="#total-dep" class="nav-link">
+      Total Dependency
+      <span class="nav-ja">従属人口指数</span>
+    </a>
+    <a href="#working-age" class="nav-link">
+      Working-Age Share
+      <span class="nav-ja">生産年齢人口割合</span>
+    </a>
+    <a href="#children-share" class="nav-link">
+      Children Share
+      <span class="nav-ja">年少人口割合</span>
+    </a>
+    <a href="#sex-ratio" class="nav-link">
+      Sex Ratio
+      <span class="nav-ja">性比</span>
+    </a>
+  </div>
+
+  <div class="nav-group">
+    <span class="nav-group-label">Patterns</span>
+    <a href="#cte" class="nav-link">Reusable Age-Bucket CTE</a>
+    <a href="#growth-rate" class="nav-link">Growth Rate</a>
+  </div>
+
+  <div class="nav-group">
+    <span class="nav-group-label">Query Cookbook</span>
+    <a href="#cookbook-map" class="nav-link">Map</a>
+    <a href="#cookbook-pyramid" class="nav-link">Population Pyramid</a>
+    <a href="#cookbook-timeseries" class="nav-link">Time Series</a>
+    <a href="#cookbook-projections" class="nav-link">IPSS Projections</a>
+    <a href="#cookbook-util" class="nav-link">Utilities</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── INTRO ───────────────────────────────────────────── -->
+  <section id="intro" class="section">
+    <div class="section-eyebrow">Reference Document</div>
+    <h1 class="section-title">Metrics &amp; Queries</h1>
+    <hr class="section-divider">
+    <p class="section-lead">
+      How to derive demographic metrics from the census star schema powering the Japan Population
+      Dashboard — a Dash/Plotly application visualizing 100 years of Japanese census data (1920–2020)
+      across 47 prefectures, with IPSS projections through 2065. All queries run against
+      <code>v_census</code> unless otherwise noted. Seven metrics are computed from first principles;
+      none rely on pre-stored aggregates.
+    </p>
+
+    <div class="intro-grid">
+      <div class="rule-card">
+        <code>age_scheme = 'scheme_a'</code>
+        <p>Always use standard 5-year bands (0–4 through 85+) for derived metrics. scheme_b is a kazoedoshi offset present only in the 1945 data.</p>
+      </div>
+      <div class="rule-card">
+        <code>age_group != 'Total'</code>
+        <p>Never use the pre-stored Total row in arithmetic — it double-counts. Sum individual bands instead.</p>
+      </div>
+      <div class="rule-card">
+        <code>area_level = 2</code>
+        <p>Filter to prefecture level. Omitting this includes the national aggregate row (area_level = 1) and produces double-counted totals.</p>
+      </div>
+      <div class="rule-card">
+        <code>age_start &gt;= 65</code>
+        <p>Safe 65+ filter pattern. Captures both closed and open-ended terminal bands regardless of which terminal band a given census year uses.</p>
+      </div>
+      <div class="rule-card">
+        <code>v_map_metrics</code>
+        <p>For choropleth map data: use this pre-aggregated view with deltas. Do not query v_census for map data.</p>
+      </div>
+      <div class="rule-card">
+        <code>sex = 'total'</code>
+        <p>For all aggregate metrics unless computing sex-disaggregated figures (e.g. the population pyramid or sex ratio).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       DERIVED METRICS
+  ══════════════════════════════════════════════════════════ -->
+  <section id="metrics" class="section">
+    <div class="section-eyebrow">Seven Metrics</div>
+    <h2 class="section-title">Derived Metrics</h2>
+    <hr class="section-divider">
+
+    <!-- ── 1: AGING INDEX ─────────────────────────────────── -->
+    <div class="metric-card" id="aging-index">
+      <div class="metric-card-head">
+        <span class="metric-num">1</span>
+        <div class="metric-titles">
+          <div class="metric-name-en">Aging Index</div>
+          <div class="metric-name-ja">高齢化指数</div>
+        </div>
+        <span class="metric-tag kpi-tag">KPI card</span>
+      </div>
+      <div class="metric-card-body">
+        <div class="formula-panel">
+          <div class="formula-label">Formula</div>
+          <div class="formula">
+            <span class="formula-num">Σ pop (65+)</span>
+            <span class="formula-den">Σ pop (0–14)</span>
+            <span class="formula-mult">× 100</span>
+          </div>
+        </div>
+        <div class="metric-info">
+          <p class="metric-desc">
+            The headline metric. Captures Japan's demographic inversion from a child-heavy to an elderly-heavy
+            society. The threshold at 100 is intuitive: below 100 means more children than elderly;
+            above 100 means the elderly outnumber children. Japan crossed 100 for the first time in 2000.
+          </p>
+          <div class="trajectory">
+            <span class="traj-label">National</span>
+            <span class="traj-chip">14.4 (1920)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">13.9 (1950)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">66.2 (1990)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip cross">119.1 (2000) ✕ 100</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">~211 (2015)</span>
+          </div>
+        </div>
+      </div>
+      <div class="sql-wrapper">
+        <div class="sql-bar">
+          <span class="sql-bar-label">SQL</span>
+          <span class="sql-view-badge">v_census</span>
+          <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+        </div>
+        <pre><code class="language-sql">SELECT area_estat, prefecture_name, prefecture_name_ja,
+    ROUND(
+        SUM(CASE WHEN age_start >= 65 THEN population ELSE 0 END) * 100.0 /
+        NULLIF(SUM(CASE WHEN age_start <= 10 AND age_end <= 14 THEN population ELSE 0 END), 0)
+    , 1) AS aging_index
+FROM v_census
+WHERE year = {year}
+  AND age_scheme = 'scheme_a'
+  AND age_group != 'Total'
+  AND sex = 'total'
+  AND area_level = 2
+GROUP BY area_estat, prefecture_name, prefecture_name_ja
+ORDER BY aging_index DESC</code></pre>
+      </div>
+    </div>
+
+    <!-- ── 2: OLD-AGE DEPENDENCY ──────────────────────────── -->
+    <div class="metric-card" id="old-age-dep">
+      <div class="metric-card-head">
+        <span class="metric-num">2</span>
+        <div class="metric-titles">
+          <div class="metric-name-en">Old-Age Dependency Ratio</div>
+          <div class="metric-name-ja">老年従属人口指数</div>
+        </div>
+        <span class="metric-tag">computed in view</span>
+      </div>
+      <div class="metric-card-body">
+        <div class="formula-panel">
+          <div class="formula-label">Formula</div>
+          <div class="formula">
+            <span class="formula-num">Σ pop (65+)</span>
+            <span class="formula-den">Σ pop (15–64)</span>
+            <span class="formula-mult">× 100</span>
+          </div>
+        </div>
+        <div class="metric-info">
+          <p class="metric-desc">
+            Quantifies the economic burden shift — how many elderly people exist per 100 working-age people.
+            Crossed the youth dependency ratio between 1995 and 2000, marking a structural turning point.
+            Available in <code>v_map_metrics</code> as <code>old_age_dep</code> but is not a selectable
+            map metric; replaced by Population Change (<code>pop_delta</code>).
+          </p>
+          <div class="trajectory">
+            <span class="traj-label">National</span>
+            <span class="traj-chip">~8.6 (1920)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">~10.3 (1970)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">25.5 (2000)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip peak">~43.5 (2015)</span>
+          </div>
+          <div class="callout warn">
+            <strong>Note:</strong> Do not add <code>old_age_dep</code> back to <code>MAP_METRICS</code>
+            in config.py. The design decision to replace it with pop_delta is intentional.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3: YOUTH DEPENDENCY ────────────────────────────── -->
+    <div class="metric-card" id="youth-dep">
+      <div class="metric-card-head">
+        <span class="metric-num">3</span>
+        <div class="metric-titles">
+          <div class="metric-name-en">Youth Dependency Ratio</div>
+          <div class="metric-name-ja">年少従属人口指数</div>
+        </div>
+      </div>
+      <div class="metric-card-body">
+        <div class="formula-panel">
+          <div class="formula-label">Formula</div>
+          <div class="formula">
+            <span class="formula-num">Σ pop (0–14)</span>
+            <span class="formula-den">Σ pop (15–64)</span>
+            <span class="formula-mult">× 100</span>
+          </div>
+        </div>
+        <div class="metric-info">
+          <p class="metric-desc">
+            The mirror of old-age dependency. Japan began as a high-youth-burden society in 1920 (~63.0),
+            falling steadily as birth rates declined through the postwar decades. By 2000 it had inverted
+            relative to old-age dependency — more economic burden from elderly than children for the
+            first time in recorded history.
+          </p>
+          <div class="trajectory">
+            <span class="traj-label">National</span>
+            <span class="traj-chip peak">~63.0 (1920)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">~35.2 (1970)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">21.4 (2000)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">~20.6 (2015)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4: TOTAL DEPENDENCY ────────────────────────────── -->
+    <div class="metric-card" id="total-dep">
+      <div class="metric-card-head">
+        <span class="metric-num">4</span>
+        <div class="metric-titles">
+          <div class="metric-name-en">Total Dependency Ratio</div>
+          <div class="metric-name-ja">従属人口指数</div>
+        </div>
+      </div>
+      <div class="metric-card-body">
+        <div class="formula-panel">
+          <div class="formula-label">Formula</div>
+          <div class="formula">
+            <span class="formula-num">Σ pop(0–14) + Σ pop(65+)</span>
+            <span class="formula-den">Σ pop (15–64)</span>
+            <span class="formula-mult">× 100</span>
+          </div>
+        </div>
+        <div class="metric-info">
+          <p class="metric-desc">
+            Traces a U-shaped arc across the century: high in 1920 (driven by youth), falling to a
+            trough around 1990, then rising again driven by the elderly. The trough period (~1970–1995)
+            is Japan's <em>demographic dividend</em> — maximum working-age share, minimum dependency burden.
+            This window correlates directly with Japan's high-growth economic era.
+          </p>
+          <div class="callout info">
+            <strong>Demographic dividend window:</strong> The trough at ~43.5 in 1990 represents peak
+            productive capacity — the lowest total burden per working-age person in Japan's recorded history.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5: WORKING-AGE SHARE ───────────────────────────── -->
+    <div class="metric-card" id="working-age">
+      <div class="metric-card-head">
+        <span class="metric-num">5</span>
+        <div class="metric-titles">
+          <div class="metric-name-en">Working-Age Share</div>
+          <div class="metric-name-ja">生産年齢人口割合</div>
+        </div>
+        <span class="metric-tag kpi-tag">KPI card</span>
+      </div>
+      <div class="metric-card-body">
+        <div class="formula-panel">
+          <div class="formula-label">Formula</div>
+          <div class="formula">
+            <span class="formula-num">Σ pop (15–64)</span>
+            <span class="formula-den">Σ total pop</span>
+            <span class="formula-mult">× 100</span>
+          </div>
+        </div>
+        <div class="metric-info">
+          <p class="metric-desc">
+            Share of the population in the prime working-age band. Peaked at ~69.5% in 1990–1995
+            and has been declining since. A falling working-age share, combined with a rising elderly share,
+            drives the structural pension and healthcare funding pressures Japan faces today.
+          </p>
+          <div class="trajectory">
+            <span class="traj-label">National</span>
+            <span class="traj-chip">~58% (1920)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip peak">~69.5% (1990–1995)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">declining (2000+)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6: CHILDREN SHARE ──────────────────────────────── -->
+    <div class="metric-card" id="children-share">
+      <div class="metric-card-head">
+        <span class="metric-num">6</span>
+        <div class="metric-titles">
+          <div class="metric-name-en">Children 0–14 Share</div>
+          <div class="metric-name-ja">年少人口割合</div>
+        </div>
+      </div>
+      <div class="metric-card-body">
+        <div class="formula-panel">
+          <div class="formula-label">Formula</div>
+          <div class="formula">
+            <span class="formula-num">Σ pop (0–14)</span>
+            <span class="formula-den">Σ total pop</span>
+            <span class="formula-mult">× 100</span>
+          </div>
+        </div>
+        <div class="metric-info">
+          <p class="metric-desc">
+            Share of the youngest cohort. Japan began as a demographically young nation — more than
+            one in three people was under 15 in 1920. By 2015, that had fallen below one in eight.
+            The 少子化 (declining birthrate) trend is visible in every census year from 1950 onward.
+          </p>
+          <div class="trajectory">
+            <span class="traj-label">National</span>
+            <span class="traj-chip peak">~36.5% (1920)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">~24.0% (1970)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">~14.6% (2000)</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-chip">~12.9% (2015)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7: SEX RATIO ───────────────────────────────────── -->
+    <div class="metric-card" id="sex-ratio">
+      <div class="metric-card-head">
+        <span class="metric-num">7</span>
+        <div class="metric-titles">
+          <div class="metric-name-en">Sex Ratio by Age Band</div>
+          <div class="metric-name-ja">性比</div>
+        </div>
+      </div>
+      <div class="metric-card-body">
+        <div class="formula-panel">
+          <div class="formula-label">Per age band</div>
+          <div class="formula">
+            <span class="formula-num">male pop</span>
+            <span class="formula-den">female pop</span>
+            <span class="formula-mult">× 100</span>
+          </div>
+        </div>
+        <div class="metric-info">
+          <p class="metric-desc">
+            Computed per age band. The natural ratio is ~103 (slightly more males born than females).
+            Significant deviation reveals historical events. The WWII male mortality notch is visible
+            in the 25–29 band in 1950 (ratio: 83.8), then walks up the pyramid at 5 years per census —
+            reaching 55–59 in 1975 (ratio: 79.7 — the dataset minimum).
+          </p>
+          <div class="callout warn">
+            <strong>WWII notch:</strong> The sex ratio anomaly is the most visually striking feature
+            of the population pyramid. It migrates predictably: 25–29 (1950) → 30–34 (1955) → … → 55–59 (1975).
+          </div>
+        </div>
+      </div>
+      <div class="sql-wrapper">
+        <div class="sql-bar">
+          <span class="sql-bar-label">SQL</span>
+          <span class="sql-view-badge">v_census</span>
+          <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+        </div>
+        <pre><code class="language-sql">SELECT age_group, age_start,
+    SUM(CASE WHEN sex = 'male'   THEN population END) AS male_pop,
+    SUM(CASE WHEN sex = 'female' THEN population END) AS female_pop,
+    ROUND(
+        SUM(CASE WHEN sex = 'male' THEN population END) * 100.0 /
+        NULLIF(SUM(CASE WHEN sex = 'female' THEN population END), 0)
+    , 1) AS sex_ratio
+FROM v_census
+WHERE year = {year}
+  AND age_scheme = 'scheme_a'
+  AND age_group != 'Total'
+  AND sex != 'total'
+  AND area_level = 2
+GROUP BY age_group, age_start
+ORDER BY age_start</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       REUSABLE CTE
+  ══════════════════════════════════════════════════════════ -->
+  <section id="cte" class="section">
+    <div class="section-eyebrow">Pattern</div>
+    <h2 class="section-title">Reusable Age-Bucket CTE</h2>
+    <hr class="section-divider">
+    <p class="section-lead">
+      Base pattern for computing all five dependency and share metrics in a single pass.
+      The CTE does one scan of the data; all derived columns are computed in the outer SELECT.
+      Use this for KPI cards and time-series queries — it avoids redundant subqueries and keeps
+      the ratio computations in one place.
+    </p>
+
+    <div class="cte-desc">
+      <div class="cte-fields">
+        <div class="cte-field">
+          <code>pop_0_14</code>
+          <p>Children — numerator for youth dependency and children share. Uses age_end ≤ 14 filter to avoid the 10–14 band edge case.</p>
+        </div>
+        <div class="cte-field">
+          <code>pop_15_64</code>
+          <p>Working-age — denominator for all dependency ratios. Shared denominator across aging index, youth dep, old-age dep, and total dep.</p>
+        </div>
+        <div class="cte-field">
+          <code>pop_65_plus</code>
+          <p>Elderly — uses age_start ≥ 65 only (no age_end filter) to correctly capture open-ended terminal bands (80+, 85+) regardless of year.</p>
+        </div>
+        <div class="cte-field">
+          <code>pop_total</code>
+          <p>Denominator for share calculations. SUM of all individual bands, not the Total row — this excludes ~1.45M persons with unknown age in early census years.</p>
+        </div>
+        <div class="cte-field">
+          <code>aging_index</code>
+          <p>pop_65_plus / pop_0_14 × 100. Crosses 100 in 2000.</p>
+        </div>
+        <div class="cte-field">
+          <code>old_age_dep</code>
+          <p>pop_65_plus / pop_15_64 × 100. Not exposed as a map metric; computed for KPI and reference.</p>
+        </div>
+        <div class="cte-field">
+          <code>youth_dep</code>
+          <p>pop_0_14 / pop_15_64 × 100. Crossed below old_age_dep between 1995–2000.</p>
+        </div>
+        <div class="cte-field">
+          <code>working_age_share</code>
+          <p>pop_15_64 / pop_total × 100. Peaked ~1990; proxy for demographic dividend window.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sql-wrapper" style="border-radius: 6px; border: 1px solid var(--border); overflow: hidden;">
+      <div class="sql-bar">
+        <span class="sql-bar-label">SQL — Age Bucket CTE (all metrics, one pass)</span>
+        <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+      </div>
+      <pre><code class="language-sql">WITH age_buckets AS (
+    SELECT year, area_estat, prefecture_name, prefecture_name_ja,
+        SUM(CASE WHEN age_start >= 0  AND age_end <= 14 THEN population ELSE 0 END) AS pop_0_14,
+        SUM(CASE WHEN age_start >= 15 AND age_end <= 64 THEN population ELSE 0 END) AS pop_15_64,
+        SUM(CASE WHEN age_start >= 65                   THEN population ELSE 0 END) AS pop_65_plus,
+        SUM(population)                                                              AS pop_total
+    FROM v_census
+    WHERE age_scheme  = 'scheme_a'
+      AND age_group  != 'Total'
+      AND sex         = 'total'
+      AND area_level  = 2
+    GROUP BY year, area_estat, prefecture_name, prefecture_name_ja
+)
+SELECT *,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14, 0), 1)                  AS aging_index,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_15_64, 0), 1)                 AS old_age_dep,
+    ROUND(pop_0_14 * 100.0 / NULLIF(pop_15_64, 0), 1)                    AS youth_dep,
+    ROUND((pop_0_14 + pop_65_plus) * 100.0 / NULLIF(pop_15_64, 0), 1)    AS total_dep,
+    ROUND(pop_15_64 * 100.0 / NULLIF(pop_total, 0), 1)                   AS working_age_share
+FROM age_buckets
+ORDER BY year, area_estat</code></pre>
+    </div>
+  </section>
+
+  <!-- ── GROWTH RATE ───────────────────────────────────────── -->
+  <section id="growth-rate" class="section" style="margin-bottom: 48px;">
+    <div class="section-eyebrow">Calculation Note</div>
+    <h2 class="section-title" style="font-size: 20px;">Growth Rate</h2>
+    <hr class="section-divider">
+    <div class="growth-aside">
+      <h4>Annualized Growth Formula</h4>
+      <div class="growth-formula">rate = (pop_b / pop_a) ^ (1 / (year_b - year_a)) - 1</div>
+      <p>
+        Census intervals are nominally 5-year steps (1920–2020) but are <em>not uniform</em> — the
+        year gap ranges from 2 to 5 depending on historical disruptions. Never hardcode a 5-year
+        denominator. Always compute the actual year gap from the data. The <code>year_gap</code>
+        column in <code>v_map_metrics</code> provides this per row.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       QUERY COOKBOOK
+  ══════════════════════════════════════════════════════════ -->
+  <section id="cookbook" class="section">
+    <div class="section-eyebrow">Ready-to-Run</div>
+    <h2 class="section-title">Query Cookbook</h2>
+    <hr class="section-divider">
+    <p class="section-lead">
+      Canonical SQL for each panel and data surface in the dashboard. Copy-paste ready.
+      Placeholder tokens in <span style="color:var(--beni);font-family:'JetBrains Mono',monospace;font-size:13px;">{braces}</span> are
+      Python f-string substitution points.
+    </p>
+
+    <!-- MAP ────────────────────────────────────────────────── -->
+    <div class="cookbook-group" id="cookbook-map">
+      <div class="cookbook-group-title">
+        Map Queries
+        <span class="subtitle">always via v_map_metrics — never v_census</span>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">Population + Aging Metrics<span class="ja">人口・高齢化指数</span></span>
+          <span class="qbadge view">v_map_metrics</span>
+        </div>
+        <div class="query-note-bar">Pre-aggregated with period deltas. <code>pop_delta</code> and <code>aging_index_delta</code> are NULL for 1920 (no prior year).</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT area_estat, population, aging_index,
+       pop_delta, aging_index_delta, prev_year, year_gap
+FROM v_map_metrics
+WHERE year = {year}</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">TFR Choropleth<span class="ja">合計特殊出生率</span></span>
+          <span class="qbadge view">v_map_metrics</span>
+          <span class="qbadge null-risk">NULL pre-1960</span>
+        </div>
+        <div class="query-note-bar">Coverage begins 1960. Map metric selector snaps minimum year to 1960 when TFR is active. Do not infer zero for missing years.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT area_estat, prefecture_name, prefecture_name_ja, year, tfr
+FROM v_map_metrics
+WHERE year = {year}
+  AND tfr IS NOT NULL</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">Net Migration<span class="ja">転入超過数</span></span>
+          <span class="qbadge view">v_map_metrics</span>
+          <span class="qbadge null-risk">NULL outside 1985–2020</span>
+        </div>
+        <div class="query-note-bar">Cumulative 5-year window ending on census year. 1985 is partial (4 years; source data begins 1982). Negative = net outflow.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT area_estat, prefecture_name, prefecture_name_ja, year, net_migration
+FROM v_map_metrics
+WHERE year = {year}
+  AND net_migration IS NOT NULL</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- PYRAMID ─────────────────────────────────────────────── -->
+    <div class="cookbook-group" id="cookbook-pyramid">
+      <div class="cookbook-group-title">
+        Population Pyramid
+        <span class="subtitle">collapses 80+ bands into a canonical 80+ terminal</span>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">National Pyramid<span class="ja">全国人口ピラミッド</span></span>
+          <span class="qbadge view">v_census</span>
+        </div>
+        <div class="query-note-bar">The inner CASE collapses all bands with age_start ≥ 80 into a single 80+ band for visual consistency across years with differing terminal bands.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT age_group, age_start, sex, SUM(population) AS population
+FROM (
+    SELECT
+        CASE WHEN age_start >= 80 THEN '80+' ELSE age_group END AS age_group,
+        CASE WHEN age_start >= 80 THEN 80    ELSE age_start END AS age_start,
+        sex, population
+    FROM v_census
+    WHERE year       = {year}
+      AND age_scheme = 'scheme_a'
+      AND age_group != 'Total'
+      AND sex       != 'total'
+      AND area_level = 2
+)
+GROUP BY age_group, age_start, sex
+ORDER BY age_start</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">Single Prefecture Pyramid<span class="ja">都道府県別人口ピラミッド</span></span>
+          <span class="qbadge view">v_census</span>
+        </div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT age_group, age_start, sex, SUM(population) AS population
+FROM (
+    SELECT
+        CASE WHEN age_start >= 80 THEN '80+' ELSE age_group END AS age_group,
+        CASE WHEN age_start >= 80 THEN 80    ELSE age_start END AS age_start,
+        sex, population
+    FROM v_census
+    WHERE year        = {year}
+      AND age_scheme  = 'scheme_a'
+      AND age_group  != 'Total'
+      AND sex        != 'total'
+      AND area_estat  = '{area_estat}'
+)
+GROUP BY age_group, age_start, sex
+ORDER BY age_start</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIME SERIES ─────────────────────────────────────────── -->
+    <div class="cookbook-group" id="cookbook-timeseries">
+      <div class="cookbook-group-title">
+        Time Series
+        <span class="subtitle">all census years; swap area filter for prefecture overlay</span>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">National Population<span class="ja">総人口</span></span>
+          <span class="qbadge view">v_census</span>
+        </div>
+        <div class="query-note-bar">Uses the pre-stored Total row — the only valid use of <code>age_group = 'Total'</code>. Avoids the unknown-age double-count issue because Total is sourced directly.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT year, SUM(population) AS total_pop
+FROM v_census
+WHERE age_group = 'Total'
+  AND sex = 'total'
+  AND area_level = 2
+GROUP BY year
+ORDER BY year</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">Aging Index Over Time<span class="ja">高齢化指数推移</span></span>
+          <span class="qbadge view">v_census</span>
+        </div>
+        <div class="query-note-bar">Swap <code>area_level = 2</code> for <code>area_estat = '{area_estat}'</code> to render a prefecture overlay as a dashed line.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">WITH age_buckets AS (
+    SELECT year,
+        SUM(CASE WHEN age_start >= 65                               THEN population ELSE 0 END) AS pop_65_plus,
+        SUM(CASE WHEN age_start <= 10 AND age_end <= 14 THEN population ELSE 0 END) AS pop_0_14
+    FROM v_census
+    WHERE age_scheme = 'scheme_a'
+      AND age_group != 'Total'
+      AND sex        = 'total'
+      AND area_level = 2   -- swap for: AND area_estat = '{area_estat}'
+    GROUP BY year
+)
+SELECT year,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14, 0), 1) AS aging_index
+FROM age_buckets
+ORDER BY year</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">Population Share (三区分)<span class="ja">年少・生産・老年人口割合</span></span>
+          <span class="qbadge view">v_census</span>
+        </div>
+        <div class="query-note-bar">Denominator = sum of three buckets, not the Total row — intentionally excludes ~1.45M persons with unknown age. The three shares always sum to 100%.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">WITH age_buckets AS (
+    SELECT year,
+        SUM(CASE WHEN age_start <= 10 AND age_end <= 14 THEN population ELSE 0 END) AS pop_0_14,
+        SUM(CASE WHEN age_start >= 15 AND age_end <= 64 THEN population ELSE 0 END) AS pop_15_64,
+        SUM(CASE WHEN age_start >= 65                   THEN population ELSE 0 END) AS pop_65_plus
+    FROM v_census
+    WHERE age_scheme = 'scheme_a'
+      AND age_group != 'Total'
+      AND sex        = 'total'
+      AND area_level = 2   -- swap for: AND area_estat = '{area_estat}'
+    GROUP BY year
+)
+SELECT year,
+    ROUND(pop_0_14    * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS youth_share,
+    ROUND(pop_15_64   * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS working_share,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS old_share,
+    pop_0_14, pop_15_64, pop_65_plus
+FROM age_buckets
+ORDER BY year</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">TFR — National Average<span class="ja">合計特殊出生率（全国平均）</span></span>
+          <span class="qbadge fact">f_tfr</span>
+          <span class="qbadge null-risk">no data pre-1960</span>
+        </div>
+        <div class="query-note-bar">National average = mean of all prefecture TFR values per year. Coverage begins 1960. Do not infer zero for pre-1960 — no rows exist.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">-- National average TFR by year
+SELECT year, ROUND(AVG(tfr), 2) AS tfr
+FROM f_tfr
+GROUP BY year
+ORDER BY year</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">TFR — Prefecture Overlay<span class="ja">都道府県別出生率オーバーレイ</span></span>
+          <span class="qbadge fact">f_tfr</span>
+        </div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">-- Single prefecture dashed overlay on TFR view
+SELECT year, tfr
+FROM f_tfr
+WHERE area_estat = '{area_estat}'
+ORDER BY year</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJECTIONS ─────────────────────────────────────────── -->
+    <div class="cookbook-group" id="cookbook-projections">
+      <div class="cookbook-group-title">
+        IPSS Projections
+        <span class="subtitle">bolted on at 2020; solid → dashed handoff</span>
+      </div>
+
+      <div class="callout info" style="margin-bottom: 20px;">
+        <strong>Handoff at 2020:</strong> Census observation lines end at 2020 (<code>IPSS_HANDOFF_YEAR</code>).
+        IPSS projection lines begin at 2020 using a confirmed census observation as the anchor.
+        The 2015 join point is avoided because IPSS upward-adjusts the 2015 baseline by ~1–2% (undercounting),
+        producing a visible step discontinuity. Joining at 2020 eliminates this.
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">National Population Projection<span class="ja">全国人口推計（三区分）</span></span>
+          <span class="qbadge fact">f_national_projections</span>
+        </div>
+        <div class="query-note-bar">Fetch all three variants to build the high/low confidence band and medium continuation line. Variants differ only in fertility assumption (TFR trajectory); mortality held at medium in all three.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT projection_year, variant, total_population
+FROM f_national_projections
+WHERE projection_year >= {IPSS_HANDOFF_YEAR}
+ORDER BY projection_year, variant</code></pre>
+        </div>
+      </div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">Projected Population Shares<span class="ja">将来人口割合推計</span></span>
+          <span class="qbadge fact">f_national_projections</span>
+        </div>
+        <div class="query-note-bar">Denominator matches the census share denominator — sum of three buckets — ensuring a seamless visual handoff between census and projection lines.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT
+    projection_year, variant,
+    ROUND(pop_0_14    * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS youth_share,
+    ROUND(pop_15_64   * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS working_share,
+    ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS old_share
+FROM f_national_projections
+WHERE projection_year >= {IPSS_HANDOFF_YEAR}
+ORDER BY projection_year, variant</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- UTILITIES ───────────────────────────────────────────── -->
+    <div class="cookbook-group" id="cookbook-util">
+      <div class="cookbook-group-title">Utilities</div>
+
+      <div class="query-card">
+        <div class="query-card-head">
+          <span class="query-name">Available Census Years<span class="ja">対象センサス年一覧</span></span>
+          <span class="qbadge view">d_years</span>
+        </div>
+        <div class="query-note-bar">Returns year, Japanese era name, and era year. Used to drive the slider and label display.</div>
+        <div class="sql-wrapper">
+          <div class="sql-bar">
+            <button class="copy-btn" onclick="copySQL(this)">Copy</button>
+          </div>
+          <pre><code class="language-sql">SELECT DISTINCT year, era_name, era_year
+FROM d_years
+ORDER BY year</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════ -->
+<footer class="page-footer">
+  <span>Japan Population Dashboard</span>
+  <a href="https://japan-population.deanallton.com" class="footer-link" target="_blank">japan-population.deanallton.com</a>
+  <a href="https://deanallton.com" class="footer-link" target="_blank">deanallton.com</a>
+  <span class="footer-right">Data: 総務省統計局 e-Stat · IPSS 2017 · 1920–2065</span>
+</footer>
+
+<script>
+// ── HIGHLIGHT.JS ──────────────────────────────────────────────
+// Register plugin BEFORE highlightAll() so it runs on the HTML
+// string internally — never touches innerHTML after the fact.
+hljs.addPlugin({
+  'after:highlight': (result) => {
+    result.value = result.value.replace(
+      /(\{[^}]+\})/g,
+      '<span style="color:var(--beni);font-style:italic;">$1</span>'
+    );
+  }
+});
+
+hljs.highlightAll();
+
+// ── COPY BUTTONS ──────────────────────────────────────────────
+function copySQL(btn) {
+  const pre = btn.closest('.sql-bar').nextElementSibling;
+  const text = pre ? pre.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 1800);
+  });
+}
+
+// ── ACTIVE NAV via IntersectionObserver ───────────────────────
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = document.querySelectorAll('section[id], .metric-card[id], .cookbook-group[id], section[id="cte"], section[id="growth-rate"]');
+
+const sectionToNavId = {
+  'intro':                '#intro',
+  'aging-index':          '[href="#aging-index"]',
+  'old-age-dep':          '[href="#old-age-dep"]',
+  'youth-dep':            '[href="#youth-dep"]',
+  'total-dep':            '[href="#total-dep"]',
+  'working-age':          '[href="#working-age"]',
+  'children-share':       '[href="#children-share"]',
+  'sex-ratio':            '[href="#sex-ratio"]',
+  'cte':                  '[href="#cte"]',
+  'growth-rate':          '[href="#growth-rate"]',
+  'cookbook-map':         '[href="#cookbook-map"]',
+  'cookbook-pyramid':     '[href="#cookbook-pyramid"]',
+  'cookbook-timeseries':  '[href="#cookbook-timeseries"]',
+  'cookbook-projections': '[href="#cookbook-projections"]',
+  'cookbook-util':        '[href="#cookbook-util"]',
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(l => l.classList.remove('active'));
+      const selector = sectionToNavId[id];
+      if (selector) {
+        const link = document.querySelector('.nav-link' + selector) ||
+                     document.querySelector(`.nav-link[href="#${id}"]`);
+        if (link) link.classList.add('active');
+      }
+    }
+  });
+}, { rootMargin: '-50px 0px -60% 0px', threshold: 0 });
+
+document.querySelectorAll(
+  'section[id], .metric-card[id], .cookbook-group[id]'
+).forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
