@@ -47,6 +47,14 @@ Python · JavaScript · Dash 4 · Plotly 6 · DuckDB · GeoPandas
 
 ---
 
+## Documentation
+
+**[Data Dictionary](https://japan-population.deanallton.com/docs/Data_Dictionary.html)** — Schema reference: all tables, views, fields, data sources, and coverage notes.
+
+**[Metrics & Queries](https://japan-population.deanallton.com/docs/Metrics_and_Queries.html)** — Derived metric formulas, SQL patterns, and the full query cookbook.
+
+---
+
 ## Data & Attribution
 
 **Census data** - Statistics Bureau of Japan, 国勢調査 1920-2020, via [e-Stat](https://www.e-stat.go.jp/). Non-commercial use with attribution.
