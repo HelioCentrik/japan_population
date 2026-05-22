@@ -1,49 +1,15 @@
 # Japan Population Dashboard
 ### 日本の人口ダッシュボード
 
-An interactive visualization of Japanese census data (1920–2020) across all 47 prefectures.
+An interactive visualization of Japanese census data (1920–2020) with projections to 2065, across all 47 prefectures.
 
 **Live:** [japan-population.deanallton.com](https://japan-population.deanallton.com)
 
----
-
-## Documentation
-
-**[Data Dictionary](https://japan-population.deanallton.com/docs/Data_Dictionary.html)** — Schema reference: all tables, views, fields, data sources, and coverage notes.
-
-**[Metrics & Queries](https://japan-population.deanallton.com/docs/Metrics_and_Queries.html)** — Derived metric formulas, SQL patterns, and the full query cookbook.
-
----
-
-## Setup
-
-**Requirements:** Python 3.12+
-
-```bash
-pip install -r requirements.txt
-python main.py
-```
-
----
-
-## Deployment
-
-Served with Gunicorn behind nginx on a self-hosted Linux server, exposed via Cloudflare Tunnel:
-
-```bash
-gunicorn wsgi:server --workers 1 --timeout 120 --bind 127.0.0.1:8050
-```
-
-**Required environment variables:**
-- `GEMINI_API_KEY` — Gemini API key for the AI Q&A panel
-
-**Cold start:** On first request, all figures are built from the committed database into an in-memory cache (30–60s). Subsequent requests are served from memory. If the database is unchanged from the previous run, the disk-backed cache makes the first request near-instant.
+![Dashboard screenshot](assets/japan-population.png)
 
 ---
 
 ## Dashboard
-
-A single-page application with four linked panels driven by a shared year control.
 
 ### Controls
 
@@ -65,6 +31,70 @@ A single-page application with four linked panels driven by a shared year contro
 **Population pyramid** — Age/sex butterfly chart for the selected year and geography. Cohort annotations mark the 団塊世代 (dankai), 団塊ジュニア, 戦中世代, and 少子化世代 birth cohorts. The WWII male deficit is visible walking up the pyramid across census years.
 
 **Time series** — Three switchable views. The population view shows national total, male, and female trends with IPSS projection confidence bands bolted on from 2020. The population share view shows youth (0–14), working-age (15–64), and elderly (65+) as shares of total population, annotated with the working-age peak and the elderly/youth crossover. The TFR view shows the national average fertility rate with the 2.1 replacement rate reference line. Prefecture overlay shown on map selection.
+
+---
+
+## Documentation
+
+**[Data Dictionary](https://japan-population.deanallton.com/docs/Data_Dictionary.html)** — Schema reference: all tables, views, fields, data sources, and coverage notes.
+
+**[Metrics & Queries](https://japan-population.deanallton.com/docs/Metrics_and_Queries.html)** — Derived metric formulas, SQL patterns, and the full query cookbook.
+
+---
+
+## Setup
+
+**Requirements:** Python 3.12+
+
+```bash
+git clone https://github.com/HelioCentrik/japan_population.git
+cd japan_population
+pip install -r requirements.txt
+```
+
+Set the required environment variable:
+
+```bash
+export GEMINI_API_KEY=your_key_here
+```
+
+Then run:
+
+```bash
+python main.py
+```
+
+---
+
+## Deployment
+
+Served with Gunicorn behind nginx on a self-hosted Linux server, exposed via Cloudflare Tunnel:
+
+```bash
+gunicorn main:server --workers 1 --timeout 120 --bind 127.0.0.1:8050
+```
+
+**Required environment variables:**
+- `GEMINI_API_KEY` — Gemini API key for the AI Q&A panel
+
+**Cold start:** On first request, all figures are built from the committed database into an in-memory cache (30–60s). Subsequent requests are served from memory. If the database is unchanged from the previous run, the disk-backed cache makes the first request near-instant.
+
+---
+
+## Project Structure
+
+```
+app/                 Application package — config, data layer, figure builders, styling
+app/data/            DuckDB singleton, figure cache, SQL view definitions
+app/viz/             Figure builders — choropleth map, pyramid, time series, KPI cards
+app/aesthetics/      Color tokens, theme definitions, Plotly template, CSS variable injection
+assets/              style.css and map_resize.js (ResizeObserver → map zoom)
+callbacks/           Callback registration — charts, UI, AI panel
+knowledge/           Markdown files concatenated into the Gemini AI system prompt
+scripts/             ETL — builds the DuckDB file from source data. Run once.
+data/                Committed database and geometry files; .figure_cache/ is gitignored
+main.py              Entrypoint — wires layout and callbacks, exposes server for Gunicorn
+```
 
 ---
 
