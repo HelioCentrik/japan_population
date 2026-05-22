@@ -465,7 +465,7 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
         r, g, b = hex_to_rgb(COLOR_TEXT_HI)
         band_color = f"rgba({r},{g},{b},{PROJECTION_BAND_ALPHA})"
 
-        # Low bound — invisible line, anchors the fill
+        # ── Total: low anchor → high fill → medium line ───────────────────
         traces.append(go.Scatter(
             x=lo["year"], y=lo["total_population"] / M,
             uid="proj_pop_lo",
@@ -475,7 +475,6 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
             showlegend=False,
             hoverinfo="skip",
         ))
-        # High bound — fills down to low
         traces.append(go.Scatter(
             x=hi["year"], y=hi["total_population"] / M,
             uid="proj_pop_hi",
@@ -483,11 +482,10 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
             mode="lines",
             line=dict(width=0),
             fill="tonexty",
-            fillcolor=band_color,
+            fillcolor=f"rgba({hex_to_rgb(COLOR_TEXT_HI)[0]},{hex_to_rgb(COLOR_TEXT_HI)[1]},{hex_to_rgb(COLOR_TEXT_HI)[2]},{PROJECTION_BAND_ALPHA})",
             showlegend=False,
             hoverinfo="skip",
         ))
-        # Medium — dashed continuation of total line
         traces.append(go.Scatter(
             x=med["year"], y=med["total_population"] / M,
             uid="proj_pop_med",
@@ -496,6 +494,74 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
             name="IPSS 中位推計 Medium",
             line=dict(color=COLOR_TEXT_HI, width=LINE_WIDTH_MAIN, dash="dash"),
             showlegend=True,
+            hoverinfo="none",
+        ))
+
+        # ── Male: low anchor → high fill → medium line ────────────────────
+        r_m, g_m, b_m = hex_to_rgb(PYRAMID_MALE_COLOR)
+        male_band = f"rgba({r_m},{g_m},{b_m},{PROJECTION_BAND_ALPHA})"
+        traces.append(go.Scatter(
+            x=lo["year"], y=lo["male_population"] / M,
+            uid="proj_pop_lo_male",
+            meta={"role": "projection"},
+            mode="lines",
+            line=dict(width=0),
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        traces.append(go.Scatter(
+            x=hi["year"], y=hi["male_population"] / M,
+            uid="proj_pop_hi_male",
+            meta={"role": "projection"},
+            mode="lines",
+            line=dict(width=0),
+            fill="tonexty",
+            fillcolor=male_band,
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        traces.append(go.Scatter(
+            x=med["year"], y=med["male_population"] / M,
+            uid="proj_pop_med_male",
+            meta={"role": "projection"},
+            mode="lines",
+            name="IPSS 中位推計 Male",
+            line=dict(color=PYRAMID_MALE_COLOR, width=LINE_WIDTH_MAIN, dash="dash"),
+            showlegend=False,
+            hoverinfo="none",
+        ))
+
+        # ── Female: low anchor → high fill → medium line ──────────────────
+        r_f, g_f, b_f = hex_to_rgb(PYRAMID_FEMALE_COLOR)
+        female_band = f"rgba({r_f},{g_f},{b_f},{PROJECTION_BAND_ALPHA})"
+        traces.append(go.Scatter(
+            x=lo["year"], y=lo["female_population"] / M,
+            uid="proj_pop_lo_female",
+            meta={"role": "projection"},
+            mode="lines",
+            line=dict(width=0),
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        traces.append(go.Scatter(
+            x=hi["year"], y=hi["female_population"] / M,
+            uid="proj_pop_hi_female",
+            meta={"role": "projection"},
+            mode="lines",
+            line=dict(width=0),
+            fill="tonexty",
+            fillcolor=female_band,
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        traces.append(go.Scatter(
+            x=med["year"], y=med["female_population"] / M,
+            uid="proj_pop_med_female",
+            meta={"role": "projection"},
+            mode="lines",
+            name="IPSS 中位推計 Female",
+            line=dict(color=PYRAMID_FEMALE_COLOR, width=LINE_WIDTH_MAIN, dash="dash"),
+            showlegend=False,
             hoverinfo="none",
         ))
 
@@ -516,7 +582,12 @@ def build_ts_population_fig(selected_year: int, area_estat: str | None = None) -
     else:
         proj = _get_national_projection_data()
         all_totals = list(national_df["total"] / M) + list(proj["medium"]["total_population"] / M)
-        all_mins = list(national_df["male"] / M) + list(national_df["female"] / M)
+        all_mins = (
+            list(national_df["male"] / M)
+            + list(national_df["female"] / M)
+            + list(proj["medium"]["male_population"] / M)
+            + list(proj["medium"]["female_population"] / M)
+        )
 
     y_min = floor(min(all_mins) * 10) / 10 / 1.4
     y_max = round(max(all_totals) * 1.2, 1)
@@ -747,6 +818,8 @@ def _get_national_projection_data() -> dict:
                 pop_0_14,
                 pop_15_64,
                 pop_65_plus,
+                male_population,
+                female_population,
                 ROUND(pop_0_14    * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS youth_share,
                 ROUND(pop_15_64   * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS working_share,
                 ROUND(pop_65_plus * 100.0 / NULLIF(pop_0_14 + pop_15_64 + pop_65_plus, 0), 1) AS old_share

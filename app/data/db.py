@@ -11,7 +11,7 @@ Startup cost: ~1-2s on first import. All queries after that run against RAM.
 
 import duckdb as ddb
 from app.utils import DB_PATH
-from app.data.sql import V_CENSUS, V_MAP_METRICS, V_TFR, V_MIGRATION, V_PROJECTIONS
+from app.data.sql import V_CENSUS, V_MAP_METRICS, V_TFR, V_MIGRATION
 
 
 
@@ -52,7 +52,6 @@ def _init_memory_db() -> ddb.DuckDBPyConnection:
     mem_con.execute(V_MAP_METRICS)
     mem_con.execute(V_TFR)
     mem_con.execute(V_MIGRATION)
-    mem_con.execute(V_PROJECTIONS)
 
     row_count = mem_con.execute("SELECT COUNT(*) FROM v_census").fetchone()[0]
     print(f"  In-memory DB ready — v_census: {row_count:,} rows")
