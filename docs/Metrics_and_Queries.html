@@ -1552,9 +1552,8 @@ ORDER BY year</code></pre>
 
       <div class="callout info" style="margin-bottom: 20px;">
         <strong>Handoff at 2020:</strong> Census observation lines end at 2020 (<code>IPSS_HANDOFF_YEAR</code>).
-        IPSS projection lines begin at 2020 using a confirmed census observation as the anchor.
-        The 2015 join point is avoided because IPSS upward-adjusts the 2015 baseline by ~1–2% (undercounting),
-        producing a visible step discontinuity. Joining at 2020 eliminates this.
+        The IPSS 2023 data begins at 2021, making 2020 the natural anchor — solid census lines end there and the
+        first projection point is 2021. No baseline divergence issue exists with the 2023 edition.
       </div>
 
       <div class="query-card">
@@ -1562,15 +1561,19 @@ ORDER BY year</code></pre>
           <span class="query-name">National Population Projection<span class="ja">全国人口推計（三区分）</span></span>
           <span class="qbadge fact">f_national_projections</span>
         </div>
-        <div class="query-note-bar">Fetch all three variants to build the high/low confidence band and medium continuation line. Variants differ only in fertility assumption (TFR trajectory); mortality held at medium in all three.</div>
+        <div class="query-note-bar">
+          Fetch all three variants to build the high/low confidence band and medium continuation line. Variants
+          differ only in fertility assumption (TFR trajectory); mortality held at medium in all three.
+        </div>
         <div class="sql-wrapper">
           <div class="sql-bar">
             <button class="copy-btn" onclick="copySQL(this)">Copy</button>
           </div>
-          <pre><code class="language-sql">SELECT projection_year, variant, total_population
-FROM f_national_projections
-WHERE projection_year >= {IPSS_HANDOFF_YEAR}
-ORDER BY projection_year, variant</code></pre>
+          <pre><code class="language-sql">
+            SELECT projection_year, variant, total_population, male_population, female_population
+            FROM f_national_projections
+            WHERE projection_year >= {IPSS_HANDOFF_YEAR}
+            ORDER BY projection_year, variant</code></pre>
         </div>
       </div>
 
@@ -1628,7 +1631,7 @@ ORDER BY year</code></pre>
   <span>Japan Population Dashboard</span>
   <a href="https://japan-population.deanallton.com" class="footer-link" target="_blank">japan-population.deanallton.com</a>
   <a href="https://deanallton.com" class="footer-link" target="_blank">deanallton.com</a>
-  <span class="footer-right">Data: 総務省統計局 e-Stat · IPSS 2017 · 1920–2065</span>
+  <span class="footer-right">Data: 総務省統計局 e-Stat · IPSS 2023 · 1920–2070</span>
 </footer>
 
 <script>
