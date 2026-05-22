@@ -100,29 +100,6 @@ JOIN d_prefectures p ON p.area_estat = m.area_estat
 ORDER BY m.census_year, m.area_estat
 """
 
-V_PROJECTIONS = """
-CREATE OR REPLACE VIEW v_projections AS
-SELECT
-    pr.area_estat,
-    p.prefecture_name,
-    p.prefecture_name_ja,
-    pr.projection_year,
-    pr.age_group_id,
-    a.age_group,
-    a.age_start,
-    a.age_end,
-    a.is_open_ended,
-    pr.sex_id,
-    s.sex,
-    s.sex_ja,
-    pr.population
-FROM f_projections pr
-JOIN d_prefectures p ON p.area_estat  = pr.area_estat
-JOIN d_age_groups  a ON a.age_group_id = pr.age_group_id
-JOIN d_sex         s ON s.sex_id       = pr.sex_id
-ORDER BY pr.projection_year, pr.area_estat
-"""
-
 # v_map_metrics: one row per prefecture × year with pre-computed demographic
 # metrics and period-over-period deltas via LAG() window functions.
 #
