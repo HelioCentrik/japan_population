@@ -34,6 +34,10 @@ from app.aesthetics.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 # ── Layout ─────────────────────────────────────────────────────────────────
 
+
+DASHBOARD_ASPECT_W = 1280
+DASHBOARD_ASPECT_H = 951
+
 SIDE_PANEL_WIDTH      = "400px"
 SIDE_PANEL_TRANSITION = "0.3s ease"
 

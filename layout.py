@@ -58,273 +58,280 @@ def serve_layout():
             dcc.Store(id="panel-mode", data="project"),
             dcc.Store(id="last-panel-mode", data="project"),
             html.Div(
-                className="dashboard-outer",
                 style={
-                    "backgroundColor": PAGE_BG,
-                    "maxWidth": "clamp(800px,66.67vw, 1800px)",
-                    "margin": "0 auto",
                     "flex": "1",
                     "minWidth": "0",
-                    "overflow-y": "visible",
+                    "display": "flex",
+                    "justifyContent": "center",
+                    "alignItems": "center",
+                    "overflow": "hidden",
                 },
                 children=[
-                    dcc.Store(id="charts-ready-trigger", data=None),
-                    dcc.Store(id="selected-prefecture", data=None),
-                    dcc.Store(id="resume-year", data=None),
-                    dcc.Store(id="map-init-zoom", data=None),
-                    dcc.Store(id="font-tier", data="lg"),
-                    dcc.Store(id="show-projections", data=True),
-                    dcc.Store(id="ai-chat-history", data=[], storage_type="local"),
-                    dcc.Store(id="ai-pending-question", data=None),
-                    dcc.Interval(
-                        id="zoom-init",
-                        interval=200,    # fires once 200ms after page load — enough for flex layout to settle
-                        max_intervals=1,
-                        n_intervals=0,
-                    ),
-                    dcc.Interval(
-                        id="ready-poll",
-                        interval=150,         # fast enough to feel instant after Plotly init
-                        max_intervals=800,    # 150ms × 800 = 120s cold-cache coverage
-                        n_intervals=0,
-                    ),
-
-                    dcc.Interval(
-                        id="play-interval",
-                        interval=PLAY_INTERVAL_MS,
-                        disabled=True,  # starts paused; callbacks toggle this
-                        n_intervals=0,
-                    ),
-
-
-                    # ── Header ────────────────────────
                     html.Div(
-                        className="dashboard-header",
-                        children=[
-                            html.Div(
-                                className="header-byline-group",
-                                children=[
-                                    html.A(
-                                        "deanallton.com",
-                                        href="https://deanallton.com",
-                                        target="_blank",
-                                        className="header-byline",
-                                    ),
-                                ],
-                            ),
-                            html.Div(
-                                className="header-text",
-                                children=[
-                                    html.Div(HEADER_TITLE_JA, className="header-title-ja"),
-                                    html.Div(HEADER_TITLE_EN, className="header-title-en"),
-                                ],
-                            ),
-                        ],
-                    ),
-
-                    # KPI Cards — skeleton shells reserve row height before update_charts fires
-                    html.Div(
-                        id="kpi-row",
-                        className="kpi-row",
-                        children=[
-                            html.Div([
-                                html.Div(className="kpi-label"),
-                                html.Div(className="kpi-value"),
-                                html.Div(className="kpi-sub"),
-                            ], className="card kpi-skeleton")
-                            for _ in range(6)
-                        ],
-                    ),
-
-                    # Play Button + Year Slider
-                    html.Div(
+                        className="dashboard-outer",
                         style={
-                            "display": "flex",
-                            "alignItems": "stretch",
-                            "gap": f"{LAYOUT_GAP}",
+                            "minWidth": "0",
                         },
                         children=[
-
-                            # Play / Pause button
-                            html.Button(
-                                "▶",
-                                id="play-btn",
-                                className="play-btn",
+                            dcc.Store(id="charts-ready-trigger", data=None),
+                            dcc.Store(id="selected-prefecture", data=None),
+                            dcc.Store(id="resume-year", data=None),
+                            dcc.Store(id="map-init-zoom", data=None),
+                            dcc.Store(id="font-tier", data="lg"),
+                            dcc.Store(id="show-projections", data=True),
+                            dcc.Store(id="ai-chat-history", data=[], storage_type="local"),
+                            dcc.Store(id="ai-pending-question", data=None),
+                            dcc.Interval(
+                                id="zoom-init",
+                                interval=200,    # fires once 200ms after page load — enough for flex layout to settle
+                                max_intervals=1,
+                                n_intervals=0,
+                            ),
+                            dcc.Interval(
+                                id="ready-poll",
+                                interval=150,         # fast enough to feel instant after Plotly init
+                                max_intervals=800,    # 150ms × 800 = 120s cold-cache coverage
+                                n_intervals=0,
                             ),
 
-                            # Slider panel
-                            html.Div(
-                                className="playback-panel",
-                                children=[
-                                    dcc.Slider(
-                                        id="year-slider",
-                                        min=min(CENSUS_YEARS),
-                                        max=max(CENSUS_YEARS),
-                                        step=None,
-                                        value=MAX_YEAR,
-                                        marks={
-                                            yr: {
-                                                "label": str(yr),
-                                                "style": {
-                                                    "color": COLOR_PRIMARY if yr == 1945 else COLOR_TEXT_MID,
-                                                    "fontSize": f"{FONT_SIZE_AXIS_TITLE}px",
-                                                    "fontWeight": "bold" if yr == 1945 else "normal",
-                                                }
-                                            }
-                                            for yr in CENSUS_YEARS
-                                        },
-                                        tooltip=None,
-                                        included=False,
-                                    )
-                                ]
+                            dcc.Interval(
+                                id="play-interval",
+                                interval=PLAY_INTERVAL_MS,
+                                disabled=True,  # starts paused; callbacks toggle this
+                                n_intervals=0,
                             ),
-                        ]
-                    ),
 
-                    html.Div(
-                        className="charts-area",
-                        children=[
 
-                            # Map + Pyramid columns
+                            # ── Header ────────────────────────
                             html.Div(
-                                className="map-pyramid-row",
-                                style={},
+                                className="dashboard-header",
                                 children=[
-                                    # Map container
                                     html.Div(
-                                        className="map-panel",
+                                        className="header-byline-group",
                                         children=[
-                                            html.Div(
-                                                className="metric-selector-strip",
-                                                children=[
-                                                    dcc.Dropdown(
-                                                        id="metric-selector",
-                                                        options=[
-                                                            {"label": meta["label"], "value": key}
-                                                            for key, meta in MAP_METRICS.items()
-                                                        ],
-                                                        value=MAP_METRIC_DEFAULT,
-                                                        clearable=False,
-                                                        searchable=False,
-                                                    ),
-                                                    html.Button(
-                                                        "✕ Clear",
-                                                        id="reset-prefecture-btn",
-                                                    ),
-                                                ]
+                                            html.A(
+                                                "deanallton.com",
+                                                href="https://deanallton.com",
+                                                target="_blank",
+                                                className="header-byline",
                                             ),
-                                            html.Button(
-                                                "⤢",
-                                                id="map-resize-btn",
-                                                className="map-resize-btn",
-                                                title="Refit map",
-                                                n_clicks=0,
-                                            ),
-                                            html.Div(
-                                                className="map-inner",
-                                                children=[
-                                                    dcc.Graph(
-                                                        id="map-graph",
-                                                        clear_on_unhover=True,
-                                                        figure=_DARK_MAP_PLACEHOLDER,
-                                                        config={"displayModeBar": False, "responsive": False},
-                                                        style={"height": "100%"},
-                                                    ),
-                                                ]
-                                            ),
-                                            dcc.Tooltip(
-                                                id="map-tooltip",
-                                                direction="right",
-                                            ),
-                                        ]
+                                        ],
+                                    ),
+                                    html.Div(
+                                        className="header-text",
+                                        children=[
+                                            html.Div(HEADER_TITLE_JA, className="header-title-ja"),
+                                            html.Div(HEADER_TITLE_EN, className="header-title-en"),
+                                        ],
+                                    ),
+                                ],
+                            ),
+
+                            # KPI Cards — skeleton shells reserve row height before update_charts fires
+                            html.Div(
+                                id="kpi-row",
+                                className="kpi-row",
+                                children=[
+                                    html.Div([
+                                        html.Div(className="kpi-label"),
+                                        html.Div(className="kpi-value"),
+                                        html.Div(className="kpi-sub"),
+                                    ], className="card kpi-skeleton")
+                                    for _ in range(6)
+                                ],
+                            ),
+
+                            # Play Button + Year Slider
+                            html.Div(
+                                style={
+                                    "display": "flex",
+                                    "alignItems": "stretch",
+                                    "gap": f"{LAYOUT_GAP}",
+                                },
+                                children=[
+
+                                    # Play / Pause button
+                                    html.Button(
+                                        "▶",
+                                        id="play-btn",
+                                        className="play-btn",
                                     ),
 
-                                    # Population Pyramid
+                                    # Slider panel
                                     html.Div(
-                                        className="pyramid-panel",
+                                        className="playback-panel",
                                         children=[
+                                            dcc.Slider(
+                                                id="year-slider",
+                                                min=min(CENSUS_YEARS),
+                                                max=max(CENSUS_YEARS),
+                                                step=None,
+                                                value=MAX_YEAR,
+                                                marks={
+                                                    yr: {
+                                                        "label": str(yr),
+                                                        "style": {
+                                                            "color": COLOR_PRIMARY if yr == 1945 else COLOR_TEXT_MID,
+                                                            "fontSize": f"{FONT_SIZE_AXIS_TITLE}px",
+                                                            "fontWeight": "bold" if yr == 1945 else "normal",
+                                                        }
+                                                    }
+                                                    for yr in CENSUS_YEARS
+                                                },
+                                                tooltip=None,
+                                                included=False,
+                                            )
+                                        ]
+                                    ),
+                                ]
+                            ),
+
+                            html.Div(
+                                className="charts-area",
+                                children=[
+
+                                    # Map + Pyramid columns
+                                    html.Div(
+                                        className="map-pyramid-row",
+                                        style={},
+                                        children=[
+                                            # Map container
                                             html.Div(
-                                                className="pyramid-legend",
-                                                children=[
-                                                    html.Span("■", style={"color": PYRAMID_MALE_COLOR}),
-                                                    html.Span("男 Male", style={"marginRight": "10px"}),
-                                                    html.Span("■", style={"color": PYRAMID_FEMALE_COLOR}),
-                                                    html.Span("女 Female"),
-                                                ]
-                                            ),
-                                            html.Div(
-                                                className="pyramid-inner",
+                                                className="map-panel",
                                                 children=[
                                                     html.Div(
-                                                        className="pyramid-graph-container",
+                                                        className="metric-selector-strip",
+                                                        children=[
+                                                            dcc.Dropdown(
+                                                                id="metric-selector",
+                                                                options=[
+                                                                    {"label": meta["label"], "value": key}
+                                                                    for key, meta in MAP_METRICS.items()
+                                                                ],
+                                                                value=MAP_METRIC_DEFAULT,
+                                                                clearable=False,
+                                                                searchable=False,
+                                                            ),
+                                                            html.Button(
+                                                                "✕ Clear",
+                                                                id="reset-prefecture-btn",
+                                                            ),
+                                                        ]
+                                                    ),
+                                                    html.Button(
+                                                        "⤢",
+                                                        id="map-resize-btn",
+                                                        className="map-resize-btn",
+                                                        title="Refit map",
+                                                        n_clicks=0,
+                                                    ),
+                                                    html.Div(
+                                                        className="map-inner",
                                                         children=[
                                                             dcc.Graph(
-                                                                id="pyramid-chart",
-                                                                className="pyramid-graph",
+                                                                id="map-graph",
                                                                 clear_on_unhover=True,
-                                                                figure=_DARK_PLACEHOLDER,
-                                                                config={"displayModeBar": False, "responsive": True},
+                                                                figure=_DARK_MAP_PLACEHOLDER,
+                                                                config={"displayModeBar": False, "responsive": False},
                                                                 style={"height": "100%"},
                                                             ),
                                                         ]
                                                     ),
+                                                    dcc.Tooltip(
+                                                        id="map-tooltip",
+                                                        direction="right",
+                                                    ),
                                                 ]
                                             ),
+
+                                            # Population Pyramid
+                                            html.Div(
+                                                className="pyramid-panel",
+                                                children=[
+                                                    html.Div(
+                                                        className="pyramid-legend",
+                                                        children=[
+                                                            html.Span("■", style={"color": PYRAMID_MALE_COLOR}),
+                                                            html.Span("男 Male", style={"marginRight": "10px"}),
+                                                            html.Span("■", style={"color": PYRAMID_FEMALE_COLOR}),
+                                                            html.Span("女 Female"),
+                                                        ]
+                                                    ),
+                                                    html.Div(
+                                                        className="pyramid-inner",
+                                                        children=[
+                                                            html.Div(
+                                                                className="pyramid-graph-container",
+                                                                children=[
+                                                                    dcc.Graph(
+                                                                        id="pyramid-chart",
+                                                                        className="pyramid-graph",
+                                                                        clear_on_unhover=True,
+                                                                        figure=_DARK_PLACEHOLDER,
+                                                                        config={"displayModeBar": False, "responsive": True},
+                                                                        style={"height": "100%"},
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                        ]
+                                                    ),
+                                                    dcc.Tooltip(
+                                                        id="pyramid-tooltip",
+                                                        direction="right",
+                                                    ),
+                                                ]
+                                            ),
+                                        ]
+                                    ),
+
+                                    # Time Series
+                                    html.Div(
+                                        className="timeseries-panel",
+                                        children=[
+                                            html.Div(
+                                                className="metric-selector-strip ts-selector-strip",
+                                                children=[
+                                                    dcc.Dropdown(
+                                                        id="ts-view-selector",
+                                                        options=[{"label": v, "value": k} for k, v in TS_VIEWS.items()],
+                                                        value=TS_VIEW_DEFAULT,
+                                                        clearable=False,
+                                                        searchable=False,
+                                                    ),
+                                                ],
+                                            ),
+                                            html.Button(
+                                                children=[
+                                                    html.Span("推計", className="proj-toggle-label"),
+                                                    html.Div(
+                                                        html.Div(className="proj-toggle-thumb"),
+                                                        className="proj-toggle-track",
+                                                    ),
+                                                ],
+                                                id="proj-toggle-btn",
+                                                className="proj-toggle-btn active",
+                                                n_clicks=0,
+                                                title="Toggle IPSS projections",
+                                            ),
+                                            dcc.Graph(
+                                                id="timeseries-chart",
+                                                clear_on_unhover=True,
+                                                figure=_DARK_PLACEHOLDER,
+                                                config={"displayModeBar": False, "responsive": True},
+                                                style={"height": "100%"},
+                                            ),
                                             dcc.Tooltip(
-                                                id="pyramid-tooltip",
-                                                direction="right",
+                                                id="timeseries-tooltip",
+                                                direction="top",
                                             ),
                                         ]
                                     ),
                                 ]
                             ),
-
-                            # Time Series
-                            html.Div(
-                                className="timeseries-panel",
-                                children=[
-                                    html.Div(
-                                        className="metric-selector-strip ts-selector-strip",
-                                        children=[
-                                            dcc.Dropdown(
-                                                id="ts-view-selector",
-                                                options=[{"label": v, "value": k} for k, v in TS_VIEWS.items()],
-                                                value=TS_VIEW_DEFAULT,
-                                                clearable=False,
-                                                searchable=False,
-                                            ),
-                                        ],
-                                    ),
-                                    html.Button(
-                                        children=[
-                                            html.Span("推計", className="proj-toggle-label"),
-                                            html.Div(
-                                                html.Div(className="proj-toggle-thumb"),
-                                                className="proj-toggle-track",
-                                            ),
-                                        ],
-                                        id="proj-toggle-btn",
-                                        className="proj-toggle-btn active",
-                                        n_clicks=0,
-                                        title="Toggle IPSS projections",
-                                    ),
-                                    dcc.Graph(
-                                        id="timeseries-chart",
-                                        clear_on_unhover=True,
-                                        figure=_DARK_PLACEHOLDER,
-                                        config={"displayModeBar": False, "responsive": True},
-                                        style={"height": "100%"},
-                                    ),
-                                    dcc.Tooltip(
-                                        id="timeseries-tooltip",
-                                        direction="top",
-                                    ),
-                                ]
-                            ),
                         ]
-                    ),
-                ]
-            ),  # end dashboard-outer
+                    ),  # end dashboard-outer
+                ],
+            ),
 
             # ── Side panel controls ──────────────────────────────────────
             html.Div(

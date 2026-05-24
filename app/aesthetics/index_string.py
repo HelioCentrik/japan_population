@@ -29,6 +29,7 @@ from app.aesthetics.config import (
     # Borders
     PANEL_BORDER_RADIUS, PANEL_BORDER_THICKNESS,
     # Layout
+    DASHBOARD_ASPECT_W, DASHBOARD_ASPECT_H,
     SIDE_PANEL_WIDTH, SIDE_PANEL_TRANSITION,
     LAYOUT_GAP, LAYOUT_OUTER_PAD, LAYOUT_MIN_HEIGHT,
     CHARTS_ROW_FLEX, CHARTS_TS_FLEX,
@@ -117,6 +118,10 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --border-radius            : {PANEL_BORDER_RADIUS};
                 --panel-border-thickness   : {PANEL_BORDER_THICKNESS};
 
+                /* Dashboard canvas */
+                --dashboard-w           : {DASHBOARD_ASPECT_W}px;
+                --dashboard-h           : {DASHBOARD_ASPECT_H}px;
+                
                 /* Layout */
                 --side-panel-width      : {SIDE_PANEL_WIDTH};
                 --side-panel-transition : {SIDE_PANEL_TRANSITION};
@@ -170,6 +175,12 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 defaultZoom:{MAP_DEFAULT_ZOOM},
                 centerLat:  {MAP_CENTER_LAT},
                 centerLon:  {MAP_CENTER_LON},
+            }};
+        </script>
+        <script>
+            window.DASHBOARD_CONFIG = {{
+                w: {DASHBOARD_ASPECT_W},
+                h: {DASHBOARD_ASPECT_H},
             }};
         </script>
         {{%css%}}

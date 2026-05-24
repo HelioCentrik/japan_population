@@ -424,9 +424,10 @@ body.slider-thinner
 
 /* Outer wrapper — full viewport height, scrolls below --min-height */
 .dashboard-outer {
-    height           : 100vh;
-    min-height       : var(--min-height);
-    overflow-y       : auto;
+    width            : var(--dashboard-w);
+    height           : var(--dashboard-h);
+    overflow         : hidden;
+    flex             : none;
     display          : flex;
     flex-direction   : column;
     gap              : var(--layout-gap);
@@ -1267,35 +1268,4 @@ body.slider-thinner
     border-top    : var(--tt-arrow-l) solid var(--tooltip-bg);
     border-bottom : none;
     pointer-events: none;
-}
-
-/* ── Responsive ────────────────────────────────────────────────────────────── */
-
-@media (max-width: 1572px) {
-    #kpi-row { flex-wrap: wrap; }
-    #kpi-row { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (max-width: 768px) {
-    #kpi-row { flex-wrap: wrap; }
-    #kpi-row { grid-template-columns: repeat(2, 1fr); }
-
-    .map-pyramid-row {
-        flex-direction: column;
-        flex          : none;
-        height        : auto;
-    }
-    .map-panel,
-    .pyramid-panel {
-        flex  : none;
-        height: 50vh;
-    }
-    .timeseries-panel {
-        flex  : none;
-        height: 30vh;
-    }
-}
-
-@media (max-width: 508px) {
-    #kpi-row { grid-template-columns: 1fr; }
 }
