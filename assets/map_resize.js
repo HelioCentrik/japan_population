@@ -60,6 +60,7 @@
         let _catchUpTimer = null;
 
         lastPanelHeight = panel.getBoundingClientRect().height;
+        let lastPanelWidth  = panel.getBoundingClientRect().width;
 
         plotDiv.on('plotly_afterplot', function () {
             clearTimeout(_catchUpTimer);
@@ -107,20 +108,31 @@
             }
         }, 3000);
 
-        let _resizeTimer = null;
-        window.addEventListener('resize', function () {
+        let _panelResizeTimer = null;
+        new ResizeObserver(function () {
             if (!revealed) return;
-            clearTimeout(_resizeTimer);
-            _resizeTimer = setTimeout(function () {
+            clearTimeout(_panelResizeTimer);
+            _panelResizeTimer = setTimeout(function () {
                 const pDiv = getPlotlyDiv();
-                if (!pDiv || !panel) return;
+                if (!pDiv) return;
+                const h = panel.getBoundingClientRect().height;
+                const w = panel.getBoundingClientRect().width;
+                const heightChanged = Math.abs(h - lastPanelHeight) > 2;
+                const widthChanged  = Math.abs(w - lastPanelWidth)  > 2;
+                if (!heightChanged && !widthChanged) return;
+                lastPanelWidth = w;
                 Plotly.Plots.resize(pDiv).then(function () {
-                    const h = panel.getBoundingClientRect().height;
-                    lastPanelHeight = h;
-                    applyResizeZoom(pDiv, h);
+                    if (heightChanged) {
+                        lastPanelHeight = h;
+                        applyResizeZoom(pDiv, h);
+                    }
+                    ['#pyramid-chart .js-plotly-plot', '#timeseries-chart .js-plotly-plot'].forEach(function (sel) {
+                        const el = document.querySelector(sel);
+                        if (el) Plotly.Plots.resize(el);
+                    });
                 });
             }, 150);
-        });
+        }).observe(panel);
 
         return true;
     }

@@ -7,7 +7,7 @@ from dash_app import app
 from startup import CENSUS_YEARS, YEAR_LABELS
 from app.aesthetics.config import (
     PAGE_BG, PANEL_BG, COLOR_PRIMARY, COLOR_TEXT_MID,
-    PLAY_INTERVAL_MS, LAYOUT_GAP,
+    PLAY_INTERVAL_MS,
     MAP_METRICS, MAP_METRIC_DEFAULT,
     MAP_REF_ZOOM, MAP_CENTER_LAT, MAP_CENTER_LON,
     PYRAMID_MALE_COLOR, PYRAMID_FEMALE_COLOR,
@@ -143,11 +143,7 @@ def serve_layout():
 
                             # Play Button + Year Slider
                             html.Div(
-                                style={
-                                    "display": "flex",
-                                    "alignItems": "stretch",
-                                    "gap": f"{LAYOUT_GAP}",
-                                },
+                                className="playback-row",
                                 children=[
 
                                     # Play / Pause button

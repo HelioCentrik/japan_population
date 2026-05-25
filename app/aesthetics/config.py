@@ -38,18 +38,21 @@ from app.aesthetics.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 DASHBOARD_ASPECT_W = 1280
 DASHBOARD_ASPECT_H = 951
 
-SIDE_PANEL_WIDTH      = "400px"
+SIDE_PANEL_WIDTH      = 400
 SIDE_PANEL_TRANSITION = "0.3s ease"
 
-LAYOUT_GAP        = "clamp(0.3rem, 0.35vw, 0.5rem)"
-LAYOUT_OUTER_PAD  = "clamp(0.35rem, 0.6vw, 0.75rem)"
-LAYOUT_MIN_HEIGHT = "700px"
+LAYOUT_GAP       = 6
+LAYOUT_OUTER_PAD = 12
+
+HEADER_FLEX       = 1.45
+KPI_ROW_FLEX      = 1.0
+PLAYBACK_ROW_FLEX = 0.57
+CHARTS_AREA_FLEX  = 7
 
 CHARTS_ANCHOR     = 10
 CHARTS_ROW_FLEX   = 7
 CHARTS_TS_FLEX    = CHARTS_ANCHOR - CHARTS_ROW_FLEX  # = 3
 
-MAP_MIN_HEIGHT    = "48px"
 MAP_FLEX          = 7
 PYRAMID_FLEX      = 3
 
@@ -240,7 +243,6 @@ YAXIS_TICK_STANDOFF    = 0
 MAX_YEAR: int = _get_max_year()
 
 HEADER_IMAGE       = "OkinawaWomanBaby_hdr_dk.png"
-HEADER_HEIGHT      = "132px"
 HEADER_BG_SIZE     = "100% auto"
 HEADER_BG_POS      = "center 22.5%"
 HEADER_TEXT_SHADOW = "2px 2px 0 rgba(0,0,0,1.0), 0 0 10px rgba(0,0,0,0.85)"
@@ -392,9 +394,7 @@ PROJECTION_BAND_ALPHA = 0.2
 
 # ── Play button ──────────────────────────────────────────────────────────
 
-PLAY_BTN_SIZE_PX   = 52
-PLAY_BTN_SIZE      = f"{PLAY_BTN_SIZE_PX}px"
-PLAY_BTN_FONT_SIZE = f"{round(PLAY_BTN_SIZE_PX * 0.538)}px"
+PLAY_BTN_FONT_SIZE = 28
 
 
 # ── Playback ─────────────────────────────────────────────────────────────
@@ -479,14 +479,17 @@ THEME = {
         },
     },
     "layout": {
-        "gap":             LAYOUT_GAP,
-        "outer_pad":       LAYOUT_OUTER_PAD,
-        "min_height":      LAYOUT_MIN_HEIGHT,
-        "border_radius":   PANEL_BORDER_RADIUS,
-        "charts_row_flex": CHARTS_ROW_FLEX,
-        "charts_ts_flex":  CHARTS_TS_FLEX,
-        "map_flex":        MAP_FLEX,
-        "pyramid_flex":    PYRAMID_FLEX,
+        "gap":               LAYOUT_GAP,
+        "outer_pad":         LAYOUT_OUTER_PAD,
+        "border_radius":     PANEL_BORDER_RADIUS,
+        "header_flex":       HEADER_FLEX,
+        "kpi_row_flex":      KPI_ROW_FLEX,
+        "playback_row_flex": PLAYBACK_ROW_FLEX,
+        "charts_area_flex":  CHARTS_AREA_FLEX,
+        "charts_row_flex":   CHARTS_ROW_FLEX,
+        "charts_ts_flex":    CHARTS_TS_FLEX,
+        "map_flex":          MAP_FLEX,
+        "pyramid_flex":      PYRAMID_FLEX,
     },
     "map": {
         "colorscale":           MAP_COLORSCALE,
@@ -508,8 +511,7 @@ THEME = {
     },
     "playback": {
         "interval_ms": PLAY_INTERVAL_MS,
-        "btn_size":    PLAY_BTN_SIZE,
-        "btn_font":    PLAY_BTN_FONT_SIZE,
+        "btn_font_px": PLAY_BTN_FONT_SIZE,
     },
     "markers": {
         "dot":         MARKER_SIZE_DOT,

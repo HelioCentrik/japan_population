@@ -31,11 +31,12 @@ from app.aesthetics.config import (
     # Layout
     DASHBOARD_ASPECT_W, DASHBOARD_ASPECT_H,
     SIDE_PANEL_WIDTH, SIDE_PANEL_TRANSITION,
-    LAYOUT_GAP, LAYOUT_OUTER_PAD, LAYOUT_MIN_HEIGHT,
+    LAYOUT_GAP, LAYOUT_OUTER_PAD,
+    HEADER_FLEX, KPI_ROW_FLEX, PLAYBACK_ROW_FLEX, CHARTS_AREA_FLEX,
     CHARTS_ROW_FLEX, CHARTS_TS_FLEX,
-    MAP_MIN_HEIGHT, MAP_FLEX, PYRAMID_FLEX,
+    MAP_FLEX, PYRAMID_FLEX,
     # Header
-    HEADER_IMAGE, HEADER_HEIGHT, HEADER_BG_SIZE, HEADER_BG_POS,
+    HEADER_IMAGE, HEADER_BG_SIZE, HEADER_BG_POS,
     HEADER_TEXT_SHADOW, HEADER_FONT_JA, HEADER_FONT_EN,
     # Tooltip
     TOOLTIP_BG, TOOLTIP_BORDER, TOOLTIP_BORDER_SIZE,
@@ -44,7 +45,7 @@ from app.aesthetics.config import (
     # KPIs
     KPI_MARGIN, KPI_LABEL_H, KPI_VALUE_H, KPI_SUB_H,
     # Play button
-    PLAY_BTN_SIZE, PLAY_BTN_FONT_SIZE,
+    PLAY_BTN_FONT_SIZE,
     # Map
     MAP_CENTER_LON, MAP_CENTER_LAT,
     MAP_DEFAULT_ZOOM, MAP_ZOOM_MIN, MAP_ZOOM_MAX,
@@ -123,20 +124,21 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --dashboard-h           : {DASHBOARD_ASPECT_H}px;
                 
                 /* Layout */
-                --side-panel-width      : {SIDE_PANEL_WIDTH};
+                --side-panel-width      : {SIDE_PANEL_WIDTH}px;
                 --side-panel-transition : {SIDE_PANEL_TRANSITION};
-                --layout-gap            : {LAYOUT_GAP};
-                --outer-pad             : {LAYOUT_OUTER_PAD};
-                --min-height            : {LAYOUT_MIN_HEIGHT};
+                --layout-gap            : {LAYOUT_GAP}px;
+                --outer-pad             : {LAYOUT_OUTER_PAD}px;
+                --header-flex           : {HEADER_FLEX};
+                --kpi-row-flex          : {KPI_ROW_FLEX};
+                --playback-row-flex     : {PLAYBACK_ROW_FLEX};
+                --charts-area-flex      : {CHARTS_AREA_FLEX};
                 --charts-row-flex       : {CHARTS_ROW_FLEX};
                 --charts-ts-flex        : {CHARTS_TS_FLEX};
-                --map-min-height        : {MAP_MIN_HEIGHT};
                 --map-flex              : {MAP_FLEX};
                 --pyramid-flex          : {PYRAMID_FLEX};
 
                 /* Header */
                 --header-image      : url('/assets/{HEADER_IMAGE}');
-                --header-height     : {HEADER_HEIGHT};
                 --header-bg-size    : {HEADER_BG_SIZE};
                 --header-bg-pos     : {HEADER_BG_POS};
                 --header-text-shadow: {HEADER_TEXT_SHADOW};
@@ -159,8 +161,7 @@ INDEX_STRING = f'''<!DOCTYPE html>
                 --kpi-sub-h   : {KPI_SUB_H}px;
 
                 /* Play button */
-                --play-btn-size      : {PLAY_BTN_SIZE};
-                --play-btn-font-size : {PLAY_BTN_FONT_SIZE};
+                --play-btn-font-size : {PLAY_BTN_FONT_SIZE}px;
 
                 /* Timeseries */
                 --ts-selector-offset-l: {TS_SELECTOR_OFFSET_L};
