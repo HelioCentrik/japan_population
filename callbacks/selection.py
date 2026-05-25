@@ -52,6 +52,20 @@ app.clientside_callback(
         var z    = parseFloat(outer?.style?.zoom) || 1.0;
         var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
         var c    = window.TOOLTIP_CONFIG.map;
+        
+        window.__tooltipDebug = {
+            raw: raw,
+            outerRect: {
+                top:    rect.top,
+                left:   rect.left,
+                width:  rect.width,
+                height: rect.height,
+            },
+            z:      z,
+            out:    out,
+            mouse:  { x: window.__lastMouseX, y: window.__lastMouseY },
+        };
+        
         return {
             x0: (raw.x0 - rect.left + c.x) / z,
             x1: (raw.x1 - rect.left + c.x) / z,
@@ -75,6 +89,20 @@ app.clientside_callback(
         var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
         var c    = window.TOOLTIP_CONFIG.pyramid;
         var xOff = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
+        
+        window.__tooltipDebug = {
+            raw: raw,
+            outerRect: {
+                top:    rect.top,
+                left:   rect.left,
+                width:  rect.width,
+                height: rect.height,
+            },
+            z:      z,
+            out:    out,
+            mouse:  { x: window.__lastMouseX, y: window.__lastMouseY },
+        };
+        
         return {
             x0: (raw.x0 - rect.left + xOff)              / z,
             x1: (raw.x1 - rect.left + xOff)              / z,
@@ -97,6 +125,20 @@ app.clientside_callback(
         var z    = parseFloat(outer?.style?.zoom) || 1.0;
         var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
         var c    = window.TOOLTIP_CONFIG.ts;
+        
+        window.__tooltipDebug = {
+            raw: raw,
+            outerRect: {
+                top:    rect.top,
+                left:   rect.left,
+                width:  rect.width,
+                height: rect.height,
+            },
+            z:      z,
+            out:    out,
+            mouse:  { x: window.__lastMouseX, y: window.__lastMouseY },
+        };
+        
         return {
             x0: (raw.x0 - rect.left - c.x) / z,
             x1: (raw.x1 - rect.left - c.x) / z,
