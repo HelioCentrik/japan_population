@@ -48,12 +48,13 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer     = document.querySelector('.dashboard-outer');
-        var chartEl   = document.querySelector('#map-graph');
-        var z         = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect      = outer.getBoundingClientRect();
-        var chartRect = chartEl.getBoundingClientRect();
-        var c         = window.TOOLTIP_CONFIG.map;
+        var outer      = document.querySelector('.dashboard-outer');
+        var chartsArea = document.querySelector('.charts-area');
+        var chartEl    = document.querySelector('#map-graph');
+        var z          = parseFloat(getComputedStyle(outer).zoom) || 1.0;
+        var rect       = chartsArea.getBoundingClientRect();
+        var chartRect  = chartEl.getBoundingClientRect();
+        var c          = window.TOOLTIP_CONFIG.map;
         var out = {
             x0: (chartRect.left + raw.x0 - rect.left) / z + c.x,
             x1: (chartRect.left + raw.x1 - rect.left) / z + c.x,
@@ -75,13 +76,14 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer     = document.querySelector('.dashboard-outer');
-        var chartEl   = document.querySelector('#pyramid-chart');
-        var z         = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect      = outer.getBoundingClientRect();
-        var chartRect = chartEl.getBoundingClientRect();
-        var c         = window.TOOLTIP_CONFIG.pyramid;
-        var xOff      = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
+        var outer      = document.querySelector('.dashboard-outer');
+        var chartsArea = document.querySelector('.charts-area');
+        var chartEl    = document.querySelector('#pyramid-chart');
+        var z          = parseFloat(getComputedStyle(outer).zoom) || 1.0;
+        var rect       = chartsArea.getBoundingClientRect();
+        var chartRect  = chartEl.getBoundingClientRect();
+        var c          = window.TOOLTIP_CONFIG.pyramid;
+        var xOff       = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
         var out = {
             x0: (chartRect.left + raw.x0 - rect.left) / z + xOff,
             x1: (chartRect.left + raw.x1 - rect.left) / z + xOff,
@@ -103,12 +105,13 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer     = document.querySelector('.dashboard-outer');
-        var chartEl   = document.querySelector('#timeseries-chart');
-        var z         = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect      = outer.getBoundingClientRect();
-        var chartRect = chartEl.getBoundingClientRect();
-        var c         = window.TOOLTIP_CONFIG.ts;
+        var outer      = document.querySelector('.dashboard-outer');
+        var chartsArea = document.querySelector('.charts-area');
+        var chartEl    = document.querySelector('#timeseries-chart');
+        var z          = parseFloat(getComputedStyle(outer).zoom) || 1.0;
+        var rect       = chartsArea.getBoundingClientRect();
+        var chartRect  = chartEl.getBoundingClientRect();
+        var c          = window.TOOLTIP_CONFIG.ts;
         var out = {
             x0: (chartRect.left + raw.x0 - rect.left) / z - c.x,
             x1: (chartRect.left + raw.x1 - rect.left) / z - c.x,
