@@ -55,10 +55,10 @@ app.clientside_callback(
         var chartRect = chartEl.getBoundingClientRect();
         var c         = window.TOOLTIP_CONFIG.map;
         var out = {
-            x0: (chartRect.left + raw.x0 / z - rect.left) / z + c.x,
-            x1: (chartRect.left + raw.x1 / z - rect.left) / z + c.x,
-            y0: (chartRect.top  + raw.y0 / z - rect.top)  / z - c.y,
-            y1: (chartRect.top  + raw.y1 / z - rect.top)  / z - c.y,
+            x0: (chartRect.left + raw.x0 - rect.left) / z + c.x,
+            x1: (chartRect.left + raw.x1 - rect.left) / z + c.x,
+            y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
+            y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
         window.__tooltipDebug = { chart: 'map', raw, z, rect, chartRect, out,
             mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
@@ -83,10 +83,10 @@ app.clientside_callback(
         var c         = window.TOOLTIP_CONFIG.pyramid;
         var xOff      = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
         var out = {
-            x0: (chartRect.left + raw.x0 / z - rect.left) / z + xOff,
-            x1: (chartRect.left + raw.x1 / z - rect.left) / z + xOff,
-            y0: (chartRect.top  + raw.y0 / z - rect.top)  / z - c.y,
-            y1: (chartRect.top  + raw.y1 / z - rect.top)  / z - c.y,
+            x0: (chartRect.left + raw.x0 - rect.left) / z + xOff,
+            x1: (chartRect.left + raw.x1 - rect.left) / z + xOff,
+            y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
+            y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
         window.__tooltipDebug = { chart: 'pyramid', raw, z, rect, chartRect, out,
             mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
@@ -110,10 +110,10 @@ app.clientside_callback(
         var chartRect = chartEl.getBoundingClientRect();
         var c         = window.TOOLTIP_CONFIG.ts;
         var out = {
-            x0: (chartRect.left + raw.x0 / z - rect.left) / z - c.x,
-            x1: (chartRect.left + raw.x1 / z - rect.left) / z - c.x,
-            y0: (chartRect.top  + raw.y0 / z - rect.top)  / z - c.y,
-            y1: (chartRect.top  + raw.y1 / z - rect.top)  / z - c.y,
+            x0: (chartRect.left + raw.x0 - rect.left) / z - c.x,
+            x1: (chartRect.left + raw.x1 - rect.left) / z - c.x,
+            y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
+            y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
         window.__tooltipDebug = { chart: 'ts', raw, z, rect, chartRect, out,
             mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
