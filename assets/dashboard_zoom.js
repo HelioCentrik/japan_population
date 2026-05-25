@@ -45,7 +45,6 @@
 
         _lastZ           = Z;
         outer.style.zoom = Z;
-        window.__dashZoom = parseFloat(outer.style.zoom);
 
         applyChartCounterZoom();
     }

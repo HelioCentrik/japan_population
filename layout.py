@@ -74,7 +74,6 @@ def serve_layout():
                         },
                         children=[
                             dcc.Store(id="charts-ready-trigger", data=None),
-                            dcc.Store(id="dashboard-zoom", data=1.0),
                             dcc.Store(id="map-init-zoom", data=None),
                             dcc.Store(id="selected-prefecture", data=None),
                             dcc.Store(id="resume-year", data=None),

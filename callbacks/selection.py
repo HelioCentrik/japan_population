@@ -11,17 +11,6 @@ from app.aesthetics.config import (
 
 
 app.clientside_callback(
-    """
-    function(n) {
-        return window.__dashZoom || 1.0;
-    }
-    """,
-    Output("dashboard-zoom", "data"),
-    Input("zoom-init", "n_intervals"),
-)
-
-
-app.clientside_callback(
     f"""
     function(n) {{
         const panel = document.querySelector('.map-panel');
@@ -50,6 +39,68 @@ app.clientside_callback(
     Output("map-init-zoom", "data", allow_duplicate=True),
     Input("map-resize-btn", "n_clicks"),
     prevent_initial_call=True,
+)
+
+
+app.clientside_callback(
+    """
+    function(hoverData) {
+        if (!hoverData?.points?.length) return window.dash_clientside.no_update;
+        var raw = hoverData.points[0].bbox;
+        if (!raw) return window.dash_clientside.no_update;
+        var z = parseFloat(document.querySelector('.dashboard-outer')?.style?.zoom) || 1.0;
+        var c = window.TOOLTIP_CONFIG.pyramid;
+        var xOff = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
+        return {
+            x0: (raw.x0 + xOff) / z,
+            x1: (raw.x1 + xOff) / z,
+            y0: (raw.y0 + c.graphTop - c.y) / z,
+            y1: (raw.y1 + c.graphTop - c.y) / z,
+        };
+    }
+    """,
+    Output("pyramid-tooltip", "bbox"),
+    Input("pyramid-chart", "hoverData"),
+)
+
+app.clientside_callback(
+    """
+    function(hoverData) {
+        if (!hoverData?.points?.length) return window.dash_clientside.no_update;
+        var raw = hoverData.points[0].bbox;
+        if (!raw) return window.dash_clientside.no_update;
+        var z = parseFloat(document.querySelector('.dashboard-outer')?.style?.zoom) || 1.0;
+        var c = window.TOOLTIP_CONFIG.map;
+        return {
+            x0: (raw.x0 + c.x) / z,
+            x1: (raw.x1 + c.x) / z,
+            y0: (raw.y0 - c.y) / z,
+            y1: (raw.y1 - c.y) / z,
+        };
+    }
+    """,
+    Output("map-tooltip", "bbox"),
+    Input("map-graph", "hoverData"),
+)
+
+app.clientside_callback(
+    """
+    function(hoverData) {
+        if (!hoverData?.points?.length) return window.dash_clientside.no_update;
+        var raw = hoverData.points[0].bbox;
+        if (!raw) return window.dash_clientside.no_update;
+        var z = parseFloat(document.querySelector('.dashboard-outer')?.style?.zoom) || 1.0;
+        var c = window.TOOLTIP_CONFIG.ts;
+        return {
+            x0: (raw.x0 - c.x) / z,
+            x1: (raw.x1 - c.x) / z,
+            y0: (raw.y0 - c.y) / z,
+            y1: (raw.y1 - c.y) / z,
+        };
+    }
+    """,
+    Output("timeseries-tooltip", "bbox"),
+    Input("timeseries-chart", "hoverData"),
 )
 
 

@@ -57,35 +57,20 @@ def _metric_value_style(metric: str, value_str: str) -> dict:
         return {"color": color}
     return {}
 
-def _apply_zoom(bbox: dict, z: float) -> dict:
-    z = z or 1.0
-    return {k: v / z for k, v in bbox.items()}
-
 
 @app.callback(
     Output("map-tooltip", "show"),
-    Output("map-tooltip", "bbox"),
     Output("map-tooltip", "children"),
     Input("map-graph", "hoverData"),
     State("metric-selector", "value"),
-    State("dashboard-zoom", "data"),
     prevent_initial_call=True,
 )
-def show_map_tooltip(hover_data, metric, zoom_factor):
+def show_map_tooltip(hover_data, metric):
     if hover_data is None or not hover_data.get("points"):
-        return False, no_update, no_update
+        return False, no_update
 
     pt   = hover_data["points"][0]
     cd   = pt.get("customdata")
-    raw  = pt.get("bbox", {})
-
-    # Push tooltip away from cursor so the hovered feature can breathe
-    bbox = _apply_zoom({
-        "x0": raw.get("x0", 0) + MAP_TOOLTIP_OFFSET_X,
-        "x1": raw.get("x1", 0) + MAP_TOOLTIP_OFFSET_X,
-        "y0": raw.get("y0", 0) - MAP_TOOLTIP_OFFSET_Y,
-        "y1": raw.get("y1", 0) - MAP_TOOLTIP_OFFSET_Y,
-    }, zoom_factor)
 
     # ── Okinawa warning card ──────────────────────────────────────────────────
     if cd is None:
@@ -102,8 +87,8 @@ def show_map_tooltip(hover_data, metric, zoom_factor):
                     className="tt-hint",
                 ),
             ], className="tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
-            return True, bbox, children
-        return False, no_update, no_update
+            return True, children
+        return False, no_update
 
     # ── Normal prefecture card ────────────────────────────────────────────────
     meta         = MAP_METRICS[metric]
@@ -147,18 +132,16 @@ def show_map_tooltip(hover_data, metric, zoom_factor):
         html.Div("再選択でクリア  /  Reselect to clear", className="tt-hint"),
     ], className="tt-card", style={"--arrow-y-offset": f"{MAP_TOOLTIP_OFFSET_Y}px"})
 
-    return True, bbox, children
+    return True, children
 
 @app.callback(
     Output("pyramid-tooltip", "show"),
-    Output("pyramid-tooltip", "bbox"),
     Output("pyramid-tooltip", "children"),
     Output("pyramid-tooltip", "direction"),
     Input("pyramid-chart", "hoverData"),
-    State("dashboard-zoom", "data"),
     prevent_initial_call=True,
 )
-def show_pyramid_tooltip(hover_data, zoom_factor):
+def show_pyramid_tooltip(hover_data):
     if hover_data is None or not hover_data.get("points"):
         return False, no_update, no_update, no_update
 
@@ -175,14 +158,6 @@ def show_pyramid_tooltip(hover_data, zoom_factor):
     direction = "left" if x_val < 0 else "right"
     arrow_cls = "tt-card arrow-right" if direction == "left" else "tt-card"
     x_offset  = PYRAMID_TOOLTIP_OFFSET_X if direction == "right" else -PYRAMID_TOOLTIP_OFFSET_X
-
-    raw  = pt.get("bbox", {})
-    bbox = _apply_zoom({
-        "x0": raw.get("x0", 0) + x_offset,
-        "x1": raw.get("x1", 0) + x_offset,
-        "y0": raw.get("y0", 0) + PYRAMID_GRAPH_TOP_OFFSET - PYRAMID_TOOLTIP_OFFSET_Y,
-        "y1": raw.get("y1", 0) + PYRAMID_GRAPH_TOP_OFFSET - PYRAMID_TOOLTIP_OFFSET_Y,
-    }, zoom_factor)
 
     # ── Bar tooltip — curveNumber 0 (male) or 1 (female) ─────────────────────
     if curve_number in (0, 1):
@@ -232,7 +207,7 @@ def show_pyramid_tooltip(hover_data, zoom_factor):
             cohort_strip,
         ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
 
-        return True, bbox, children, direction
+        return True, children, direction
 
     # ── Scatter cohort marker tooltips — curveNumber 2 (war_gen) or 3 (shoushika) ──
     # customdata shape (set in pyramid.py Step 1): [name_ja, birth_range, accent_hex, age_label]
@@ -256,34 +231,24 @@ def show_pyramid_tooltip(hover_data, zoom_factor):
         ]),
     ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
 
-    return True, bbox, children, direction
+    return True, children, direction
 
 @app.callback(
     Output("timeseries-tooltip", "show"),
-    Output("timeseries-tooltip", "bbox"),
     Output("timeseries-tooltip", "children"),
     Output("timeseries-tooltip", "direction"),
     Input("timeseries-chart", "hoverData"),
     State("ts-view-selector", "value"),
-    State("dashboard-zoom", "data"),
     prevent_initial_call=True,
 )
-def show_timeseries_tooltip(hover_data, ts_view, zoom_factor):
+def show_timeseries_tooltip(hover_data, ts_view):
     if hover_data is None or not hover_data.get("points"):
-        return False, no_update, no_update, no_update
+        return False, no_update, no_update
 
     pt = hover_data["points"][0]
     cd = pt.get("customdata")
     if cd is None:
-        return False, no_update, no_update, no_update
-
-    raw   = pt.get("bbox", {})
-    bbox = _apply_zoom({
-        "x0": raw.get("x0", 0) - TS_TOOLTIP_OFFSET_X,
-        "x1": raw.get("x1", 0) - TS_TOOLTIP_OFFSET_X,
-        "y0": raw.get("y0", 0) - TS_TOOLTIP_OFFSET_Y,
-        "y1": raw.get("y1", 0) - TS_TOOLTIP_OFFSET_Y,
-    }, zoom_factor)
+        return False, no_update, no_update
 
     year = cd[0]
 
@@ -439,4 +404,4 @@ def show_timeseries_tooltip(hover_data, ts_view, zoom_factor):
             "--arrow-x-offset": f"{TS_TOOLTIP_OFFSET_X}px",
         })
 
-    return True, bbox, children, "top"
+    return True, children, "top"

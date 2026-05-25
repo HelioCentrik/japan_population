@@ -42,6 +42,9 @@ from app.aesthetics.config import (
     TOOLTIP_BG, TOOLTIP_BORDER, TOOLTIP_BORDER_SIZE,
     TOOLTIP_TEXT_HI, TOOLTIP_TEXT_MID,
     TOOLTIP_HINT, TOOLTIP_DIVIDER,
+    MAP_TOOLTIP_OFFSET_X, MAP_TOOLTIP_OFFSET_Y,
+    PYRAMID_TOOLTIP_OFFSET_X, PYRAMID_TOOLTIP_OFFSET_Y, PYRAMID_GRAPH_TOP_OFFSET,
+    TS_TOOLTIP_OFFSET_X, TS_TOOLTIP_OFFSET_Y,
     # KPIs
     KPI_MARGIN, KPI_LABEL_H, KPI_VALUE_H, KPI_SUB_H,
     # Play button
@@ -182,6 +185,14 @@ INDEX_STRING = f'''<!DOCTYPE html>
             window.DASHBOARD_CONFIG = {{
                 w: {DASHBOARD_ASPECT_W},
                 h: {DASHBOARD_ASPECT_H},
+            }};
+        </script>
+        <script>
+            window.TOOLTIP_CONFIG = {{
+                map:      {{ x: {MAP_TOOLTIP_OFFSET_X},      y: {MAP_TOOLTIP_OFFSET_Y} }},
+                pyramid:  {{ x: {PYRAMID_TOOLTIP_OFFSET_X},  y: {PYRAMID_TOOLTIP_OFFSET_Y},
+                            graphTop: {PYRAMID_GRAPH_TOP_OFFSET} }},
+                ts:       {{ x: {TS_TOOLTIP_OFFSET_X},       y: {TS_TOOLTIP_OFFSET_Y} }},
             }};
         </script>
         {{%css%}}
