@@ -143,13 +143,13 @@ def show_map_tooltip(hover_data, metric):
 )
 def show_pyramid_tooltip(hover_data):
     if hover_data is None or not hover_data.get("points"):
-        return False, no_update, no_update, no_update
+        return False, no_update, no_update
 
     pt           = hover_data["points"][0]
     cd           = pt.get("customdata")
     curve_number = pt.get("curveNumber", 0)
     if cd is None:
-        return False, no_update, no_update, no_update
+        return False, no_update, no_update
 
     # Direction logic is the same for all trace types:
     # negative x (male side) → tooltip left, arrow points right
