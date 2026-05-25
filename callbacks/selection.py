@@ -48,21 +48,20 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer = document.querySelector('.dashboard-outer');
-        var z     = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect  = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
-        var c     = window.TOOLTIP_CONFIG.map;
-        var out   = {
-            x0: (raw.x0 - rect.left + c.x) / z,
-            x1: (raw.x1 - rect.left + c.x) / z,
-            y0: (raw.y0 - rect.top  - c.y) / z,
-            y1: (raw.y1 - rect.top  - c.y) / z,
+        var outer     = document.querySelector('.dashboard-outer');
+        var chartEl   = document.querySelector('#map-graph');
+        var z         = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect      = outer.getBoundingClientRect();
+        var chartRect = chartEl.getBoundingClientRect();
+        var c         = window.TOOLTIP_CONFIG.map;
+        var out = {
+            x0: (chartRect.left + raw.x0 / z - rect.left) / z + c.x,
+            x1: (chartRect.left + raw.x1 / z - rect.left) / z + c.x,
+            y0: (chartRect.top  + raw.y0 / z - rect.top)  / z - c.y,
+            y1: (chartRect.top  + raw.y1 / z - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = {
-            chart: 'map', raw: raw, z: z,
-            outerRect: {top: rect.top, left: rect.left},
-            out: out, mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
-        };
+        window.__tooltipDebug = { chart: 'map', raw, z, rect, chartRect, out,
+            mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
         return out;
     }
     """,
@@ -74,24 +73,23 @@ app.clientside_callback(
     """
     function(hoverData) {
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
-        var raw  = hoverData.points[0].bbox;
+        var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer = document.querySelector('.dashboard-outer');
-        var z     = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect  = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
-        var c     = window.TOOLTIP_CONFIG.pyramid;
-        var xOff  = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
-        var out   = {
-            x0: (raw.x0 - rect.left + xOff)             / z,
-            x1: (raw.x1 - rect.left + xOff)             / z,
-            y0: (raw.y0 - rect.top  + c.graphTop - c.y) / z,
-            y1: (raw.y1 - rect.top  + c.graphTop - c.y) / z,
+        var outer     = document.querySelector('.dashboard-outer');
+        var chartEl   = document.querySelector('#pyramid-chart');
+        var z         = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect      = outer.getBoundingClientRect();
+        var chartRect = chartEl.getBoundingClientRect();
+        var c         = window.TOOLTIP_CONFIG.pyramid;
+        var xOff      = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
+        var out = {
+            x0: (chartRect.left + raw.x0 / z - rect.left) / z + xOff,
+            x1: (chartRect.left + raw.x1 / z - rect.left) / z + xOff,
+            y0: (chartRect.top  + raw.y0 / z - rect.top)  / z - c.y,
+            y1: (chartRect.top  + raw.y1 / z - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = {
-            chart: 'pyramid', raw: raw, z: z,
-            outerRect: {top: rect.top, left: rect.left},
-            out: out, mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
-        };
+        window.__tooltipDebug = { chart: 'pyramid', raw, z, rect, chartRect, out,
+            mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
         return out;
     }
     """,
@@ -103,23 +101,22 @@ app.clientside_callback(
     """
     function(hoverData) {
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
-        var raw  = hoverData.points[0].bbox;
+        var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer = document.querySelector('.dashboard-outer');
-        var z     = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect  = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
-        var c     = window.TOOLTIP_CONFIG.ts;
-        var out   = {
-            x0: (raw.x0 - rect.left - c.x) / z,
-            x1: (raw.x1 - rect.left - c.x) / z,
-            y0: (raw.y0 - rect.top  - c.y) / z,
-            y1: (raw.y1 - rect.top  - c.y) / z,
+        var outer     = document.querySelector('.dashboard-outer');
+        var chartEl   = document.querySelector('#timeseries-chart');
+        var z         = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect      = outer.getBoundingClientRect();
+        var chartRect = chartEl.getBoundingClientRect();
+        var c         = window.TOOLTIP_CONFIG.ts;
+        var out = {
+            x0: (chartRect.left + raw.x0 / z - rect.left) / z - c.x,
+            x1: (chartRect.left + raw.x1 / z - rect.left) / z - c.x,
+            y0: (chartRect.top  + raw.y0 / z - rect.top)  / z - c.y,
+            y1: (chartRect.top  + raw.y1 / z - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = {
-            chart: 'ts', raw: raw, z: z,
-            outerRect: {top: rect.top, left: rect.left},
-            out: out, mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
-        };
+        window.__tooltipDebug = { chart: 'ts', raw, z, rect, chartRect, out,
+            mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
         return out;
     }
     """,
