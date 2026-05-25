@@ -210,7 +210,6 @@ html, body {
 .play-btn {
     flex-shrink      : 0;
     align-self       : stretch;
-    width            : var(--play-btn-size);
     aspect-ratio     : 1 / 1;
     background-color : var(--panel-border);
     color            : var(--color-text-mid);
@@ -422,7 +421,7 @@ body.slider-thinner
     background-color : var(--page-bg);
 }
 
-/* Outer wrapper — full viewport height, scrolls below --min-height */
+/* Outer wrapper — fixed canvas, flex column; children share height via flex ratios */
 .dashboard-outer {
     width            : var(--dashboard-w);
     height           : var(--dashboard-h);
@@ -776,7 +775,8 @@ body.slider-thinner
 .dashboard-header {
     position           : relative;
     width              : 100%;
-    height             : var(--header-height);
+    flex               : var(--header-flex);
+    min-height         : 0;
     background-image   : var(--header-image);
     background-size    : var(--header-bg-size);
     background-position: var(--header-bg-pos);
@@ -852,6 +852,8 @@ body.slider-thinner
 
 /* KPI row */
 #kpi-row {
+    flex                  : var(--kpi-row-flex);
+    min-height            : 0;
     display               : grid;
     grid-template-columns : repeat(6, 1fr);
     gap                   : var(--layout-gap);
@@ -862,6 +864,14 @@ body.slider-thinner
 }
 
 /* Playback row */
+.playback-row {
+    flex             : var(--playback-row-flex);
+    min-height       : 0;
+    display          : flex;
+    align-items      : stretch;
+    gap              : var(--layout-gap);
+}
+
 .playback-panel {
     flex             : 1;
     border-radius    : var(--border-radius);
@@ -882,7 +892,7 @@ body.slider-thinner
 
 /* Charts area — fills all remaining vertical space */
 .charts-area {
-    flex           : 1;
+    flex           : var(--charts-area-flex);
     min-height     : 0;
     display        : flex;
     flex-direction : column;
@@ -902,7 +912,7 @@ body.slider-thinner
 /* Map panel */
 .map-panel {
     flex             : var(--map-flex);
-    min-height       : var(--map-min-height);
+    min-height       : 0;
     border-radius    : var(--border-radius);
     background-color : var(--panel-bg);
     position         : relative;
