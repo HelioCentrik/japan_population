@@ -48,34 +48,15 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var z = parseFloat(document.querySelector('.dashboard-outer')?.style?.zoom) || 1.0;
-        var c = window.TOOLTIP_CONFIG.pyramid;
-        var xOff = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
+        var outer = document.querySelector('.dashboard-outer');
+        var z    = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
+        var c    = window.TOOLTIP_CONFIG.map;
         return {
-            x0: (raw.x0 + xOff) / z,
-            x1: (raw.x1 + xOff) / z,
-            y0: (raw.y0 + c.graphTop - c.y) / z,
-            y1: (raw.y1 + c.graphTop - c.y) / z,
-        };
-    }
-    """,
-    Output("pyramid-tooltip", "bbox"),
-    Input("pyramid-chart", "hoverData"),
-)
-
-app.clientside_callback(
-    """
-    function(hoverData) {
-        if (!hoverData?.points?.length) return window.dash_clientside.no_update;
-        var raw = hoverData.points[0].bbox;
-        if (!raw) return window.dash_clientside.no_update;
-        var z = parseFloat(document.querySelector('.dashboard-outer')?.style?.zoom) || 1.0;
-        var c = window.TOOLTIP_CONFIG.map;
-        return {
-            x0: (raw.x0 + c.x) / z,
-            x1: (raw.x1 + c.x) / z,
-            y0: (raw.y0 - c.y) / z,
-            y1: (raw.y1 - c.y) / z,
+            x0: (raw.x0 - rect.left + c.x) / z,
+            x1: (raw.x1 - rect.left + c.x) / z,
+            y0: (raw.y0 - rect.top  - c.y) / z,
+            y1: (raw.y1 - rect.top  - c.y) / z,
         };
     }
     """,
@@ -89,13 +70,38 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var z = parseFloat(document.querySelector('.dashboard-outer')?.style?.zoom) || 1.0;
-        var c = window.TOOLTIP_CONFIG.ts;
+        var outer = document.querySelector('.dashboard-outer');
+        var z    = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
+        var c    = window.TOOLTIP_CONFIG.pyramid;
+        var xOff = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
         return {
-            x0: (raw.x0 - c.x) / z,
-            x1: (raw.x1 - c.x) / z,
-            y0: (raw.y0 - c.y) / z,
-            y1: (raw.y1 - c.y) / z,
+            x0: (raw.x0 - rect.left + xOff)              / z,
+            x1: (raw.x1 - rect.left + xOff)              / z,
+            y0: (raw.y0 - rect.top  + c.graphTop - c.y)  / z,
+            y1: (raw.y1 - rect.top  + c.graphTop - c.y)  / z,
+        };
+    }
+    """,
+    Output("pyramid-tooltip", "bbox"),
+    Input("pyramid-chart", "hoverData"),
+)
+
+app.clientside_callback(
+    """
+    function(hoverData) {
+        if (!hoverData?.points?.length) return window.dash_clientside.no_update;
+        var raw = hoverData.points[0].bbox;
+        if (!raw) return window.dash_clientside.no_update;
+        var outer = document.querySelector('.dashboard-outer');
+        var z    = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
+        var c    = window.TOOLTIP_CONFIG.ts;
+        return {
+            x0: (raw.x0 - rect.left - c.x) / z,
+            x1: (raw.x1 - rect.left - c.x) / z,
+            y0: (raw.y0 - rect.top  - c.y) / z,
+            y1: (raw.y1 - rect.top  - c.y) / z,
         };
     }
     """,
