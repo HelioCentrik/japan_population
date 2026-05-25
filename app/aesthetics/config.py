@@ -34,7 +34,6 @@ from app.aesthetics.themes import ACTIVE_THEME as _t, ACTIVE_THEME_NAME
 
 # ── Layout ─────────────────────────────────────────────────────────────────
 
-
 DASHBOARD_ASPECT_W = 1280
 DASHBOARD_ASPECT_H = 951
 

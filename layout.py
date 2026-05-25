@@ -229,7 +229,6 @@ def serve_layout():
                                                                 clear_on_unhover=True,
                                                                 figure=_DARK_MAP_PLACEHOLDER,
                                                                 config={"displayModeBar": False, "responsive": False},
-                                                                style={"height": "100%"},
                                                             ),
                                                         ]
                                                     ),
@@ -261,11 +260,10 @@ def serve_layout():
                                                                 children=[
                                                                     dcc.Graph(
                                                                         id="pyramid-chart",
-                                                                        className="pyramid-graph",
+                                                                        # className="pyramid-graph",
                                                                         clear_on_unhover=True,
                                                                         figure=_DARK_PLACEHOLDER,
                                                                         config={"displayModeBar": False, "responsive": True},
-                                                                        style={"height": "100%"},
                                                                     ),
                                                                 ]
                                                             ),
@@ -314,7 +312,6 @@ def serve_layout():
                                                 clear_on_unhover=True,
                                                 figure=_DARK_PLACEHOLDER,
                                                 config={"displayModeBar": False, "responsive": True},
-                                                style={"height": "100%"},
                                             ),
                                             dcc.Tooltip(
                                                 id="timeseries-tooltip",

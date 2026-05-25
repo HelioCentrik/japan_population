@@ -20,6 +20,7 @@
         revealed = true;
         const inner = document.querySelector('.map-inner');
         if (inner) inner.style.opacity = '1';
+        resizeCharts();
     }
 
     // Plotly.relayout with map layout props triggers fillBelowLookup internally,
@@ -50,6 +51,22 @@
         }
     }
 
+    // getBoundingClientRect() returns zoomed viewport coords when CSS zoom is on
+    // .dashboard-outer. Divide by the zoom factor to recover the logical height
+    // that the map zoom formula expects.
+    function logicalHeight(panel) {
+        const outer = document.querySelector('.dashboard-outer');
+        const zoom  = parseFloat(outer && outer.style.zoom) || 1;
+        return panel.getBoundingClientRect().height / zoom;
+    }
+
+    function resizeCharts() {
+        ['#pyramid-chart .js-plotly-plot', '#timeseries-chart .js-plotly-plot'].forEach(function (sel) {
+            const el = document.querySelector(sel);
+            if (el) Plotly.Plots.resize(el);
+        });
+    }
+
     function attach() {
         const panel   = document.querySelector('.map-panel');
         const plotDiv = getPlotlyDiv();
@@ -59,7 +76,7 @@
         let zoomApplied   = false;
         let _catchUpTimer = null;
 
-        lastPanelHeight = panel.getBoundingClientRect().height;
+        lastPanelHeight = logicalHeight(panel);
 
         plotDiv.on('plotly_afterplot', function () {
             clearTimeout(_catchUpTimer);
@@ -67,7 +84,7 @@
             if (revealed) {
                 // Only re-zoom on genuine panel resize — afterplot fires on every
                 // data update (year change, metric switch, prefecture click).
-                const h = panel.getBoundingClientRect().height;
+                const h = logicalHeight(panel);
                 if (Math.abs(h - lastPanelHeight) > 2) {
                     lastPanelHeight = h;
                     applyResizeZoom(plotDiv, h);
@@ -115,9 +132,10 @@
                 const pDiv = getPlotlyDiv();
                 if (!pDiv || !panel) return;
                 Plotly.Plots.resize(pDiv).then(function () {
-                    const h = panel.getBoundingClientRect().height;
+                    const h = logicalHeight(panel);
                     lastPanelHeight = h;
                     applyResizeZoom(pDiv, h);
+                    resizeCharts();
                 });
             }, 150);
         });
@@ -134,7 +152,7 @@
         const panel   = document.querySelector('.map-panel');
         const plotDiv = getPlotlyDiv();
         if (!panel || !plotDiv) return window.dash_clientside.no_update;
-        const h    = panel.getBoundingClientRect().height;
+        const h    = logicalHeight(panel);
         const zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN,
             REF_ZOOM + Math.log2(h / REF_HEIGHT)));
         lastPanelHeight = h;
@@ -143,6 +161,7 @@
             'map.center.lat': CENTER_LAT,
             'map.center.lon': CENTER_LON,
         });
+        resizeCharts();
         return window.dash_clientside.no_update;
     };
 })();

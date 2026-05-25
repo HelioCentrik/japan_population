@@ -6,7 +6,26 @@
     }
 
     const DESIGN_W = window.DASHBOARD_CONFIG.w;
-    const DESIGN_H = window.DASHBOARD_CONFIG.h;   // ← add
+    const DESIGN_H = window.DASHBOARD_CONFIG.h;
+
+    let _lastZ = null;
+
+    const CHART_SELECTORS = ['#map-graph', '#pyramid-chart', '#timeseries-chart'];
+
+    function applyChartCounterZoom() {
+        if (_lastZ === null) return false;
+        const cz = String(1 / _lastZ);
+        let allFound = true;
+        CHART_SELECTORS.forEach(function (sel) {
+            const el = document.querySelector(sel);
+            if (el) {
+                el.style.zoom = cz;
+            } else {
+                allFound = false;
+            }
+        });
+        return allFound;
+    }
 
     function applyZoom() {
         const outer    = document.querySelector('.dashboard-outer');
@@ -21,8 +40,13 @@
         if (available < 1) return;
 
         const zoomW = available / DESIGN_W;
-        const zoomH = window.innerHeight / DESIGN_H;   // ← add
-        outer.style.zoom = Math.min(zoomW, zoomH);     // ← was: available / DESIGN_W
+        const zoomH = window.innerHeight / DESIGN_H;
+        const Z     = Math.min(zoomW, zoomH);
+
+        _lastZ           = Z;
+        outer.style.zoom = Z;
+
+        applyChartCounterZoom();
     }
 
     // Window resize — debounced
@@ -41,12 +65,17 @@
         return true;
     }
 
-    // Poll until DOM is ready, then wire up and apply initial zoom
+    // Poll until outer DOM ready, then wire up
     const _init = setInterval(function () {
         if (!document.querySelector('.dashboard-outer')) return;
         clearInterval(_init);
         attachObserver();
         applyZoom();
     }, 100);
+
+    // Separate poll for chart counter-zoom — charts render after outer DOM via React
+    const _chartInit = setInterval(function () {
+        if (applyChartCounterZoom()) clearInterval(_chartInit);
+    }, 200);
 
 })();

@@ -936,6 +936,10 @@ body.slider-thinner
     transition       : opacity 0.5s ease;
 }
 
+#map-graph {
+    height: 100%;
+}
+
 /* Pyramid panel */
 .pyramid-panel {
     flex             : var(--pyramid-flex);
@@ -971,10 +975,14 @@ body.slider-thinner
     bottom   : 0;
 }
 .pyramid-panel .dash-graph {
-    height: 100% !important;   /* was: unset */
     flex: 1;
     min-height: 0;
 }
+
+#pyramid-chart {
+    height: 100%;
+}
+
 .pyramid-legend {
     position        : absolute;
     top             : 6px;
@@ -1011,11 +1019,16 @@ body.slider-thinner
     pointer-events: none;
     z-index       : 10;
 }
+
 .timeseries-inner {
     position         : absolute;
     inset            : 0;
     overflow         : hidden;
     border-radius    : var(--border-radius);
+}
+
+#timeseries-chart {
+    height: 100%;
 }
 
 .ts-selector-strip {
