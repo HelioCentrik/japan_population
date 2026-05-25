@@ -49,29 +49,21 @@ app.clientside_callback(
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
         var outer = document.querySelector('.dashboard-outer');
-        var z    = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
-        var c    = window.TOOLTIP_CONFIG.map;
-        
-        window.__tooltipDebug = {
-            raw: raw,
-            outerRect: {
-                top:    rect.top,
-                left:   rect.left,
-                width:  rect.width,
-                height: rect.height,
-            },
-            z:      z,
-            out:    out,
-            mouse:  { x: window.__lastMouseX, y: window.__lastMouseY },
-        };
-        
-        return {
+        var z     = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect  = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
+        var c     = window.TOOLTIP_CONFIG.map;
+        var out   = {
             x0: (raw.x0 - rect.left + c.x) / z,
             x1: (raw.x1 - rect.left + c.x) / z,
             y0: (raw.y0 - rect.top  - c.y) / z,
             y1: (raw.y1 - rect.top  - c.y) / z,
         };
+        window.__tooltipDebug = {
+            chart: 'map', raw: raw, z: z,
+            outerRect: {top: rect.top, left: rect.left},
+            out: out, mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
+        };
+        return out;
     }
     """,
     Output("map-tooltip", "bbox"),
@@ -82,33 +74,25 @@ app.clientside_callback(
     """
     function(hoverData) {
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
-        var raw = hoverData.points[0].bbox;
+        var raw  = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
         var outer = document.querySelector('.dashboard-outer');
-        var z    = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
-        var c    = window.TOOLTIP_CONFIG.pyramid;
-        var xOff = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
-        
+        var z     = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect  = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
+        var c     = window.TOOLTIP_CONFIG.pyramid;
+        var xOff  = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
+        var out   = {
+            x0: (raw.x0 - rect.left + xOff)             / z,
+            x1: (raw.x1 - rect.left + xOff)             / z,
+            y0: (raw.y0 - rect.top  + c.graphTop - c.y) / z,
+            y1: (raw.y1 - rect.top  + c.graphTop - c.y) / z,
+        };
         window.__tooltipDebug = {
-            raw: raw,
-            outerRect: {
-                top:    rect.top,
-                left:   rect.left,
-                width:  rect.width,
-                height: rect.height,
-            },
-            z:      z,
-            out:    out,
-            mouse:  { x: window.__lastMouseX, y: window.__lastMouseY },
+            chart: 'pyramid', raw: raw, z: z,
+            outerRect: {top: rect.top, left: rect.left},
+            out: out, mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
         };
-        
-        return {
-            x0: (raw.x0 - rect.left + xOff)              / z,
-            x1: (raw.x1 - rect.left + xOff)              / z,
-            y0: (raw.y0 - rect.top  + c.graphTop - c.y)  / z,
-            y1: (raw.y1 - rect.top  + c.graphTop - c.y)  / z,
-        };
+        return out;
     }
     """,
     Output("pyramid-tooltip", "bbox"),
@@ -119,32 +103,24 @@ app.clientside_callback(
     """
     function(hoverData) {
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
-        var raw = hoverData.points[0].bbox;
+        var raw  = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
         var outer = document.querySelector('.dashboard-outer');
-        var z    = parseFloat(outer?.style?.zoom) || 1.0;
-        var rect = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
-        var c    = window.TOOLTIP_CONFIG.ts;
-        
-        window.__tooltipDebug = {
-            raw: raw,
-            outerRect: {
-                top:    rect.top,
-                left:   rect.left,
-                width:  rect.width,
-                height: rect.height,
-            },
-            z:      z,
-            out:    out,
-            mouse:  { x: window.__lastMouseX, y: window.__lastMouseY },
-        };
-        
-        return {
+        var z     = parseFloat(outer?.style?.zoom) || 1.0;
+        var rect  = outer ? outer.getBoundingClientRect() : {left: 0, top: 0};
+        var c     = window.TOOLTIP_CONFIG.ts;
+        var out   = {
             x0: (raw.x0 - rect.left - c.x) / z,
             x1: (raw.x1 - rect.left - c.x) / z,
             y0: (raw.y0 - rect.top  - c.y) / z,
             y1: (raw.y1 - rect.top  - c.y) / z,
         };
+        window.__tooltipDebug = {
+            chart: 'ts', raw: raw, z: z,
+            outerRect: {top: rect.top, left: rect.left},
+            out: out, mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
+        };
+        return out;
     }
     """,
     Output("timeseries-tooltip", "bbox"),

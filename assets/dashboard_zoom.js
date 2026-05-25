@@ -78,4 +78,6 @@
         if (applyChartCounterZoom()) clearInterval(_chartInit);
     }, 200);
 
+    document.addEventListener('mousemove', function(e) { window.__lastMouseX = e.clientX; window.__lastMouseY = e.clientY; });
+
 })();
