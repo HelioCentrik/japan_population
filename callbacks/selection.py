@@ -11,6 +11,17 @@ from app.aesthetics.config import (
 
 
 app.clientside_callback(
+    """
+    function(n) {
+        return window.__dashZoom || 1.0;
+    }
+    """,
+    Output("dashboard-zoom", "data"),
+    Input("zoom-init", "n_intervals"),
+)
+
+
+app.clientside_callback(
     f"""
     function(n) {{
         const panel = document.querySelector('.map-panel');
