@@ -76,11 +76,11 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer      = document.querySelector('.dashboard-outer');
-        var chartsArea = document.querySelector('.charts-area');
-        var chartEl    = document.querySelector('#pyramid-chart');
-        var z          = parseFloat(getComputedStyle(outer).zoom) || 1.0;
-        var rect       = chartsArea.getBoundingClientRect();
+        var outer   = document.querySelector('.dashboard-outer');
+        var panelEl = document.querySelector('.pyramid-panel');
+        var chartEl = document.querySelector('#pyramid-chart');
+        var z       = parseFloat(getComputedStyle(outer).zoom) || 1.0;
+        var rect    = panelEl.getBoundingClientRect();
         var chartRect  = chartEl.getBoundingClientRect();
         var c          = window.TOOLTIP_CONFIG.pyramid;
         var xOff       = (hoverData.points[0].x || 0) < 0 ? -c.x : c.x;
@@ -105,11 +105,11 @@ app.clientside_callback(
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
-        var outer      = document.querySelector('.dashboard-outer');
-        var chartsArea = document.querySelector('.charts-area');
-        var chartEl    = document.querySelector('#timeseries-chart');
-        var z          = parseFloat(getComputedStyle(outer).zoom) || 1.0;
-        var rect       = chartsArea.getBoundingClientRect();
+        var outer   = document.querySelector('.dashboard-outer');
+        var panelEl = document.querySelector('.timeseries-panel');
+        var chartEl = document.querySelector('#timeseries-chart');
+        var z       = parseFloat(getComputedStyle(outer).zoom) || 1.0;
+        var rect    = panelEl.getBoundingClientRect();
         var chartRect  = chartEl.getBoundingClientRect();
         var c          = window.TOOLTIP_CONFIG.ts;
         var out = {
