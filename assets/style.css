@@ -425,7 +425,7 @@ body.slider-thinner
 .dashboard-outer {
     width            : var(--dashboard-w);
     height           : var(--dashboard-h);
-    overflow         : hidden;
+    overflow         : visible;
     flex             : none;
     display          : flex;
     flex-direction   : column;

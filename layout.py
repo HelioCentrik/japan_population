@@ -64,7 +64,6 @@ def serve_layout():
                     "display": "flex",
                     "justifyContent": "center",
                     "alignItems": "center",
-                    "overflow": "hidden",
                 },
                 children=[
                     html.Div(
