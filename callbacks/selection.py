@@ -61,23 +61,6 @@ app.clientside_callback(
             y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
             y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = {
-            chart: 'map',
-            raw: raw,
-            z: z,
-            rect: rect,
-            chartRect: chartRect,
-            out: out,
-            outerInlineZoom: outer ? outer.style.zoom || null : null,
-            outerComputedZoom: outer ? getComputedStyle(outer).zoom : null,
-            chartInlineZoom: chartEl ? chartEl.style.zoom || null : null,
-            chartComputedZoom: chartEl ? getComputedStyle(chartEl).zoom : null,
-            dashboardZoomDebug: window.__dashboardZoomDebug || null,
-            devicePixelRatio: window.devicePixelRatio,
-            locationHref: window.location.href,
-            userAgent: navigator.userAgent,
-            mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
-        };
         return out;
     }
     """,
@@ -105,23 +88,6 @@ app.clientside_callback(
             y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
             y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = {
-            chart: 'pyramid',
-            raw: raw,
-            z: z,
-            rect: rect,
-            chartRect: chartRect,
-            out: out,
-            outerInlineZoom: outer ? outer.style.zoom || null : null,
-            outerComputedZoom: outer ? getComputedStyle(outer).zoom : null,
-            chartInlineZoom: chartEl ? chartEl.style.zoom || null : null,
-            chartComputedZoom: chartEl ? getComputedStyle(chartEl).zoom : null,
-            dashboardZoomDebug: window.__dashboardZoomDebug || null,
-            devicePixelRatio: window.devicePixelRatio,
-            locationHref: window.location.href,
-            userAgent: navigator.userAgent,
-            mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
-        };
         return out;
     }
     """,
@@ -147,23 +113,6 @@ app.clientside_callback(
             x1: (chartRect.left + raw.x1 - rect.left) / z - c.x,
             y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
             y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
-        };
-        window.__tooltipDebug = {
-            chart: 'ts',
-            raw: raw,
-            z: z,
-            rect: rect,
-            chartRect: chartRect,
-            out: out,
-            outerInlineZoom: outer ? outer.style.zoom || null : null,
-            outerComputedZoom: outer ? getComputedStyle(outer).zoom : null,
-            chartInlineZoom: chartEl ? chartEl.style.zoom || null : null,
-            chartComputedZoom: chartEl ? getComputedStyle(chartEl).zoom : null,
-            dashboardZoomDebug: window.__dashboardZoomDebug || null,
-            devicePixelRatio: window.devicePixelRatio,
-            locationHref: window.location.href,
-            userAgent: navigator.userAgent,
-            mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
         };
         return out;
     }
