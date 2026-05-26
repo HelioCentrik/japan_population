@@ -134,13 +134,7 @@ def show_map_tooltip(hover_data, metric):
 
     return True, children
 
-@app.callback(
-    Output("pyramid-tooltip", "show"),
-    Output("pyramid-tooltip", "children"),
-    Output("pyramid-tooltip", "direction"),
-    Input("pyramid-chart", "hoverData"),
-    prevent_initial_call=True,
-)
+
 @app.callback(
     Output("pyramid-tooltip", "show"),
     Output("pyramid-tooltip", "children"),
