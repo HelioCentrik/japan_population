@@ -10,12 +10,35 @@
 
     let _lastZ = null;
 
+    window.__dashboardZoomDebug = window.__dashboardZoomDebug || {};
+
     const CHART_SELECTORS = ['#map-graph', '#pyramid-chart', '#timeseries-chart'];
+
+    function snapshotChartZooms() {
+        return Object.fromEntries(
+            CHART_SELECTORS.map(function (sel) {
+                const el = document.querySelector(sel);
+                return [sel, el ? {
+                    inlineZoom: el.style.zoom || null,
+                    computedZoom: getComputedStyle(el).zoom,
+                    rect: el.getBoundingClientRect().toJSON
+                        ? el.getBoundingClientRect().toJSON()
+                        : {
+                            left: el.getBoundingClientRect().left,
+                            top: el.getBoundingClientRect().top,
+                            width: el.getBoundingClientRect().width,
+                            height: el.getBoundingClientRect().height,
+                        }
+                } : null];
+            })
+        );
+    }
 
     function applyChartCounterZoom() {
         if (_lastZ === null) return false;
         const cz = String(1 / _lastZ);
         let allFound = true;
+
         CHART_SELECTORS.forEach(function (sel) {
             const el = document.querySelector(sel);
             if (el) {
@@ -24,6 +47,20 @@
                 allFound = false;
             }
         });
+
+        const outer = document.querySelector('.dashboard-outer');
+
+        window.__dashboardZoomDebug = {
+            source: 'applyChartCounterZoom',
+            lastZ: _lastZ,
+            counterZoom: cz,
+            outerInlineZoom: outer ? outer.style.zoom || null : null,
+            outerComputedZoom: outer ? getComputedStyle(outer).zoom : null,
+            chartZooms: snapshotChartZooms(),
+            allFound: allFound,
+            ts: performance.now(),
+        };
+
         return allFound;
     }
 
@@ -45,6 +82,18 @@
 
         _lastZ           = Z;
         outer.style.zoom = Z;
+
+        window.__dashboardZoomDebug = {
+            source: 'applyZoom-before-counter',
+            lastZ: _lastZ,
+            outerInlineZoom: outer.style.zoom || null,
+            outerComputedZoom: getComputedStyle(outer).zoom,
+            available: available,
+            zoomW: zoomW,
+            zoomH: zoomH,
+            chartZooms: snapshotChartZooms(),
+            ts: performance.now(),
+        };
 
         applyChartCounterZoom();
     }

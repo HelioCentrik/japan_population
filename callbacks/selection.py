@@ -49,10 +49,10 @@ app.clientside_callback(
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
         var outer      = document.querySelector('.dashboard-outer');
-        var chartsArea = document.querySelector('.charts-area');
+        var panelEl    = document.querySelector('.map-panel');
         var chartEl    = document.querySelector('#map-graph');
         var z          = parseFloat(getComputedStyle(outer).zoom) || 1.0;
-        var rect       = chartsArea.getBoundingClientRect();
+        var rect       = panelEl.getBoundingClientRect();
         var chartRect  = chartEl.getBoundingClientRect();
         var c          = window.TOOLTIP_CONFIG.map;
         var out = {
@@ -61,8 +61,23 @@ app.clientside_callback(
             y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
             y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = { chart: 'map', raw, z, rect, chartRect, out,
-            mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
+        window.__tooltipDebug = {
+            chart: 'map',
+            raw: raw,
+            z: z,
+            rect: rect,
+            chartRect: chartRect,
+            out: out,
+            outerInlineZoom: outer ? outer.style.zoom || null : null,
+            outerComputedZoom: outer ? getComputedStyle(outer).zoom : null,
+            chartInlineZoom: chartEl ? chartEl.style.zoom || null : null,
+            chartComputedZoom: chartEl ? getComputedStyle(chartEl).zoom : null,
+            dashboardZoomDebug: window.__dashboardZoomDebug || null,
+            devicePixelRatio: window.devicePixelRatio,
+            locationHref: window.location.href,
+            userAgent: navigator.userAgent,
+            mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
+        };
         return out;
     }
     """,
@@ -90,8 +105,23 @@ app.clientside_callback(
             y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
             y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = { chart: 'pyramid', raw, z, rect, chartRect, out,
-            mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
+        window.__tooltipDebug = {
+            chart: 'pyramid',
+            raw: raw,
+            z: z,
+            rect: rect,
+            chartRect: chartRect,
+            out: out,
+            outerInlineZoom: outer ? outer.style.zoom || null : null,
+            outerComputedZoom: outer ? getComputedStyle(outer).zoom : null,
+            chartInlineZoom: chartEl ? chartEl.style.zoom || null : null,
+            chartComputedZoom: chartEl ? getComputedStyle(chartEl).zoom : null,
+            dashboardZoomDebug: window.__dashboardZoomDebug || null,
+            devicePixelRatio: window.devicePixelRatio,
+            locationHref: window.location.href,
+            userAgent: navigator.userAgent,
+            mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
+        };
         return out;
     }
     """,
@@ -118,8 +148,23 @@ app.clientside_callback(
             y0: (chartRect.top  + raw.y0 - rect.top)  / z - c.y,
             y1: (chartRect.top  + raw.y1 - rect.top)  / z - c.y,
         };
-        window.__tooltipDebug = { chart: 'ts', raw, z, rect, chartRect, out,
-            mouse: {x: window.__lastMouseX, y: window.__lastMouseY} };
+        window.__tooltipDebug = {
+            chart: 'ts',
+            raw: raw,
+            z: z,
+            rect: rect,
+            chartRect: chartRect,
+            out: out,
+            outerInlineZoom: outer ? outer.style.zoom || null : null,
+            outerComputedZoom: outer ? getComputedStyle(outer).zoom : null,
+            chartInlineZoom: chartEl ? chartEl.style.zoom || null : null,
+            chartComputedZoom: chartEl ? getComputedStyle(chartEl).zoom : null,
+            dashboardZoomDebug: window.__dashboardZoomDebug || null,
+            devicePixelRatio: window.devicePixelRatio,
+            locationHref: window.location.href,
+            userAgent: navigator.userAgent,
+            mouse: {x: window.__lastMouseX, y: window.__lastMouseY}
+        };
         return out;
     }
     """,
