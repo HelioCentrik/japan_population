@@ -278,8 +278,8 @@ MAP_REF_HEIGHT           = 582    # panel height (px) at which MAP_REF_ZOOM was 
 MAP_REF_ZOOM             = 3.75   # zoom that fits Japan at MAP_REF_HEIGHT
 
 MAP_HIGHLIGHT_LINE_WIDTH = 2.5
-MAP_TOOLTIP_OFFSET_X     = 0   # px rightward from hovered point
-MAP_TOOLTIP_OFFSET_Y     = 0   # px upward from hovered point
+MAP_TOOLTIP_OFFSET_X     = 24   # px rightward from hovered point
+MAP_TOOLTIP_OFFSET_Y     = 32   # px upward from hovered point
 
 MAP_NO_DATA_COLOR   = "rgba(100, 100, 100, 0.45)"   # grey fill when metric has no data for year
 
@@ -363,8 +363,8 @@ PYRAMID_MARGIN_R     = 12
 PYRAMID_MARGIN_T     = 6
 PYRAMID_MARGIN_B     = 28
 PYRAMID_GRAPH_TOP_OFFSET    = 0
-PYRAMID_TOOLTIP_OFFSET_X    = 0
-PYRAMID_TOOLTIP_OFFSET_Y    = 0
+PYRAMID_TOOLTIP_OFFSET_X    = 12
+PYRAMID_TOOLTIP_OFFSET_Y    = 20
 
 
 # ── Timeseries configuration ──────────────────────────────────────────────
@@ -374,8 +374,8 @@ TIMESERIES_MARGIN_T  = 12
 TIMESERIES_MARGIN_B  = 28
 
 TS_SELECTOR_OFFSET_L = TIMESERIES_MARGIN_L + 8
-TS_TOOLTIP_OFFSET_X  = 0
-TS_TOOLTIP_OFFSET_Y  = 0
+TS_TOOLTIP_OFFSET_X  = 32
+TS_TOOLTIP_OFFSET_Y  = 24
 
 TS_VIEWS = {
     "pop_share":  "人口割合 Population Share",
