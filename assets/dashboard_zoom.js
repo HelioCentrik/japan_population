@@ -9,8 +9,11 @@
     const DESIGN_H = window.DASHBOARD_CONFIG.h;
 
     let _lastZ = null;
+    let _settleRaf = null;
 
     window.__dashboardZoomDebug = window.__dashboardZoomDebug || {};
+    window.__dashboardZoomSettled = false;
+    window.__dashboardZoomValue = null;
 
     const CHART_SELECTORS = ['#map-graph', '#pyramid-chart', '#timeseries-chart'];
 
@@ -34,8 +37,36 @@
         );
     }
 
+    function emitZoomSettled() {
+        if (_lastZ === null) return;
+
+        window.__dashboardZoomSettled = true;
+        window.__dashboardZoomValue = _lastZ;
+
+        window.dispatchEvent(new CustomEvent('dashboard:zoom-settled', {
+            detail: {
+                zoom: _lastZ,
+                counterZoom: 1 / _lastZ,
+            },
+        }));
+    }
+
+    function scheduleZoomSettled() {
+        if (_settleRaf) cancelAnimationFrame(_settleRaf);
+
+        // Two RAFs lets the browser apply outer zoom + chart counter-zoom
+        // before downstream code measures Plotly/chart rects.
+        _settleRaf = requestAnimationFrame(function () {
+            _settleRaf = requestAnimationFrame(function () {
+                _settleRaf = null;
+                emitZoomSettled();
+            });
+        });
+    }
+
     function applyChartCounterZoom() {
         if (_lastZ === null) return false;
+
         const cz = String(1 / _lastZ);
         let allFound = true;
 
@@ -61,6 +92,10 @@
             ts: performance.now(),
         };
 
+        if (allFound) {
+            scheduleZoomSettled();
+        }
+
         return allFound;
     }
 
@@ -80,7 +115,10 @@
         const zoomH = window.innerHeight / DESIGN_H;
         const Z     = Math.min(zoomW, zoomH);
 
-        _lastZ           = Z;
+        _lastZ = Z;
+        window.__dashboardZoomSettled = false;
+        window.__dashboardZoomValue = null;
+
         outer.style.zoom = Z;
 
         window.__dashboardZoomDebug = {
@@ -106,7 +144,7 @@
     });
 
     // Side panel open/close fires as the CSS transition runs — ResizeObserver
-    // catches the width change mid-transition and keeps zoom live during the slide
+    // catches the width change mid-transition and keeps zoom live during the slide.
     function attachObserver() {
         const panel = document.querySelector('.side-panel');
         if (!panel) return false;
@@ -114,7 +152,7 @@
         return true;
     }
 
-    // Poll until outer DOM ready, then wire up
+    // Poll until outer DOM ready, then wire up.
     const _init = setInterval(function () {
         if (!document.querySelector('.dashboard-outer')) return;
         clearInterval(_init);
@@ -122,11 +160,14 @@
         applyZoom();
     }, 100);
 
-    // Separate poll for chart counter-zoom — charts render after outer DOM via React
+    // Separate poll for chart counter-zoom — charts render after outer DOM via React.
     const _chartInit = setInterval(function () {
         if (applyChartCounterZoom()) clearInterval(_chartInit);
     }, 200);
 
-    document.addEventListener('mousemove', function(e) { window.__lastMouseX = e.clientX; window.__lastMouseY = e.clientY; });
+    document.addEventListener('mousemove', function(e) {
+        window.__lastMouseX = e.clientX;
+        window.__lastMouseY = e.clientY;
+    });
 
 })();

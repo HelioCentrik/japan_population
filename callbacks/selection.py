@@ -15,8 +15,13 @@ app.clientside_callback(
     function(n) {{
         const panel = document.querySelector('.map-panel');
         if (!panel) return window.dash_clientside.no_update;
-        const h = panel.getBoundingClientRect().height;
+
+        const outer = document.querySelector('.dashboard-outer');
+        const z = parseFloat(outer && getComputedStyle(outer).zoom) || 1.0;
+
+        const h = panel.getBoundingClientRect().height / z;
         if (h < 10) return window.dash_clientside.no_update;
+
         const zoom = Math.min({MAP_ZOOM_MAX}, Math.max({MAP_ZOOM_MIN},
             {MAP_REF_ZOOM} + Math.log2(h / {MAP_REF_HEIGHT})));
         return zoom;
@@ -45,6 +50,7 @@ app.clientside_callback(
 app.clientside_callback(
     """
     function(hoverData) {
+        if (window.__dashboardZoomSettled !== true) return window.dash_clientside.no_update;
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
@@ -71,6 +77,7 @@ app.clientside_callback(
 app.clientside_callback(
     """
     function(hoverData) {
+        if (window.__dashboardZoomSettled !== true) return window.dash_clientside.no_update;
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
@@ -98,6 +105,7 @@ app.clientside_callback(
 app.clientside_callback(
     """
     function(hoverData) {
+        if (window.__dashboardZoomSettled !== true) return window.dash_clientside.no_update;
         if (!hoverData?.points?.length) return window.dash_clientside.no_update;
         var raw = hoverData.points[0].bbox;
         if (!raw) return window.dash_clientside.no_update;
