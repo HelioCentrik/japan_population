@@ -141,6 +141,13 @@ def show_map_tooltip(hover_data, metric):
     Input("pyramid-chart", "hoverData"),
     prevent_initial_call=True,
 )
+@app.callback(
+    Output("pyramid-tooltip", "show"),
+    Output("pyramid-tooltip", "children"),
+    Output("pyramid-tooltip", "direction"),
+    Input("pyramid-chart", "hoverData"),
+    prevent_initial_call=True,
+)
 def show_pyramid_tooltip(hover_data):
     print(f"[pyramid tooltip] fired — hover_data: {hover_data}", flush=True)
     if hover_data is None or not hover_data.get("points"):
@@ -155,87 +162,91 @@ def show_pyramid_tooltip(hover_data):
         print("[pyramid tooltip] early exit — cd is None", flush=True)
         return False, no_update, no_update
 
-    # Direction logic is the same for all trace types:
-    # negative x (male side) → tooltip left, arrow points right
-    # zero or positive x     → tooltip right, arrow points left
-    x_val     = pt.get("x", 0)
-    direction = "left" if x_val < 0 else "right"
-    arrow_cls = "tt-card arrow-right" if direction == "left" else "tt-card"
-    x_offset  = PYRAMID_TOOLTIP_OFFSET_X if direction == "right" else -PYRAMID_TOOLTIP_OFFSET_X
+    try:
+        x_val     = pt.get("x", 0)
+        direction = "left" if x_val < 0 else "right"
+        arrow_cls = "tt-card arrow-right" if direction == "left" else "tt-card"
+        x_offset  = PYRAMID_TOOLTIP_OFFSET_X if direction == "right" else -PYRAMID_TOOLTIP_OFFSET_X
 
-    # ── Bar tooltip — curveNumber 0 (male) or 1 (female) ─────────────────────
-    if curve_number in (0, 1):
-        age_label  = cd[0]
-        male_pop   = cd[1]
-        female_pop = cd[2]
-        cohort_key = cd[3] if len(cd) > 3 else ""
+        # ── Bar tooltip — curveNumber 0 (male) or 1 (female) ─────────────────
+        if curve_number in (0, 1):
+            age_label  = cd[0]
+            male_pop   = cd[1]
+            female_pop = cd[2]
+            cohort_key = cd[3] if len(cd) > 3 else ""
 
-        cohort_strip = None
-        if cohort_key:
-            _COHORT_META = {
-                "dankai":    ("団塊の世代", "1947–1949年生まれ", ACCENT_DANKAI),
-                "dankai_jr": ("団塊ジュニア", "1971–1974年生まれ", ACCENT_DANKAI_JR),
-            }
-            cohort_name, birth_range, cohort_color = _COHORT_META[cohort_key]
-            cohort_strip = html.Div([
-                html.Hr(className="tt-divider"),
+            cohort_strip = None
+            if cohort_key:
+                _COHORT_META = {
+                    "dankai":    ("団塊の世代", "1947–1949年生まれ", ACCENT_DANKAI),
+                    "dankai_jr": ("団塊ジュニア", "1971–1974年生まれ", ACCENT_DANKAI_JR),
+                }
+                cohort_name, birth_range, cohort_color = _COHORT_META[cohort_key]
+                cohort_strip = html.Div([
+                    html.Hr(className="tt-divider"),
+                    html.Div([
+                        html.Div(className="pyramid-tt-cohort-strip",
+                                 style={"--cohort-color": cohort_color}),
+                        html.Div([
+                            html.Span(cohort_name, className="tt-label",
+                                      style={"color": cohort_color}),
+                            html.Span(f"  {birth_range}", className="tt-hint"),
+                        ]),
+                    ], className="pyramid-tt-cohort-row"),
+                ])
+
+            children = html.Div([
+                html.Div(f"年齢: {age_label}", className="tt-title"),
                 html.Div([
                     html.Div(className="pyramid-tt-cohort-strip",
-                             style={"--cohort-color": cohort_color}),
+                             style={"--cohort-color": PYRAMID_MALE_COLOR}),
                     html.Div([
-                        html.Span(cohort_name, className="tt-label",
-                                  style={"color": cohort_color}),
-                        html.Span(f"  {birth_range}", className="tt-hint"),
+                        html.Span("男 Male  ", className="tt-label"),
+                        html.Span(f"{int(male_pop):,}", className="tt-value"),
                     ]),
                 ], className="pyramid-tt-cohort-row"),
-            ])
+                html.Div([
+                    html.Div(className="pyramid-tt-cohort-strip",
+                             style={"--cohort-color": PYRAMID_FEMALE_COLOR}),
+                    html.Div([
+                        html.Span("女 Female  ", className="tt-label"),
+                        html.Span(f"{int(female_pop):,}", className="tt-value"),
+                    ]),
+                ], className="pyramid-tt-cohort-row"),
+                cohort_strip,
+            ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
+
+            return True, children, direction
+
+        # ── Scatter cohort marker tooltips — curveNumber 2+ ──────────────────
+        # customdata shape: [name_ja, birth_range, accent_hex, age_label]
+        cohort_name  = cd[0]
+        birth_range  = cd[1]
+        cohort_color = cd[2]
+        age_label    = cd[3]
 
         children = html.Div([
-            html.Div(f"年齢: {age_label}", className="tt-title"),
             html.Div([
                 html.Div(className="pyramid-tt-cohort-strip",
-                         style={"--cohort-color": PYRAMID_MALE_COLOR}),
-                html.Div([
-                    html.Span("男 Male  ", className="tt-label"),
-                    html.Span(f"{int(male_pop):,}", className="tt-value"),
-                ]),
+                         style={"--cohort-color": cohort_color}),
+                html.Div(cohort_name, className="tt-title",
+                         style={"color": cohort_color}),
             ], className="pyramid-tt-cohort-row"),
+            html.Div(birth_range, className="tt-hint"),
+            html.Hr(className="tt-divider"),
             html.Div([
-                html.Div(className="pyramid-tt-cohort-strip",
-                         style={"--cohort-color": PYRAMID_FEMALE_COLOR}),
-                html.Div([
-                    html.Span("女 Female  ", className="tt-label"),
-                    html.Span(f"{int(female_pop):,}", className="tt-value"),
-                ]),
-            ], className="pyramid-tt-cohort-row"),
-            cohort_strip,
+                html.Span("年齢  ", className="tt-label"),
+                html.Span(age_label, className="tt-value"),
+            ]),
         ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
 
         return True, children, direction
 
-    # ── Scatter cohort marker tooltips — curveNumber 2 (war_gen) or 3 (shoushika) ──
-    # customdata shape (set in pyramid.py Step 1): [name_ja, birth_range, accent_hex, age_label]
-    cohort_name  = cd[0]
-    birth_range  = cd[1]
-    cohort_color = cd[2]
-    age_label    = cd[3]
-
-    children = html.Div([
-        html.Div([
-            html.Div(className="pyramid-tt-cohort-strip",
-                     style={"--cohort-color": cohort_color}),
-            html.Div(cohort_name, className="tt-title",
-                     style={"color": cohort_color}),
-        ], className="pyramid-tt-cohort-row"),
-        html.Div(birth_range, className="tt-hint"),
-        html.Hr(className="tt-divider"),
-        html.Div([
-            html.Span("年齢  ", className="tt-label"),
-            html.Span(age_label, className="tt-value"),
-        ]),
-    ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
-
-    return True, children, direction
+    except Exception as e:
+        import traceback
+        print(f"[pyramid tooltip] EXCEPTION: {e}", flush=True)
+        traceback.print_exc()
+        return False, no_update, no_update
 
 @app.callback(
     Output("timeseries-tooltip", "show"),
