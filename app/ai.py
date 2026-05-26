@@ -27,8 +27,12 @@ from app.aesthetics.config import AI_MODEL_NAME, AI_MAX_TOKENS, AI_HISTORY_LIMIT
 # definitions. knowledge/*.md files are additive context: narrative, historical
 # background, and source detail. All files concatenated in alphabetical order.
 
-AGENT_MD = Path("AGENT.md").read_text(encoding="utf-8")
-_knowledge = sorted(Path("knowledge").glob("*.md"))
+KNOWLEDGE_DIR = Path("knowledge")
+AGENT_MD = (KNOWLEDGE_DIR / "AGENT.md").read_text(encoding="utf-8")
+_knowledge = sorted(
+    p for p in KNOWLEDGE_DIR.glob("*.md")
+    if p.name != "AGENT.md"
+)
 _knowledge_text = "\n\n---\n\n".join(p.read_text(encoding="utf-8") for p in _knowledge)
 SYSTEM_PROMPT = f"{AGENT_MD}\n\n---\n\n{_knowledge_text}" if _knowledge_text else AGENT_MD
 
