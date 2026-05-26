@@ -142,13 +142,17 @@ def show_map_tooltip(hover_data, metric):
     prevent_initial_call=True,
 )
 def show_pyramid_tooltip(hover_data):
+    print(f"[pyramid tooltip] fired — hover_data: {hover_data}", flush=True)
     if hover_data is None or not hover_data.get("points"):
+        print("[pyramid tooltip] early exit — no points", flush=True)
         return False, no_update, no_update
 
     pt           = hover_data["points"][0]
     cd           = pt.get("customdata")
     curve_number = pt.get("curveNumber", 0)
+    print(f"[pyramid tooltip] curveNumber: {curve_number}, customdata: {cd}", flush=True)
     if cd is None:
+        print("[pyramid tooltip] early exit — cd is None", flush=True)
         return False, no_update, no_update
 
     # Direction logic is the same for all trace types:
