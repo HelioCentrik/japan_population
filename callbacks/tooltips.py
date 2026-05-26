@@ -234,6 +234,7 @@ def show_pyramid_tooltip(hover_data):
             ]),
         ], className=arrow_cls, style={"--arrow-y-offset": f"{PYRAMID_TOOLTIP_OFFSET_Y}px"})
 
+        print("[pyramid tooltip] about to return True", flush=True)
         return True, children, direction
 
     except Exception as e:
